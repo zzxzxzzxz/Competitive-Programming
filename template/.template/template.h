@@ -8,10 +8,10 @@ using namespace std;
 #define REP(...) GET_MACRO(__VA_ARGS__, REP4, REP3, REP2)(__VA_ARGS__)
 #define REPIT(i,c) for(__typeof((c).begin()) i=(c).begin();i!=(c).end();i++)
 #define PIS(x) printf("%d ",x)
-#define PRINTIA(a,n) REP(i,n){printf("%d ", *((a)+i));}putchar('\n');
 #define PN() putchar('\n')
 #define MP make_pair
 #define PB push_back
+#define EB emplace_back
 
 typedef pair<int,int> PII;
 typedef long long LL;
@@ -30,9 +30,7 @@ void PI(const int head, T... tail ) {
     PI(tail...);
 }
 
+const int MOD = 1000000007
+#define MAX_N 100005
 
-int main() {
-    Solution *sol = new Solution();
 
-    auto ans = sol->;
-}

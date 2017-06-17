@@ -9,10 +9,10 @@ using namespace std;
 #define REP(...) GET_MACRO(__VA_ARGS__, REP4, REP3, REP2)(__VA_ARGS__)
 #define REPIT(i,c) for(__typeof((c).begin()) i=(c).begin();i!=(c).end();i++)
 #define PIS(x) printf("%d ",x)
-#define PRINTIA(a,n) REP(i,n){printf("%d ", *((a)+i));}putchar('\n');
 #define PN() putchar('\n')
 #define MP make_pair
 #define PB push_back
+#define EB emplace_back
 
 typedef pair<int,int> PII;
 typedef long long LL;
@@ -38,88 +38,44 @@ void mget( int src, T &head, U&... tail ) {
     mget(src,tail...);
 }
 
-LL get_worst_l(LL l, LL r) {
-    LL worst = 0, cur = 0;
-    REP(i, l, r) {
-        cur += GetTaste(i);
-        worst = min(worst, cur);
-    }
-    return worst;
-}
-
-LL get_worst_r(LL l, LL r) {
-    LL worst = 0, cur = 0;
-    REP(i, r-1, l-1, -1) {
-        cur += GetTaste(i);
-        worst = min(worst, cur);
-    }
-    return worst;
-}
-
-LL get_worst(LL l, LL r) {
-    LL worst = 0, cur = 0;
-    REP(i, l, r) {
-        cur += GetTaste(i);
-        if(cur > 0) {
-            cur = 0;
-        }
-        worst = min(worst, cur);
-    }
-    return worst;
-}
-
-LL get_sum(LL l, LL r) {
-    LL cur = 0;
-    REP(i, l, r) {
-        cur += GetTaste(i);
-    }
-    return cur;
-}
-
 int main()
 {
     int id = MyNodeId();
     int nnodes = NumberOfNodes();
     LL n = GetN();
 
-    LL cur = 0, cur0 = 0, cur1;
+    if(n < nnodes) {
+        nnodes = n;
+    }
+
     LL l = n * id / nnodes;
     LL r = n * (id+1) / nnodes;
 
-    LL worst = get_worst(l, r);
-    LL worstl = get_worst_l(l, r);
-    LL worstr = get_worst_r(l, r);
-    LL sum = get_sum(l, r);
+    LL Mnode = 0, cur = 0;
+    REP(i, l, r) {
+        cur += GetValue(i);
+        if(cur < 0) {
+            cur = 0;
+        }
+        Mnode = max(Mnode, cur);
+    }
 
-    mput(0, worst, worstl, worstr, sum);
+    mput(0, Mnode);
     Send(0);
 
     if(id != 0)
         return 0;
 
-    LL nodew[nnodes], nodewl[nnodes], nodewr[nnodes], nodesum[nnodes];
+    LL M[nnodes], Mall = 0;
     REP(i, nnodes) {
         int src = Receive(-1);
-        mget(src, nodew[src], nodewl[src], nodewr[src], nodesum[src]);
+        mget(src, M[src]);
+    }
+    REP(i, nnodes) {
+        Mall = max(Mall, M[src]);
     }
 
-    LL m = 0;
+    printf("%lld\n", Mall);
 
-    REP(i, nnodes) {
-        m = min(m, nodew[i]);
-    }
-    REP(i, nnodes) {
-        LL s = 0;
-        REP(j, i+1, nnodes) {
-            LL cur = nodewr[i] + s + nodewl[j];
-            m = min(m, cur);
-            s += nodesum[j];
-        }
-    }
-    LL sum_all = 0;
-    REP(i, nnodes) {
-        sum_all += nodesum[i];
-    }
-    printf("%lld\n", sum_all - m);
     return 0;
 }
