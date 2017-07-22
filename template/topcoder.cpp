@@ -23,14 +23,14 @@ void RI( int& head, T&... tail ) {
     scanf("%d",&head);
     RI(tail...);
 }
-void PI() {putchar('\n');}
-template<typename... T>
-void PI(const int head, T... tail ) {
-    printf("%d ", head);
-    PI(tail...);
+void print() {putchar('\n');}
+template<typename T, typename... U>
+void print(T head, U... tail) {
+    cout << head << " ";
+    print(tail...);
 }
 
-const int MOD = 1000000007
+const int MOD = 1000000007;
 #define MAX_N 100005
 
 

@@ -32,24 +32,24 @@ void PI(const int head, T... tail ) {
 
 #define MAX_N 50000
 
-void split(const string& s, const char* delim, vector<string>& tokens) {
+vector<string> split(const string& s, const string& delim) {
+    vector<string> tokens;
     size_t start = 0;
     size_t end = s.find(delim, start);
     while(end != string::npos) {
         tokens.push_back(s.substr(start, end-start));
-        start = end + strlen(delim);
+        start = end + delim.size();
         end = s.find(delim, start);
     }
     tokens.push_back(s.substr(start, s.size()-start));
+    return move(tokens);
 }
 
+#include<omp.h>
 int main()
 {
-    //string s(",");
-    //string s("");
-    string s("asdq,,dsgre,,tjjjj");
-    vector<string> tokens;
-    split(s, ",,", tokens);
+    char s[100] = ",asdq,,dsgre,tjjjj,";
+    vector<string> tokens = split(s, ",");
     REPIT(ii, tokens) {
         printf("\"%s\"\n", ii->c_str());
     }

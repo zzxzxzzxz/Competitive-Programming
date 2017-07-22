@@ -33,19 +33,36 @@ void print(T head, U... tail) {
 const int MOD = 1000000007;
 #define MAX_N 100005
 
-
-void solve() {
-
+double EPS = 1e-10;
+double dbl_add(double a, double b) {
+    if(fabs(a + b) < EPS * (fabs(a) + fabs(b)))
+        return 0;
+    return a + b;
 }
+
+struct P {
+    double x, y;
+    P() {}
+    P(double x, double y) : x(x), y(y) {}
+    P operator + (P p) {
+        return P(dbl_add(x, p.x), dbl_add(y, p.y));
+    }
+    P operator - (P p) {
+        return P(dbl_add(x, -p.x), dbl_add(y, -p.y));
+    }
+    P operator * (double d) {
+        return P(x * d, y * d);
+    }
+    double dot(P p) {
+        return dbl_add(x * p.x, y * p.y);
+    }
+    double det(P p) {
+        return dbl_add(x * p.y, -y * p.x);
+    }
+};
 
 int main()
 {
-    int T;
-    RI(T);
-    REP(i, T) {
-        printf("Case #%d: ", i+1);
-        solve();
-    }
 
     return 0;
 }
