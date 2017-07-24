@@ -88,7 +88,7 @@ int main()
         G[a].PB(b);
         G[b].PB(a);
     }
-    init(N);
+    init(N+1);
     PI(lca(6, 5));
     PI(lca(2, 5));
     PI(lca(5, 3));
