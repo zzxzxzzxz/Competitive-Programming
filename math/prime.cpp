@@ -30,9 +30,10 @@ void PI(const int head, T... tail ) {
     PI(tail...);
 }
 
-#define MAX_N 10000005
+#define MAX_N 1000000005
+#define MAX_SQRT_N 31624
 
-bool notp[MAX_N];
+bool notp[MAX_SQRT_N];
 vector<int> prime;
 
 void genprime() {
@@ -40,13 +41,16 @@ void genprime() {
     prime.PB(2);
     notp[0] = true;
     notp[1] = true;
-    while(cur <= ceil(sqrt(MAX_N))) {
-        REP(i, cur+cur, MAX_N, cur) {
+    while(cur < MAX_SQRT_N) {
+        REP(i, cur+cur, MAX_SQRT_N, cur) {
             notp[i] = true;
         }
         cur++;
-        while(notp[cur] and cur <= ceil(sqrt(MAX_N))) {
+        while(notp[cur] and cur < MAX_SQRT_N) {
             cur++;
+        }
+        if(cur == MAX_SQRT_N) {
+            break;
         }
         prime.PB(cur);
     }
@@ -56,7 +60,7 @@ void genprime() {
 int main()
 {
     genprime();
-    REP(i, 10) {
+    REP(i, prime.size()) {
         PIS(prime[i]);
     }
     PN();

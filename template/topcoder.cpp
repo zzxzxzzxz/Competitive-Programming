@@ -9,6 +9,7 @@ using namespace std;
 #define REPIT(i,c) for(__typeof((c).begin()) i=(c).begin();i!=(c).end();i++)
 #define PIS(x) printf("%d ",x)
 #define PN() putchar('\n')
+#define PRINTARR(a,b) for(int i=0;(a+i)!=(b);i++){cout << *(a+i) << " ";}PN();
 #define MP make_pair
 #define PB push_back
 #define EB emplace_back
@@ -20,8 +21,14 @@ typedef unsigned long long ULL;
 void RI() {}
 template<typename... T>
 void RI( int& head, T&... tail ) {
-    scanf("%d",&head);
+    scanf("%d", &head);
     RI(tail...);
+}
+void RLL() {}
+template<typename... T>
+void RLL( LL& head, T&... tail ) {
+    scanf("%lld", &head);
+    RLL(tail...);
 }
 void print() {putchar('\n');}
 template<typename T, typename... U>
