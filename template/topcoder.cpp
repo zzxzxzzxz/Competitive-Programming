@@ -13,8 +13,10 @@ using namespace std;
 #define MP make_pair
 #define PB push_back
 #define EB emplace_back
+#define MT make_tuple
 
-typedef pair<int,int> PII;
+typedef pair<int, int> PII;
+typedef tuple<int, int, int> T3I;
 typedef long long LL;
 typedef unsigned long long ULL;
 
