@@ -15,10 +15,11 @@ using namespace std;
 #define EB emplace_back
 #define MT make_tuple
 
-typedef pair<int, int> PII;
-typedef tuple<int, int, int> T3I;
-typedef long long LL;
-typedef unsigned long long ULL;
+using PII = pair<int, int>;
+using T3U = tuple<int, int, int>;
+using LL = long long;
+using ULL =  unsigned long long;
+using Mat = array<array<int, 2>, 2>;
 
 void RI() {}
 template<typename... T>

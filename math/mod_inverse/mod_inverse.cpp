@@ -15,11 +15,10 @@ using namespace std;
 #define EB emplace_back
 #define MT make_tuple
 
-using PII = pair<int, int>;
-using T3U = tuple<int, int, int>;
-using LL = long long;
-using ULL =  unsigned long long;
-using Mat = array<array<int, 2>, 2>;
+typedef pair<int, int> PII;
+typedef tuple<int, int, int> T3I;
+typedef long long LL;
+typedef unsigned long long ULL;
 
 void RI() {}
 template<typename... T>
@@ -43,15 +42,27 @@ void print(T head, U... tail) {
 const int MOD = 1000000007;
 #define MAX_N 100005
 
+LL inverse(LL a) {
+    LL inv = 1;
+    int p = MOD - 2;
+    while(p) {
+        if(p & 1) {
+            inv = (inv * a) % MOD;
+        }
+        a = (a * a) % MOD;
+        p >>= 1;
+    }
+    return inv;
 
-#define PROB //XXX
+}
 
-class PROB {
-    public:
-};
-
-int main() {
-    PROB *p = new PROB();
-
-    auto ans = p->;
+int main()
+{
+    int a = 5231423;
+    print(a * inverse(a) % MOD);
+    a = 1;
+    print(a * inverse(a) % MOD);
+    a = 10000009;
+    print(a * inverse(a) % MOD);
+    return 0;
 }

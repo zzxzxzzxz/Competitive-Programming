@@ -19,7 +19,7 @@ using PII = pair<int, int>;
 using T3U = tuple<int, int, int>;
 using LL = long long;
 using ULL =  unsigned long long;
-using Mat = array<array<int, 2>, 2>;
+using Mat = array<array<LL, 2>, 2>;
 
 void RI() {}
 template<typename... T>
@@ -43,15 +43,37 @@ void print(T head, U... tail) {
 const int MOD = 1000000007;
 #define MAX_N 100005
 
+Mat mul(Mat& A, Mat& B) {
+    Mat C;
+    for(int i = 0; i < 2; i++) {
+        for(int j = 0; j < 2; j++) {
+            C[i][j] = 0;
+            for(int k = 0; k < 2; k++) {
+                C[i][j] = (C[i][j] + A[i][k] * B[k][j]) % MOD;
+            }
+        }
+    }
+    return C;
+}
 
-#define PROB //XXX
+long long fibonacci(int a) {
+    Mat T = {1, 0, 1, 0};
+    Mat F = {1, 1, 1, 0};
+    while(a) {
+        if(a & 1) {
+            T = mul(T, F);
+        }
+        F = mul(F, F);
+        a >>= 1;
+    }
+    return T[0][0];
+}
 
-class PROB {
-    public:
-};
-
-int main() {
-    PROB *p = new PROB();
-
-    auto ans = p->;
+int main()
+{
+    REP(i, 10) {
+        print(fibonacci(i));
+    }
+    print(fibonacci(1000000000));
+    return 0;
 }
