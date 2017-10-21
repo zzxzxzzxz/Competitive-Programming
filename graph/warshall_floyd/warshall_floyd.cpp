@@ -43,6 +43,7 @@ const int MOD = 1000000007;
 #define MAX_N 105
 
 int N, P;
+double INF = 1e18;
 double D[MAX_N][MAX_N];
 
 void warshall() {
@@ -55,89 +56,3 @@ void warshall() {
     }
 }
 
-double INF = 1e18;
-
-LL cnt[MAX_N][MAX_N];
-LL powN[50];
-
-void dfs(int v, int depth) {
-    if(depth == P) {
-        return;
-    }
-    REP(i, 1, N+1) {
-        if(i == v) {
-            continue;
-        }
-        cnt[v][i] += powN[P - depth];
-        dfs(i, depth+1);
-    }
-}
-
-void solve() {
-    int M;
-    RI(N, M, P);
-
-    powN[0] = 1;
-    REP(i, 1, P+1) {
-        powN[i] = powN[i-1] * (N-1);
-    }
-
-    int okP;
-    if(N == 2) {
-        okP = 30;
-    } else {
-        okP = 30 / log(N-1);
-    }
-
-    if(P <= okP) {
-        dfs(1, 0);
-    }
-    REP(i, 1, N+1) {
-        REP(j, 1, N+1) {
-            D[i][j] = INF;
-            if(i == j) {
-                D[i][j] = 0;
-            }
-        }
-    }
-    REP(i, M) {
-        int u, v, d;
-        RI(u, v, d);
-        D[u][v] = d;
-        D[v][u] = d;
-    }
-	if(N == 2) {
-        printf("%lf\n", D[1][2] * P);
-        return;
-    }
-    warshall();
-
-    double ans = 0.0, div = 0;
-    REP(i, 1, N+1) {
-        REP(j, 1, N+1) {
-            if(i == j) {
-                continue;
-            }
-            if(P < okP) {
-                div += cnt[i][j];
-                ans += D[i][j] * cnt[i][j];
-            } else {
-                div += 1;
-                ans += D[i][j];
-            }
-        }
-    }
-    printf("%lf\n", ans / div);
-}
-
-int main()
-{
-    int T;
-    RI(T);
-    REP(i, T) {
-        printf("Case #%d: ", i+1);
-        solve();
-    }
-
-    return 0;
-}
