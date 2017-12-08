@@ -9,17 +9,16 @@ using namespace std;
 #define REPIT(i,c) for(__typeof((c).begin()) i=(c).begin();i!=(c).end();i++)
 #define PIS(x) printf("%d ",x)
 #define PN() putchar('\n')
-#define PRINTARR(a,b) for(int i=0;(a+i)!=(b);i++){cout << *(a+i) << " ";}PN();
 #define MP make_pair
 #define PB push_back
 #define EB emplace_back
 #define MT make_tuple
 
 using PII = pair<int, int>;
-using T3U = tuple<int, int, int>;
+using TI3 = tuple<int, int, int>;
 using LL = long long;
 using ULL =  unsigned long long;
-using Mat = array<array<int, 2>, 2>;
+using MAT = array<array<int, 2>, 2>;
 
 void RI() {}
 template<typename... T>
@@ -41,7 +40,7 @@ void print(T head, U... tail) {
 }
 
 const int MOD = 1000000007;
-#define MAX_N 100005
+#define MAX_N 300005
 
 
 void solve() {
