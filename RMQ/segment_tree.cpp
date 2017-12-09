@@ -15,10 +15,10 @@ using namespace std;
 #define MT make_tuple
 
 using PII = pair<int, int>;
-using T3U = tuple<int, int, int>;
+using TI3 = tuple<int, int, int>;
 using LL = long long;
 using ULL =  unsigned long long;
-using Mat = array<array<int, 2>, 2>;
+using MAT = array<array<int, 2>, 2>;
 
 void RI() {}
 template<typename... T>
@@ -40,61 +40,12 @@ void print(T head, U... tail) {
 }
 
 const int MOD = 1000000007;
-#define MAX_N 100005
+#define MAX_N 300005
 
-int bit[MAX_N + 1], n;
-
-void build() {
-    for(int i = 1; i <= n; i++) {
-        int j = i + (i & -i);
-        if(j <= n) {
-            bit[j] += bit[i];
-        }
-    }
-}
-
-int sum(int i) {
-    int s = 0;
-    while (i > 0) {
-        s += bit[i];
-        i -= i & -i;
-    }
-    return s;
-}
-
-void add(int i, int x) {
-    i += 1;
-    while (i <= n) {
-        bit[i] += x;
-        i += i & -i;
-    }
-}
 
 int main()
 {
-    int i, x;
-    RI(n);
-    REP(i, 1, n + 1) {
-        RI(bit[i]);
-    }
-    build();
-    REP(i, 1, n + 1) {
-        PIS(sum(i));
-    }
-    PN();
-    while (scanf("%d%d", &i, &x) > 0) {
-        printf("%d %d\n", i, x);
-        arr[i] += x;
-        add(i, x);
-        REP(j, n) {
-            printf("%d ", arr[j]);
-        }
-        printf("\n");
-        for(int j = 1; j <= n; j++) {
-            printf("%d ", sum(j));
-        }
-        printf("\n");
-    }
+    int n;
 
     return 0;
 }
