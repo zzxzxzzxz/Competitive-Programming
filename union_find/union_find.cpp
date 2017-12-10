@@ -42,67 +42,52 @@ void print(T head, U... tail) {
 const int MOD = 1000000007;
 #define MAX_N 300005
 
-int bit[MAX_N + 1], n;
+int parent[MAX_N];
+int rnk[MAX_N];
 
-void build() {
-    for(int i = 1; i <= n; i++) {
-        int j = i + (i & -i);
-        if(j <= n) {
-            bit[j] += bit[i];
+void init(int n) {
+    for(int i = 0; i < n; i++) {
+        parent[i] = i;
+        rnk[i] = 0;
+    }
+}
+
+int find(int x) {
+    if(parent[x] == x) {
+        return x;
+    }
+    parent[x] = find(parent[x]);
+    return parent[x];
+}
+
+void unite(int x, int y) {
+    x = find(x);
+    y = find(y);
+    if(x == y) {
+        return;
+    }
+
+    if(rnk[x] < rnk[y]) {
+        parent[x] = y;
+    } else {
+        parent[y] = x;
+        if(rnk[x] == rnk[y]) {
+            rnk[x]++;
         }
     }
 }
 
-
-int sum(int i) {
-    int s = 0;
-    while (i > 0) {
-        s += bit[i];
-        i -= i & -i;
-    }
-    return s;
+bool same(int x, int y) {
+    return find(x) == find(y);
 }
-
-
-void add(int i, int x) {
-    while (i <= n) {
-        bit[i] += x;
-        i += i & -i;
-    }
-}
-
 
 int main()
 {
-/*
-    5
-    1 2 3 4 5
-    3
-    1 2
-    4 5
-    3 -1
-*/
-    RI(n);
-    REP(i, 1, n + 1) {
-        RI(bit[i]);
-    }
-    build();
-    REP(i, 1, n + 1) {
-        PIS(sum(i));
-    }
-    PN();
-
-    int m;
-    RI(m);
-    REP(i, m) {
-        int idx, value;
-        RI(idx, value);
-        add(idx, value);
-        print(idx, value);
-        REP(j, 1, n + 1) {
-            PIS(sum(j));
-        }
-        PN();
-    }
+    int n = 10;
+    init(n);
+    unite(1, 2);
+    printf("%d\n", same(1, 3));
+    unite(2, 3);
+    printf("%d\n", same(1, 3));
     return 0;
 }

@@ -18,7 +18,7 @@ using PII = pair<int, int>;
 using TI3 = tuple<int, int, int>;
 using LL = long long;
 using ULL =  unsigned long long;
-using MAT = array<array<int, 2>, 2>;
+using MAT = array<array<LL, 2>, 2>;
 
 void RI() {}
 template<typename... T>

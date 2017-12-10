@@ -42,67 +42,23 @@ void print(T head, U... tail) {
 const int MOD = 1000000007;
 #define MAX_N 300005
 
-int bit[MAX_N + 1], n;
-
-void build() {
-    for(int i = 1; i <= n; i++) {
-        int j = i + (i & -i);
-        if(j <= n) {
-            bit[j] += bit[i];
-        }
+int extgcd(int a, int b, int& x, int &y) {
+    int d = a;
+    if(b != 0) {
+        d = extgcd(b, a % b, y, x);
+        y -= (a / b) * x;
+    } else {
+        x = 1;
+        y = 0;
     }
+    return d;
 }
-
-
-int sum(int i) {
-    int s = 0;
-    while (i > 0) {
-        s += bit[i];
-        i -= i & -i;
-    }
-    return s;
-}
-
-
-void add(int i, int x) {
-    while (i <= n) {
-        bit[i] += x;
-        i += i & -i;
-    }
-}
-
 
 int main()
 {
-/*
-    5
-    1 2 3 4 5
-    3
-    1 2
-    4 5
-    3 -1
-*/
-    RI(n);
-    REP(i, 1, n + 1) {
-        RI(bit[i]);
-    }
-    build();
-    REP(i, 1, n + 1) {
-        PIS(sum(i));
-    }
-    PN();
-
-    int m;
-    RI(m);
-    REP(i, m) {
-        int idx, value;
-        RI(idx, value);
-        add(idx, value);
-        print(idx, value);
-        REP(j, 1, n + 1) {
-            PIS(sum(j));
-        }
-        PN();
-    }
+    int a, b, x, y;
+    scanf("%d%d", &a, &b);
+    int m = extgcd(a, b, x, y);
+    printf("%d %d %d %d %d\n", a, x, b, y, m);
     return 0;
 }

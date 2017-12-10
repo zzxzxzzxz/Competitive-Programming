@@ -42,67 +42,37 @@ void print(T head, U... tail) {
 const int MOD = 1000000007;
 #define MAX_N 300005
 
-int bit[MAX_N + 1], n;
-
-void build() {
-    for(int i = 1; i <= n; i++) {
-        int j = i + (i & -i);
-        if(j <= n) {
-            bit[j] += bit[i];
+MAT mul(MAT& A, MAT& B) {
+    MAT C;
+    for(int i = 0; i < 2; i++) {
+        for(int j = 0; j < 2; j++) {
+            C[i][j] = 0;
+            for(int k = 0; k < 2; k++) {
+                C[i][j] = (C[i][j] + A[i][k] * B[k][j]) % MOD;
+            }
         }
     }
+    return C;
 }
 
-
-int sum(int i) {
-    int s = 0;
-    while (i > 0) {
-        s += bit[i];
-        i -= i & -i;
-    }
-    return s;
-}
-
-
-void add(int i, int x) {
-    while (i <= n) {
-        bit[i] += x;
-        i += i & -i;
-    }
-}
-
-
-int main()
-{
-/*
-    5
-    1 2 3 4 5
-    3
-    1 2
-    4 5
-    3 -1
-*/
-    RI(n);
-    REP(i, 1, n + 1) {
-        RI(bit[i]);
-    }
-    build();
-    REP(i, 1, n + 1) {
-        PIS(sum(i));
-    }
-    PN();
-
-    int m;
-    RI(m);
-    REP(i, m) {
-        int idx, value;
-        RI(idx, value);
-        add(idx, value);
-        print(idx, value);
-        REP(j, 1, n + 1) {
-            PIS(sum(j));
+long long fibonacci(int a) {
+    MAT T = {1, 0, 1, 0};
+    MAT F = {1, 1, 1, 0};
+    while(a) {
+        if(a & 1) {
+            T = mul(T, F);
         }
-        PN();
+        F = mul(F, F);
+        a >>= 1;
     }
+    return T[0][0];
+}
+
+int main() {
+    for(int i = 0; i < 10; i++) {
+        printf("%lld ", fibonacci(i));
+    }
+    printf("\n");
+    printf("%lld\n", fibonacci(1000000000));
     return 0;
 }
