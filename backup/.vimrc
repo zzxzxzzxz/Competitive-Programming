@@ -35,12 +35,5 @@ autocmd BufWritePre * %s/\s\+$//e
 "paste / nopaste
 noremap <C-i> :set invpaste paste?<CR>
 
-"copy to / paste from /tmp/vimcpbuf
-"vnoremap y "+y:new +0put\ +<CR>G"_dd:wq! /tmp/vimcpbuf<CR>
-"vnoremap d "+d:new +0put\ +<CR>G"_dd:wq! /tmp/vimcpbuf<CR>
-"nnoremap yy "+yy:new +0put\ +<CR>G"_dd:wq! /tmp/vimcpbuf<CR>
-"nnoremap dd "+dd:new +0put\ +<CR>G"_dd:wq! /tmp/vimcpbuf<CR>
-"nnoremap p :r! cat /tmp/vimcpbuf<CR>
-
-":vmap <silent> ,y "xy<CR>:wviminfo! ~/.viminfo
-":nmap <silent> ,p :rviminfo! ~/.viminfo<CR>"xp
+" clipboard
+set clipboard=unnamed
