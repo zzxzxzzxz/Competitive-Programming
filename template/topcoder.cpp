@@ -1,3 +1,7 @@
+#pragma comment(linker, "/stack:200000000")
+#pragma GCC optimize("Ofast")
+#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native")
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -20,22 +24,30 @@ using LL = long long;
 using ULL =  unsigned long long;
 using MAT = array<array<LL, 2>, 2>;
 
-void RI() {}
-template<typename... T>
-void RI( int& head, T&... tail ) {
-    scanf("%d", &head);
-    RI(tail...);
+template<class T> void _R( T &x ) { cin>>x; }
+void _R(int &x) { scanf("%d", &x); }
+void _R(LL &x) { scanf("%lld", &x); }
+void _R(double &x) { scanf("%lf", &x); }
+void _R(char &x) { scanf(" %c", &x); }
+void _R(char *x) { scanf("%s", x); }
+void R() {}
+template<class T, class... U>
+void R( T& head, U&... tail ) {
+    _R(head);
+    R(tail...);
 }
-void RLL() {}
-template<typename... T>
-void RLL( LL& head, T&... tail ) {
-    scanf("%lld", &head);
-    RLL(tail...);
-}
-void print() {putchar('\n');}
-template<typename T, typename... U>
-void print(T head, U... tail) {
-    cout << head << " ";
+
+template<class T> void _print( const T &x ) { cout << x; }
+void _print( const int &x ) { printf("%d", x); }
+void _print( const LL &x ) { printf("%lld", x); }
+void _print( const double &x ) { printf("%.16f\n",x); }
+void _print( const char &x ) { putchar(x); }
+void _print( const char *x ) { printf("%s",x); }
+template<class T> void _print( const vector<T> &x ) { for (auto i = x.begin(); i != x.end(); _print(*i++)) if (i != x.cbegin()) putchar(' '); }
+void print() {}
+template<class T, class... U> void print( const T& head, const U&... tail ) {
+    _print(head);
+    putchar(sizeof...(tail) ? ' ' : '\n');
     print(tail...);
 }
 
