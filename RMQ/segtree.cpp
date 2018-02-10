@@ -52,7 +52,7 @@ template<class T, class... U> void print( const T& head, const U&... tail ) {
 }
 
 const int MOD = 1000000007;
-#define MAX_N 300005
+#define MAX_N (1 << 18)
 
 int N;
 int dat[2 * MAX_N];
@@ -67,8 +67,12 @@ void init(int n_) {
     while(N < n_) {
         N <<= 1;
     }
-    for(int i = 0; i < 2 * N - 1; i++) {
-        dat[i] = zero;
+    fill(dat, dat + 2 * N - 1, zero);
+}
+
+void build() {
+    for(int k = N - 2; k >= 0; k--) {
+        dat[k] = func(dat[k * 2 + 1], dat[k * 2 + 2]);
     }
 }
 
@@ -88,21 +92,25 @@ int query(int a, int b, int k = 0, int l = 0, int r = N) {
     if(a <= l && r <= b) {
         return dat[k];
     }
-    int vl = query(a, b, k * 2 + 1, l, l + (r - l) / 2);
-    int vr = query(a, b, k * 2 + 2, l + (r - l) / 2, r);
+    int mid = l + (r - l) / 2;
+    int vl = query(a, b, k * 2 + 1, l, mid);
+    int vr = query(a, b, k * 2 + 2, mid, r);
     return func(vl, vr);
 }
 
 int main()
 {
-    int n = 100;
-    init(n);
     vector<int> v = {2, 3, 5, 1, 5, 6, 2};
+    int n = v.size();
+    init(n);
     for(int i = 0; i < v.size(); i++) {
-        update(i, v[i]);
+        dat[i + N - 1] = v[i];
     }
+    build();
     print(query(0, 3));
     print(query(1, 3));
+    print(query(0, 4));
+    update(3, 6);
     print(query(0, 4));
     return 0;
 }
