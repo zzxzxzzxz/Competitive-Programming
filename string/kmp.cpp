@@ -54,15 +54,49 @@ template<class T, class... U> void print( const T& head, const U&... tail ) {
 const int MOD = 1000000007;
 #define MAX_N 300005
 
+int F[MAX_N];
 
-#define PROB //XXX
+void build_failure_function(string s) {
+    int m = s.size();
+    F[0] = 0;
+    for(int i = 1; i < m; i++) {
+        int j = F[i-1];
+        while(j > 0 and s[j] != s[i]) {
+            j = F[j - 1];
+        }
+        if(s[i] == s[j]) {
+            ++j;
+        }
+        F[i] = j;
+    }
+}
 
-class PROB {
-    public:
-};
+int kmp(string& s, string& p) {
+    int n = s.size(), m = p.size();
+    for(int i = 0, k = 0; i < n; i++) {
+        print(i, k);
+        while(k > 0 and s[i] != p[k]) {
+            k = F[k-1];
+        }
+        if(s[i] == p[k]) {
+            k++;
+        }
+        if(k == m) {
+            return i - k + 1;
+        }
+    }
+    return -1;
+}
 
-int main() {
-    PROB *p = new PROB();
-
-    auto ans = p->;
+int main()
+{
+    string s = "abxabcabcabyab";
+    string p = "abcaby";
+    build_failure_function(p);
+    REP(i, p.size()) {
+        PIS(F[i]);
+    }
+    PN();
+    print(kmp(s, p));
+    return 0;
 }

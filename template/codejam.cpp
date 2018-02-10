@@ -24,23 +24,23 @@ using LL = long long;
 using ULL =  unsigned long long;
 using MAT = array<array<LL, 2>, 2>;
 
-template<class T> void _R( T &x ) { cin>>x; }
-void _R(int &x) { scanf("%d", &x); }
-void _R(LL &x) { scanf("%lld", &x); }
-void _R(double &x) { scanf("%lf", &x); }
-void _R(char &x) { scanf(" %c", &x); }
-void _R(char *x) { scanf("%s", x); }
-void R() {}
+template<class T> void _read( T &x ) { cin>>x; }
+void _read(int &x) { scanf("%d", &x); }
+void _read(LL &x) { scanf("%lld", &x); }
+void _read(double &x) { scanf("%lf", &x); }
+void _read(char &x) { scanf(" %c", &x); }
+void _read(char *x) { scanf("%s", x); }
+void read() {}
 template<class T, class... U>
-void R( T& head, U&... tail ) {
-    _R(head);
-    R(tail...);
+void read( T& head, U&... tail ) {
+    _read(head);
+    read(tail...);
 }
 
 template<class T> void _print( const T &x ) { cout << x; }
 void _print( const int &x ) { printf("%d", x); }
 void _print( const LL &x ) { printf("%lld", x); }
-void _print( const double &x ) { printf("%.16f\n",x); }
+void _print( const double &x ) { printf("%.16lf",x); }
 void _print( const char &x ) { putchar(x); }
 void _print( const char *x ) { printf("%s",x); }
 template<class T> void _print( const vector<T> &x ) { for (auto i = x.begin(); i != x.end(); _print(*i++)) if (i != x.cbegin()) putchar(' '); }
