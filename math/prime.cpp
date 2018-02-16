@@ -1,3 +1,7 @@
+#pragma comment(linker, "/stack:200000000")
+#pragma GCC optimize("Ofast")
+#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native")
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -20,55 +24,70 @@ using LL = long long;
 using ULL =  unsigned long long;
 using MAT = array<array<LL, 2>, 2>;
 
-void RI() {}
-template<typename... T>
-void RI( int& head, T&... tail ) {
-    scanf("%d", &head);
-    RI(tail...);
+template<class T> void _read( T &x ) { cin>>x; }
+void _read(int &x) { scanf("%d", &x); }
+void _read(LL &x) { scanf("%lld", &x); }
+void _read(double &x) { scanf("%lf", &x); }
+void _read(char &x) { scanf(" %c", &x); }
+void _read(char *x) { scanf("%s", x); }
+void read() {}
+template<class T, class... U>
+void read( T& head, U&... tail ) {
+    _read(head);
+    read(tail...);
 }
-void RLL() {}
-template<typename... T>
-void RLL( LL& head, T&... tail ) {
-    scanf("%lld", &head);
-    RLL(tail...);
-}
-void print() {putchar('\n');}
-template<typename T, typename... U>
-void print(T head, U... tail) {
-    cout << head << " ";
+
+template<class T> void _print( const T &x ) { cout << x; }
+void _print( const int &x ) { printf("%d", x); }
+void _print( const LL &x ) { printf("%lld", x); }
+void _print( const double &x ) { printf("%.16lf",x); }
+void _print( const char &x ) { putchar(x); }
+void _print( const char *x ) { printf("%s",x); }
+template<class T> void _print( const vector<T> &x ) { for (auto i = x.begin(); i != x.end(); _print(*i++)) if (i != x.cbegin()) putchar(' '); }
+void print() {}
+template<class T, class... U> void print( const T& head, const U&... tail ) {
+    _print(head);
+    putchar(sizeof...(tail) ? ' ' : '\n');
     print(tail...);
 }
 
 const int MOD = 1000000007;
 #define MAX_N 1000000005
-#define MAX_SQRT_N 31624
+#define MAX_P 10000000
 
-bool notprime[MAX_SQRT_N];
-vector<int> prime;
+int minp[MAX_P];
+vector<int> primes;
 
-void genprime() {
-    notprime[0] = true;
-    notprime[1] = true;
-    int cur = 2;
-
-    while(cur < MAX_SQRT_N) {
-        prime.push_back(cur);
-        for(int i = cur * 2; i < MAX_SQRT_N; i += cur) {
-            notprime[i] = true;
-        }
-        cur++;
-        while(cur < MAX_SQRT_N and notprime[cur]) {
-            cur++;
+void Sieve() {
+    for(int i = 2; i < MAX_P; i++) {
+        if(minp[i] == 0) {
+            //primes.push_back(i);
+            for(int j = i; j < MAX_P; j += i) {
+                if(minp[j] == 0) {
+                    minp[j] = i;
+                }
+            }
         }
     }
 }
 
+vector<int> getpdiv(int x) {
+    vector<int> ps;
+    while(x > 1) {
+        if(ps.empty() or ps.back() != minp[x]) {
+            ps.push_back(minp[x]);
+        }
+        x /= minp[x];
+    }
+    return ps;
+}
+
 int main()
 {
-    genprime();
-    for(int i = 0; i < (int)prime.size(); i++) {
-        printf("%d ", prime[i]);
-    }
-    printf("\n");
+    Sieve();
+    int x;
+    read(x);
+    auto ps = getpdiv(x);
+    print(ps);
     return 0;
 }

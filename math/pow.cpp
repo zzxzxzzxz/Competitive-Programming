@@ -54,49 +54,26 @@ template<class T, class... U> void print( const T& head, const U&... tail ) {
 const int MOD = 1000000007;
 #define MAX_N 300005
 
-int F[MAX_N];
-
-void build_failure_function(string s) {
-    int m = s.size();
-    F[0] = 0;
-    for(int i = 1; i < m; i++) {
-        int k = F[i-1];
-        while(k > 0 and s[k] != s[i]) {
-            k = F[k - 1];
+long long mypow(long long x, long long p) {
+    long long ret = 1;
+    while(p) {
+        if(p & 1) {
+            ret = (ret * x) % MOD;
         }
-        if(s[k] == s[i]) {
-            ++k;
-        }
-        F[i] = k;
+        x = (x * x) % MOD;
+        p >>= 1;
     }
-}
-
-size_t kmp(string& s, string& p) {
-    int n = s.size(), m = p.size();
-    for(int i = 0, k = 0; i < n; i++) {
-        print(i, k);
-        while(k > 0 and s[i] != p[k]) {
-            k = F[k-1];
-        }
-        if(s[i] == p[k]) {
-            ++k;
-        }
-        if(k == m) {
-            return i - k + 1;
-        }
-    }
-    return string::npos;
+    return ret;
 }
 
 int main()
 {
-    string s = "abxabcabcabyab";
-    string p = "abcaby";
-    build_failure_function(p);
-    REP(i, p.size()) {
-        PIS(F[i]);
-    }
-    PN();
-    print(kmp(s, p));
+    int a;
+    a = 5231423;
+    print(a * mypow(a, MOD - 2) % MOD);
+    a = 1;
+    print(a * mypow(a, MOD - 2) % MOD);
+    a = 10000009;
+    print(a * mypow(a, MOD - 2) % MOD);
     return 0;
 }

@@ -1,3 +1,7 @@
+#pragma comment(linker, "/stack:200000000")
+#pragma GCC optimize("Ofast")
+#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native")
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -20,45 +24,67 @@ using LL = long long;
 using ULL =  unsigned long long;
 using MAT = array<array<LL, 2>, 2>;
 
-void RI() {}
-template<typename... T>
-void RI( int& head, T&... tail ) {
-    scanf("%d", &head);
-    RI(tail...);
+template<class T> void _read( T &x ) { cin>>x; }
+void _read(int &x) { scanf("%d", &x); }
+void _read(LL &x) { scanf("%lld", &x); }
+void _read(double &x) { scanf("%lf", &x); }
+void _read(char &x) { scanf(" %c", &x); }
+void _read(char *x) { scanf("%s", x); }
+void read() {}
+template<class T, class... U>
+void read( T& head, U&... tail ) {
+    _read(head);
+    read(tail...);
 }
-void RLL() {}
-template<typename... T>
-void RLL( LL& head, T&... tail ) {
-    scanf("%lld", &head);
-    RLL(tail...);
-}
-void print() {putchar('\n');}
-template<typename T, typename... U>
-void print(T head, U... tail) {
-    cout << head << " ";
+
+template<class T> void _print( const T &x ) { cout << x; }
+void _print( const int &x ) { printf("%d", x); }
+void _print( const LL &x ) { printf("%lld", x); }
+void _print( const double &x ) { printf("%.16lf",x); }
+void _print( const char &x ) { putchar(x); }
+void _print( const char *x ) { printf("%s",x); }
+template<class T> void _print( const vector<T> &x ) { for (auto i = x.begin(); i != x.end(); _print(*i++)) if (i != x.cbegin()) putchar(' '); }
+void print() {}
+template<class T, class... U> void print( const T& head, const U&... tail ) {
+    _print(head);
+    putchar(sizeof...(tail) ? ' ' : '\n');
     print(tail...);
 }
 
 const int MOD = 1000000007;
 #define MAX_N 300005
 
-int extgcd(int a, int b, int& x, int &y) {
-    int d = a;
-    if(b != 0) {
-        d = extgcd(b, a % b, y, x);
-        y -= (a / b) * x;
-    } else {
-        x = 1;
-        y = 0;
+tuple<long long, long long, long long> extgcd(long long a, long long b) {
+    if(b == 0) {
+        return {a, 1, 0};
     }
-    return d;
+    long long d, x, y;
+    tie(d, y, x) = extgcd(b, a % b);
+    y -= (a / b) * x;
+    return {d, x, y};
+}
+
+void minnnzx(long long a, long long &x, long long b, long long &y, long long d) {
+    LL r = (x % (b/d) + (b/d)) % (b/d);
+    LL m = (x - r) / (b/d);
+    x -= b/d * m;
+    y += a/d * m;
 }
 
 int main()
 {
-    int a, b, x, y;
-    scanf("%d%d", &a, &b);
-    int m = extgcd(a, b, x, y);
-    printf("%d %d %d %d %d\n", a, x, b, y, m);
+    LL n, a, b;
+    read(n, a, b);
+    LL d, x, y;
+    tie(d, x, y) = extgcd(a, b);
+    if(n % d) {
+        print("No");
+        return 0;
+    }
+    x *= n / d;
+    y *= n / d;
+    minnnzx(a, x, b, y, d);
+    print(a, x, b, y, d);
+    print(a * x + b * y);
     return 0;
 }
