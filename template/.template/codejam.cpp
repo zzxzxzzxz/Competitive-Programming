@@ -5,8 +5,8 @@ void solve() {
 int main()
 {
     int T;
-    RI(T);
-    REP(i, T) {
+    scanf("%d", &T);
+    for(int i = 0; i < T; i++) {
         printf("Case #%d: ", i+1);
         solve();
     }

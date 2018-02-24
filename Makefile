@@ -1,5 +1,5 @@
-FLAGS = -std=c++14 -O2 -Wall -Wno-unused-result -Wno-unused-const-variable -Wno-pragmas
-#FLAGS = -std=c++14 -Ofast -Wall -Wno-unused-result -Wno-unused-const-variable -Wno-pragmas
+FLAGS = -std=c++14 -Ofast -Wall -Wno-unused-result -Wno-unused-const-variable -Wno-pragmas
+#FLAGS = -std=c++14 -O2 -Wall -Wno-unused-result -Wno-unused-const-variable -Wno-pragmas
 
 compile:
 	g++ ${FLAGS} ${s}
