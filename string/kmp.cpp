@@ -56,15 +56,15 @@ const int MOD = 1000000007;
 
 int F[MAX_N];
 
-void build_failure_function(string s) {
-    int m = s.size();
+void build_failure_function(string& p) {
+    int m = p.size();
     F[0] = 0;
+    int k = 0;
     for(int i = 1; i < m; i++) {
-        int k = F[i-1];
-        while(k > 0 and s[k] != s[i]) {
+        while(k > 0 and p[k] != p[i]) {
             k = F[k - 1];
         }
-        if(s[k] == s[i]) {
+        if(p[k] == p[i]) {
             ++k;
         }
         F[i] = k;
@@ -73,16 +73,16 @@ void build_failure_function(string s) {
 
 size_t kmp(string& s, string& p) {
     int n = s.size(), m = p.size();
-    for(int i = 0, k = 0; i < n; i++) {
-        print(i, k);
-        while(k > 0 and s[i] != p[k]) {
-            k = F[k-1];
+    int k = 0;
+    for(int i = 0; i < n; i++) {
+        while(k > 0 and p[k] != s[i]) {
+            k = F[k - 1];
         }
-        if(s[i] == p[k]) {
+        if(p[k] == s[i]) {
             ++k;
         }
         if(k == m) {
-            return i - k + 1;
+            return i - m + 1;
         }
     }
     return string::npos;
@@ -93,10 +93,6 @@ int main()
     string s = "abxabcabcabyab";
     string p = "abcaby";
     build_failure_function(p);
-    REP(i, p.size()) {
-        PIS(F[i]);
-    }
-    PN();
     print(kmp(s, p));
     return 0;
 }

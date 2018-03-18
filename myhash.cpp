@@ -52,67 +52,29 @@ template<class T, class... U> void print( const T& head, const U&... tail ) {
 }
 
 const int MOD = 1000000007;
-#define MAX_N (1 << 20)
+#define MAX_N 300005
 
-int N;
-int dat[2 * MAX_N];
-
-struct SegTree {
-    int zero = INT_MAX;
-    int func(const int a, const int b) {
-        return min(a, b);
-    }
-
-    SegTree(int n_) {
-        N = 1;
-        while(N < n_) {
-            N <<= 1;
+class myHash {
+public:
+    size_t operator()(vector<int> const& vec) const {
+        std::size_t seed = vec.size();
+        for(auto& i : vec) {
+            seed ^= i + 0x9e3779b9 + (seed << 6) + (seed >> 2);
         }
-        fill(dat, dat + 2 * N, zero);
-    }
-
-    void build() {
-        for(int k = N - 1; k >= 0; k--) {
-            dat[k] = func(dat[k * 2], dat[k * 2 + 1]);
-        }
-    }
-
-    void update(int k, int a) {
-        k += N;
-        dat[k] = a;
-        while(k > 1) {
-            k >>= 1;
-            dat[k] = func(dat[k * 2], dat[k * 2 + 1]);
-        }
-    }
-
-    int query(int a, int b, int k = 1, int l = 0, int r = N) {
-        if(r <= a or b <= l) {
-            return zero;
-        }
-        if(a <= l and r <= b) {
-            return dat[k];
-        }
-        int mid = l + (r - l) / 2;
-        int vl = query(a, b, k * 2, l, mid);
-        int vr = query(a, b, k * 2 + 1, mid, r);
-        return func(vl, vr);
+        return seed;
     }
 };
 
+unordered_set<vector<int>, myHash> s;
+
 int main()
 {
-    vector<int> v = {2, 3, 5, 1, 5, 6, 2};
-    int n = v.size();
-    SegTree t(n);
-    for(int i = 0; i < v.size(); i++) {
-        dat[i + N] = v[i];
-    }
-    t.build();
-    print(t.query(0, 3));
-    print(t.query(1, 3));
-    print(t.query(0, 4));
-    t.update(3, 6);
-    print(t.query(0, 4));
+    s.insert({1, 2, 3});
+    s.insert({1, 2});
+    s.insert({4});
+    auto ii = s.find({1, 2});
+    print(ii == s.end());
+    ii = s.find({4, 5});
+    print(ii == s.end());
     return 0;
 }
