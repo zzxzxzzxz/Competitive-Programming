@@ -27,7 +27,6 @@ using MAT = array<array<LL, 2>, 2>;
 template<class T> void _read( T &x ) { cin>>x; }
 void _read(int &x) { scanf("%d", &x); }
 void _read(LL &x) { scanf("%lld", &x); }
-void _read(ULL &x) { scanf("%llu", &x); }
 void _read(double &x) { scanf("%lf", &x); }
 void _read(char &x) { scanf(" %c", &x); }
 void _read(char *x) { scanf("%s", x); }
@@ -56,14 +55,19 @@ const int MOD = 1000000007;
 #define MAX_N 300005
 
 
-#define PROB //XXX
-
-class PROB {
-    public:
-};
-
-int main() {
-    PROB *p = new PROB();
-
-    auto ans = p->;
+int main()
+{
+    auto myhash = [](vector<int> vec)->size_t {
+        size_t seed = vec.size();
+        for(auto& i : vec) {
+            seed ^= i + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        }
+        return seed;
+    };
+    unordered_set<vector<int>, decltype(myhash)> s(0, myhash);
+    s.insert({1, 2, 3});
+    s.insert({1, 2});
+    print(s.find({1, 2}) == s.end());
+    print(s.find({1, 2, 4}) == s.end());
+    return 0;
 }

@@ -27,6 +27,7 @@ using MAT = array<array<LL, 2>, 2>;
 template<class T> void _read( T &x ) { cin>>x; }
 void _read(int &x) { scanf("%d", &x); }
 void _read(LL &x) { scanf("%lld", &x); }
+void _read(ULL &x) { scanf("%llu", &x); }
 void _read(double &x) { scanf("%lf", &x); }
 void _read(char &x) { scanf(" %c", &x); }
 void _read(char *x) { scanf("%s", x); }
