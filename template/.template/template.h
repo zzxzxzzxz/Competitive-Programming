@@ -52,7 +52,9 @@ template<class T, class... U> void print( const T& head, const U&... tail ) {
     print(tail...);
 }
 
+#define LLINF 0x3f3f3f3f3f3f3f3f
+#define INF 0x3f3f3f3f
+
 const int MOD = 1000000007;
 #define MAX_N 300005
-
 
