@@ -51,6 +51,10 @@ template<class T, class... U> void print( const T& head, const U&... tail ) {
     putchar(sizeof...(tail) ? ' ' : '\n');
     print(tail...);
 }
+template<class T> void print1(T& x, int cond = 0) {
+    _print(x);
+    printf("%c", " \n"[cond]);
+}
 
 #define LLINF 0x3f3f3f3f3f3f3f3f
 #define INF 0x3f3f3f3f

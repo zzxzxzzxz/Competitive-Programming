@@ -1,43 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#define GET_MACRO(_1,_2,_3,_4,NAME,...) NAME
-#define REP2(i,n) for(int i=0;i<(int)(n);i++)
-#define REP3(i,m,n) for(int i=m;i<(int)(n);i++)
-#define REP4(i,m,n,s) for(int i=m;(s>0 and i<(int)(n)) or (s<0 and i>(int)(n));i+=s)
-#define REP(...) GET_MACRO(__VA_ARGS__, REP4, REP3, REP2)(__VA_ARGS__)
-#define REPIT(i,c) for(__typeof((c).begin()) i=(c).begin();i!=(c).end();i++)
-#define PIS(x) printf("%d ",x)
-#define PN() putchar('\n')
-#define MP make_pair
-#define PB push_back
-#define EB emplace_back
-#define MT make_tuple
-
-using PII = pair<int, int>;
-using TI3 = tuple<int, int, int>;
-using LL = long long;
-using ULL =  unsigned long long;
-using MAT = array<array<LL, 2>, 2>;
-
-void RI() {}
-template<typename... T>
-void RI( int& head, T&... tail ) {
-    scanf("%d", &head);
-    RI(tail...);
-}
-void RLL() {}
-template<typename... T>
-void RLL( LL& head, T&... tail ) {
-    scanf("%lld", &head);
-    RLL(tail...);
-}
-void print() {putchar('\n');}
-template<typename T, typename... U>
-void print(T head, U... tail) {
-    cout << head << " ";
-    print(tail...);
-}
+#define INF 0x3f3f3f3f
 
 const int MOD = 1000000007;
 #define MAX_N 300005
@@ -47,7 +11,6 @@ struct edge {
     int cost;
 };
 
-const int INF = 1e8;
 int V;
 vector<edge> G[MAX_N];
 int d[MAX_N];
@@ -56,7 +19,7 @@ void dijkstra(int s) {
     priority_queue<pair<int, int>,
                    vector<pair<int, int> >,
                    greater<pair<int, int> > > que;
-    fill(d, d + V, INF);
+    memset(d, INF, sizeof(d));
     d[s] = 0;
     que.push(make_pair(0, s));
 
