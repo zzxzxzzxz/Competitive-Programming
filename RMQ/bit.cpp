@@ -36,28 +36,21 @@ void add(int i, int x) {
 
 int main()
 {
-/*
-    5
-    1 2 3 4 5
-    3
-    1 2
-    4 5
-    3 -1
-*/
-    scanf("%d", &n);
+    vector<int> v = {1, 2, 3, 4, 5};
+    n = v.size();
     for(int i = 1; i <= n; ++i) {
-        scanf("%d", &bit[i]);
+        bit[i] = v[i - 1];
     }
     build();
+
     for(int i = 1; i <= n; ++i) {
         printf("%d%c", sum(i), " \n"[i == n]);
     }
 
-    int m;
-    scanf("%d", &m);
-    for(int i = 0; i < m; ++i) {
+    vector<pair<int, int>> M = {{1, 2}, {4, 5}, {3, -1}};
+    for(auto& m: M) {
         int idx, value;
-        scanf("%d%d", &idx, &value);
+        tie(idx, value) = m;
         add(idx, value);
         printf("%d %d\n", idx, value);
         for(int j = 1; j <= n; ++j) {

@@ -53,22 +53,17 @@ void add(int i, int j, int x) {
 
 int main()
 {
-    /*
-    4 4
-    1 0 1 1
-    1 0 1 0
-    0 1 0 1
-    1 0 0 1
-    3
-    1 1 -1
-    2 3 1
-    3 2 -1
-    */
-
-    scanf("%d%d", &n, &m);
+    n = 4;
+    m = 4;
+    vector<vector<int>> v = {
+        {1, 0, 1, 1},
+        {1, 0, 1, 0},
+        {0, 1, 0, 1},
+        {1, 0, 0, 1}
+    };
     for(int i = 1; i <= n; ++i) {
         for(int j = 1; j <= m; ++j) {
-            scanf("%d", &bit[i][j]);
+            bit[i][j] = v[i-1][j-1];
         }
     }
     build();
@@ -80,11 +75,14 @@ int main()
     }
     putchar('\n');
 
-    int q;
-    scanf("%d", &q);
-    for(int k = 0; k < q; ++k) {
+    vector<tuple<int, int, int>> Q = {
+        {1, 1, -1},
+        {2, 3, 1},
+        {3, 2, -1}
+    };
+    for(auto& q: Q) {
         int row, col, value;
-        scanf("%d%d%d", &row, &col, &value);
+        tie(row, col, value) = q;
         add(row, col, value);
         printf("%d %d %d\n", row, col, value);
         for(int i = 1; i <= n; ++i) {
