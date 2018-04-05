@@ -1,44 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#define GET_MACRO(_1,_2,_3,_4,NAME,...) NAME
-#define REP2(i,n) for(int i=0;i<(int)(n);i++)
-#define REP3(i,m,n) for(int i=m;i<(int)(n);i++)
-#define REP4(i,m,n,s) for(int i=m;(s>0 and i<(int)(n)) or (s<0 and i>(int)(n));i+=s)
-#define REP(...) GET_MACRO(__VA_ARGS__, REP4, REP3, REP2)(__VA_ARGS__)
-#define REPIT(i,c) for(__typeof((c).begin()) i=(c).begin();i!=(c).end();i++)
-#define PIS(x) printf("%d ",x)
-#define PN() putchar('\n')
-#define MP make_pair
-#define PB push_back
-#define EB emplace_back
-#define MT make_tuple
-
-using PII = pair<int, int>;
-using TI3 = tuple<int, int, int>;
-using LL = long long;
-using ULL =  unsigned long long;
-using MAT = array<array<LL, 2>, 2>;
-
-void RI() {}
-template<typename... T>
-void RI( int& head, T&... tail ) {
-    scanf("%d", &head);
-    RI(tail...);
-}
-void RLL() {}
-template<typename... T>
-void RLL( LL& head, T&... tail ) {
-    scanf("%lld", &head);
-    RLL(tail...);
-}
-void print() {putchar('\n');}
-template<typename T, typename... U>
-void print(T head, U... tail) {
-    cout << head << " ";
-    print(tail...);
-}
-
 const int MOD = 1000000007;
 #define MAX_N 5005
 
@@ -103,36 +65,34 @@ int main()
     3 2 -1
     */
 
-    RI(n, m);
-    REP(i, 1, n + 1) {
-        REP(j, 1, m + 1) {
-            RI(bit[i][j]);
+    scanf("%d%d", &n, &m);
+    for(int i = 1; i <= n; ++i) {
+        for(int j = 1; j <= m; ++j) {
+            scanf("%d", &bit[i][j]);
         }
     }
     build();
 
-    REP(j, 1, n + 1) {
-        REP(k, 1, m + 1) {
-            PIS(sum(j, k));
+    for(int i = 1; i <= n; ++i) {
+        for(int j = 1; j <= m; ++j) {
+            printf("%d%c", sum(i, j), " \n"[j == m]);
         }
-        PN();
     }
-    PN();
+    putchar('\n');
 
     int q;
-    RI(q);
-    REP(i, q) {
+    scanf("%d", &q);
+    for(int k = 0; k < q; ++k) {
         int row, col, value;
-        RI(row, col, value);
+        scanf("%d%d%d", &row, &col, &value);
         add(row, col, value);
-        print(row, col, value);
-        REP(j, 1, n + 1) {
-            REP(k, 1, m + 1) {
-                PIS(sum(j, k));
+        printf("%d %d %d\n", row, col, value);
+        for(int i = 1; i <= n; ++i) {
+            for(int j = 1; j <= m; ++j) {
+                printf("%d%c", sum(i, j), " \n"[j == m]);
             }
-            PN();
         }
-        PN();
+        putchar('\n');
     }
     return 0;
 }
