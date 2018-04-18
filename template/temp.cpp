@@ -36,16 +36,16 @@ template<class T, class U> auto _maxtype(T x, U y) {
 #define EB emplace_back
 #define MT make_tuple
 
-template<class T> void _read( T &x ) { cin>>x; }
-void _read(int &x) { scanf("%d", &x); }
-void _read(LL &x) { scanf("%lld", &x); }
-void _read(ULL &x) { scanf("%llu", &x); }
-void _read(double &x) { scanf("%lf", &x); }
-void _read(char &x) { scanf(" %c", &x); }
-void _read(char *x) { scanf("%s", x); }
+template<class T> void _read(T &x) {cin>>x;}
+void _read(int &x) {scanf("%d", &x);}
+void _read(LL &x) {scanf("%lld", &x);}
+void _read(ULL &x) {scanf("%llu", &x);}
+void _read(double &x) {scanf("%lf", &x);}
+void _read(char &x) {scanf(" %c", &x);}
+void _read(char *x) {scanf("%s", x);}
 void read() {}
 template<class T, class... U>
-void read( T& head, U&... tail ) {
+void read(T& head, U&... tail) {
     _read(head);
     read(tail...);
 }
@@ -62,7 +62,7 @@ template<class T> void _print(const vector<T> &x) {
     }
 }
 void print() {}
-template<class T, class... U> void print( const T& head, const U&... tail ) {
+template<class T, class... U> void print(const T& head, const U&... tail) {
     _print(head);
     putchar(sizeof...(tail) ? ' ' : '\n');
     print(tail...);
