@@ -1,4 +1,4 @@
-FLAGS = -std=c++14 -O2 -Wall -Wextra -Wno-unused-result -Wno-unused-const-variable -Wno-pragmas -Wconversion
+FLAGS = -std=c++14 -O2 -Wall -Wextra -Wno-unused-result -Wno-unused-const-variable -Wno-pragmas
 
 compile:
 	g++ ${FLAGS} ${s}
