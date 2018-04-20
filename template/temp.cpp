@@ -11,15 +11,12 @@ using LL = long long;
 using ULL = unsigned long long;
 using MAT = array<array<LL, 2>, 2>;
 
-template<class T>
-using is_fd = is_fundamental<typename remove_reference<T>::type>;
-
-template<class T> constexpr inline auto _start1(true_type, T&&) {return 0;}
-template<class T> constexpr inline auto _start1(false_type, T &&x) {return x.begin();}
-template<class T> constexpr inline auto _start(T &&x) {return _start1(is_fd<T>(), x);}
-template<class T> constexpr inline auto _end1(true_type, T &&x) {return x;}
-template<class T> constexpr inline auto _end1(false_type, T &&x) {return x.end();}
-template<class T> constexpr inline auto _end(T &&x) {return _end1(is_fd<T>(), x);}
+template<class T> constexpr inline auto _start1(true_type, const T&) {return 0;}
+template<class T> constexpr inline auto _start1(false_type, const T& x) {return x.begin();}
+template<class T> constexpr inline auto _start(const T& x) {return _start1(is_fundamental<T>(), x);}
+template<class T> constexpr inline auto _end1(true_type, const T& x) {return x;}
+template<class T> constexpr inline auto _end1(false_type, const T& x) {return x.end();}
+template<class T> constexpr inline auto _end(const T& x) {return _end1(is_fundamental<T>(), x);}
 
 #define PN() putchar('\n')
 #define PB push_back
@@ -27,7 +24,7 @@ template<class T> constexpr inline auto _end(T &&x) {return _end1(is_fd<T>(), x)
 #define GET_MACRO(_1,_2,_3,_4,NAME,...) NAME
 #define CHECK(a,b) static_assert(std::is_same<decltype(a), decltype(b)>::value, "REP diff type");
 
-#define REPPP(i,s,c,t) for(i; ((s) and (c)) or (printf("%c", "\n "[c]) and (c)); (t))
+#define REPPP(i,s,c,t) for(i; ((s) and (c)) or (putchar("\n "[c]) and (c)); (t))
 #define REPP2(i,n) REPPP(auto i=_start(n),i==_start(n),i!=_end(n),++i)
 #define REPP3(i,m,n) CHECK(m,n) REPPP(auto i=(m),i==(m),i<(n),++i)
 #define REPP4(i,m,n,s) CHECK(m,n) REPPP(auto i=(m),i==(m),((s)>0 and i<(n)) or ((s)<0 and i>(n)),i+=(s))
@@ -39,6 +36,7 @@ template<class T> constexpr inline auto _end(T &&x) {return _end1(is_fd<T>(), x)
 #define REP(...) GET_MACRO(__VA_ARGS__, REP4, REP3, REP2)(__VA_ARGS__)
 
 template<class T> void _read(T &x) {cin>>x;}
+void _read(size_t &x) {scanf("%zu", &x);}
 void _read(int &x) {scanf("%d", &x);}
 void _read(LL &x) {scanf("%lld", &x);}
 void _read(ULL &x) {scanf("%llu", &x);}
@@ -53,8 +51,10 @@ void read(T& head, U&... tail) {
 }
 
 template<class T> void _print(const T &x) {cout << x;}
+void _print(const size_t &x) {printf("%zu", x);}
 void _print(const int &x) {printf("%d", x);}
 void _print(const LL &x) {printf("%lld", x);}
+void _print(const ULL &x) {printf("%llu", x);}
 void _print(const double &x) {printf("%.16lf",x);}
 void _print(const char &x) {putchar(x);}
 void _print(const char *x) {printf("%s",x);}

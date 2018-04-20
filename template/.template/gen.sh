@@ -1,3 +1,3 @@
-cat template.h temp.cpp > ../temp.cpp
-cat template.h codejam.cpp > ../codejam.cpp
-cat template.h topcoder.cpp > ../topcoder.cpp
+cat template.h _temp.cpp > ../temp.cpp
+cat template.h _codejam.cpp > ../codejam.cpp
+cat template.h _topcoder.cpp > ../topcoder.cpp
