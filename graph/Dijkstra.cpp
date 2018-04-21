@@ -11,7 +11,6 @@ struct edge {
     int cost;
 };
 
-int V;
 vector<edge> G[MAX_N];
 int d[MAX_N];
 
