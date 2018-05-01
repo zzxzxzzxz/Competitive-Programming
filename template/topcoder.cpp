@@ -1,3 +1,7 @@
+#pragma comment(linker, "/stack:200000000")
+#pragma GCC optimize("Ofast")
+#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native")
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -7,11 +11,27 @@ using LL = long long;
 using ULL = unsigned long long;
 using MAT = array<array<LL, 2>, 2>;
 
+template<class T, int = numeric_limits<T>::min()> constexpr inline T _start(const T&) {return 0;}
+template<class T> constexpr inline typename T::const_iterator _start(const T& x) {return x.begin();}
+template<class T, int = numeric_limits<T>::min()> constexpr inline T _end(const T& x) {return x;}
+template<class T> constexpr inline typename T::const_iterator _end(const T& x) {return x.end();}
+
 #define PN() putchar('\n')
 #define PB push_back
 #define EB emplace_back
 #define GET_MACRO(_1,_2,_3,_4,NAME,...) NAME
 #define CHECK(a,b) static_assert(std::is_same<decltype(a), decltype(b)>::value, "REP diff type");
+
+#define REPPP(i,s,c,t) for(i; ((s) and (c)) or (putchar("\n "[c]) and (c)); (t))
+#define REPP2(i,n) REPPP(auto i=_start(n),i==_start(n),i!=_end(n),++i)
+#define REPP3(i,m,n) CHECK(m,n) REPPP(auto i=(m),i==(m),i<(n),++i)
+#define REPP4(i,m,n,s) CHECK(m,n) REPPP(auto i=(m),i==(m),((s)>0 and i<(n)) or ((s)<0 and i>(n)),i+=(s))
+#define REPP(...) GET_MACRO(__VA_ARGS__, REPP4, REPP3, REPP2)(__VA_ARGS__)
+
+#define REP2(i,n) for(auto i=_start(n);i!=_end(n);++i)
+#define REP3(i,m,n) CHECK(m,n) for(auto i=(m);i<(n);++i)
+#define REP4(i,m,n,s) CHECK(m,n) for(auto i=(m);((s)>0 and i<(n)) or ((s)<0 and i>(n));i+=(s))
+#define REP(...) GET_MACRO(__VA_ARGS__, REP4, REP3, REP2)(__VA_ARGS__)
 
 template<class T> void _read(T &x) {cin>>x;}
 void _read(size_t &x) {scanf("%zu", &x);}

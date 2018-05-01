@@ -11,12 +11,10 @@ using LL = long long;
 using ULL = unsigned long long;
 using MAT = array<array<LL, 2>, 2>;
 
-template<class T> constexpr inline auto _start1(true_type, const T&) {return 0;}
-template<class T> constexpr inline auto _start1(false_type, const T& x) {return x.begin();}
-template<class T> constexpr inline auto _start(const T& x) {return _start1(is_fundamental<T>(), x);}
-template<class T> constexpr inline auto _end1(true_type, const T& x) {return x;}
-template<class T> constexpr inline auto _end1(false_type, const T& x) {return x.end();}
-template<class T> constexpr inline auto _end(const T& x) {return _end1(is_fundamental<T>(), x);}
+template<class T, int = numeric_limits<T>::min()> constexpr inline T _start(const T&) {return 0;}
+template<class T> constexpr inline typename T::const_iterator _start(const T& x) {return x.begin();}
+template<class T, int = numeric_limits<T>::min()> constexpr inline T _end(const T& x) {return x;}
+template<class T> constexpr inline typename T::const_iterator _end(const T& x) {return x.end();}
 
 #define PN() putchar('\n')
 #define PB push_back
