@@ -15,7 +15,7 @@ T mypow(T x, unsigned long long p) {
 template<int P>
 class Zp {
     public:
-        Zp(long long _x): x(_x) {x %= P; x = (x < 0)? x + P: x;}
+        Zp(long long _x = 0): x(_x) {x %= P; x = (x < 0)? x + P: x;}
 
         Zp& operator+=(const Zp& rhs) {this->x += rhs.x; if(this->x >= P) this->x -= P; return *this;}
         template<class T> Zp& operator+=(const T& rhs) {operator+=(Zp(rhs)); return *this;}
@@ -49,13 +49,10 @@ class Zp {
 
     private:
         long long x;
-        friend ostream& operator<<(ostream& out, const Zp& a) {return out << a.x;}
+        friend ostream& operator<<(ostream& out, const Zp& rhs) {return out << rhs.x;}
+        friend istream& operator>>(istream& in, Zp& rhs) {long long t; in >> t; rhs = Zp(t); return in;}
 };
 
-template<int P>
-void test(Zp<P> x) {
-    cout << x << endl;
-}
 
 int main()
 {
@@ -75,5 +72,8 @@ int main()
     } catch(overflow_error& e) {
         cout << e.what() << endl;
     }
+//    Zp<107> z;
+//    cin >> z;
+//    cout << z << endl;
     return 0;
 }
