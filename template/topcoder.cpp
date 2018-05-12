@@ -18,7 +18,7 @@ template<class T> constexpr inline T end(const T& x) {return x;}
 #define PB push_back
 #define EB emplace_back
 #define GET_MACRO(_1,_2,_3,_4,NAME,...) NAME
-#define CHECK(a,b) static_assert(std::is_same<decltype(a), decltype(b)>::value, "REP diff type");
+#define CHECK(a,b) static_assert(std::is_same<decltype(a), decltype(b)>::value, "REP diff types");
 
 #define REPPP(i,s,c,t) for(i; ((s) and (c)) or (putchar("\n "[c]) and (c)); (t))
 #define REPP2(i,n) REPPP(auto i=begin(n),i==begin(n),i!=end(n),++i)
