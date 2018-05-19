@@ -5,12 +5,13 @@ const int MOD = 1000000007;
 #define MAX_N 5000
 #define INF 0x3f3f3f3f
 
-int V;
+int V = 0;
 vector<int> G[MAX_N];
 int match[MAX_N];
 bool used[MAX_N];
 
 void add_edge(int u, int v) {
+    V = max(max(V, u + 1), v + 1);
     G[u].push_back(v);
     G[v].push_back(u);
 }
@@ -44,7 +45,6 @@ int bipartite_matching() {
 
 int main()
 {
-    V = 6;
     vector<pair<int, int>> E = {
         {1, 4},
         {1, 5},

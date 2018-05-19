@@ -3,21 +3,23 @@ using namespace std;
 
 using PII = pair<int, int>;
 
+#define INF 0x3f3f3f3f
+
 const int MOD = 1000000007;
 #define MAX_N 5000
-#define INF 0x3f3f3f3f
 
 struct edge {
     int to, cap, cost, rev;
 };
 
-int V;
+int V = 0;
 vector<edge> G[MAX_N];
 int h[MAX_N];
 int dist[MAX_N];
 int prevv[MAX_N], preve[MAX_N];
 
 void add_edge(int from, int to, int cap, int cost) {
+    V = max(max(V, to + 1), from + 1);
     int i = G[from].size();
     int j = G[to].size();
     G[from].push_back({to, cap, cost, j});
@@ -39,7 +41,7 @@ int min_cost_flow(int s, int t, int f) {
             if(dist[v] < d) {
                 continue;
             }
-            for(int i = 0; i < G[v].size(); i++){
+            for(int i = 0; i < int(G[v].size()); i++){
                 edge& e = G[v][i];
                 if(e.cap > 0 and dist[e.to] > dist[v] + e.cost + h[v] - h[e.to]){
                     dist[e.to] = dist[v] + e.cost + h[v] - h[e.to];
@@ -72,7 +74,6 @@ int min_cost_flow(int s, int t, int f) {
 
 int main()
 {
-    V = 5;
     vector<tuple<int, int, int, int>> E = {
         {0, 1, 10, 2},
         {0, 2, 2, 4},
