@@ -2,9 +2,11 @@ syntax on
 
 set undofile
 
+set ruler
 set number
 set hlsearch
 set background=dark
+set backspace=indent,eol,start
 
 set tabstop=4
 set shiftwidth=4
@@ -15,8 +17,8 @@ set expandtab
 noremap <silent> <Space> :silent noh<Bar>echo<CR>
 
 "block comment / uncomment map
-autocmd FileType cpp vnoremap <C-n> :normal i//<CR>
-autocmd FileType cpp vnoremap <C-m> :normal ^x^x<CR>
+autocmd FileType c,cpp,rust,go vnoremap <C-n> :normal i//<CR>
+autocmd FileType c,cpp,rust,go vnoremap <C-m> :normal ^x^x<CR>
 autocmd FileType python,sh,make vnoremap <C-n> :normal i#<CR>
 autocmd FileType python,sh,make vnoremap <C-m> :normal ^x<CR>
 
@@ -24,7 +26,7 @@ autocmd FileType python,sh,make vnoremap <C-m> :normal ^x<CR>
 autocmd FileType python setlocal smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class,with
 autocmd FileType proto setlocal ts=2 sw=2
 autocmd FileType make setlocal noexpandtab
-autocmd FileType cpp setlocal autoindent smartindent
+autocmd FileType c,cpp,rust,go setlocal autoindent smartindent
 
 "last position
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
@@ -35,5 +37,5 @@ autocmd BufWritePre * %s/\s\+$//e
 "paste / nopaste
 noremap <C-i> :set invpaste paste?<CR>
 
-" clipboard
+"clipboard
 set clipboard=unnamed
