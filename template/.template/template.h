@@ -12,7 +12,7 @@ using ULL = unsigned long long;
 using MAT = array<array<LL, 2>, 2>;
 
 template<class T> constexpr inline T begin(const T&) {return 0;}
-template<class T> constexpr inline T end(const T& x) {return x;}
+template<class T> constexpr inline T end(const T& x) {return max(T(0), x);}
 
 #define PN() putchar('\n')
 #define PB push_back
