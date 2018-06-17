@@ -17,6 +17,9 @@ Plugin 'Vimjas/vim-python-pep8-indent'
 " jedi-vim
 Plugin 'davidhalter/jedi-vim'
 
+" nerd commenter
+Plugin 'scrooloose/nerdcommenter'
+
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -49,12 +52,6 @@ set expandtab
 " un-highlight by space
 noremap <silent> <Space> :silent noh<Bar>echo<CR>
 
-" block comment / uncomment map
-autocmd FileType c,cpp,rust,go vnoremap <C-n> :normal i//<CR>
-autocmd FileType c,cpp,rust,go vnoremap <C-m> :normal ^x^x<CR>
-autocmd FileType python,sh,make vnoremap <C-n> :normal i#<CR>
-autocmd FileType python,sh,make vnoremap <C-m> :normal ^x<CR>
-
 " indent for filetypes
 autocmd FileType proto setlocal ts=2 sw=2
 autocmd FileType make setlocal noexpandtab
@@ -81,9 +78,13 @@ inoremap (<CR> (<CR>)<C-o>O
 inoremap jk <ESC>
 
 " jedi vim
-let g:jedi#popup_on_dot = 0
 let g:jedi#show_call_signatures = 0
+autocmd FileType python setlocal completeopt-=preview
 
 " easy motion
 map <Leader> <Plug>(easymotion-prefix)
-map <Leader>s <Plug>(easymotion-s2)
+map <Leader>s <Plug>(easymotion-sn)
+
+" nerd commenter
+let g:NERDDefaultAlign = 'left'
+map <silent> c :call NERDComment(0,"toggle")<CR>
