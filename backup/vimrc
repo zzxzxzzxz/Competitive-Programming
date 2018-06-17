@@ -14,6 +14,9 @@ Plugin 'easymotion/vim-easymotion'
 " python pep8 indent
 Plugin 'Vimjas/vim-python-pep8-indent'
 
+" jedi-vim
+Plugin 'davidhalter/jedi-vim'
+
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -74,6 +77,13 @@ inoremap {<CR> {<CR>}<C-o>O
 inoremap [<CR> [<CR>]<C-o>O
 inoremap (<CR> (<CR>)<C-o>O
 
-" python go to definition
-autocmd FileType python noremap <silent> gd :let varname = '\<<C-R><C-W>\>'<CR>?\<def\><CR>/<C-R>=varname<CR><CR>
-autocmd FileType python noremap <silent> gF :let varname = '\<def <C-R><C-W>\>'<CR>?<C-R>=varname<CR><CR>
+" back to normal mode by jk
+inoremap jk <ESC>
+
+" jedi vim
+let g:jedi#popup_on_dot = 0
+let g:jedi#show_call_signatures = 0
+
+" easy motion
+map <Leader> <Plug>(easymotion-prefix)
+map <Leader>s <Plug>(easymotion-s2)

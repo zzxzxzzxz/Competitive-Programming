@@ -14,6 +14,7 @@ using MAT = array<array<LL, 2>, 2>;
 template<class T> constexpr inline T begin(const T&) {return 0;}
 template<class T> constexpr inline T end(const T& x) {return max(T(0), x);}
 
+#define SIZE(x) int((x).size())
 #define PN() putchar('\n')
 #define PB push_back
 #define EB emplace_back
