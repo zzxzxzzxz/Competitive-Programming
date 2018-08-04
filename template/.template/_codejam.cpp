@@ -1,5 +1,4 @@
 void solve() {
-
 }
 
 int main()

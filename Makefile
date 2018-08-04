@@ -1,32 +1,32 @@
-FLAGS = -std=c++14 -O2 -Wall -Wextra -Wno-unused-result -Wno-unused-const-variable -Wno-pragmas
+#FLAGS = -std=c++17 -O2 -Wall -Wextra -Wno-unused-result -Wno-unused-const-variable -Wno-pragmas -lstdc++
+FLAGS = -std=c++17 -O2 -Wall -Wextra -Wno-unused-result -Wno-unused-const-variable -Wno-pragmas -lstdc++ -Wl,-stack_size -Wl,1000000
 
 compile:
-	g++ ${FLAGS} ${s}
+	gcc ${FLAGS} ${s}
 
 openmp_compile:
-	g++ ${FLAGS} -fopenmp ${s}
+	gcc ${FLAGS} -fopenmp ${s}
 
 pA:
-	g++ ${FLAGS} A.cpp -o A
+	gcc ${FLAGS} A.cpp -o A
 
 pB:
-	g++ ${FLAGS} B.cpp -o B
+	gcc ${FLAGS} B.cpp -o B
 
 pC:
-	g++ ${FLAGS} C.cpp -o C
+	gcc ${FLAGS} C.cpp -o C
 
 pD:
-	g++ ${FLAGS} D.cpp -o D
+	gcc ${FLAGS} D.cpp -o D
 
 pE:
-	g++ ${FLAGS} E.cpp -o E
+	gcc ${FLAGS} E.cpp -o E
 
 pF:
-	g++ ${FLAGS} F.cpp -o F
+	gcc ${FLAGS} F.cpp -o F
 
 pG:
-	g++ ${FLAGS} G.cpp -o G
+	gcc ${FLAGS} G.cpp -o G
 
 clean:
-	@rm -rf $(shell find ./ -name '.*.un~')
-	@rm -f in*.txt a.out A B C D E F G *.in *.out
+	@rm -f in*.txt a.out A B C D E F G *.in *.out *input* *output*

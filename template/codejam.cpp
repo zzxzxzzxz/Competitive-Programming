@@ -78,7 +78,6 @@ const int MOD = 1000000007;
 #define MAX_N 300005
 
 void solve() {
-
 }
 
 int main()
