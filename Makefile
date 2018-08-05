@@ -1,5 +1,4 @@
-#FLAGS = -std=c++17 -O2 -Wall -Wextra -Wno-unused-result -Wno-unused-const-variable -Wno-pragmas -lstdc++
-FLAGS = -std=c++17 -O2 -Wall -Wextra -Wno-unused-result -Wno-unused-const-variable -Wno-pragmas -lstdc++ -Wl,-stack_size -Wl,1000000
+FLAGS = -std=c++17 -Ofast -Wall -Wextra -Wno-unused-result -Wno-unused-const-variable -Wno-pragmas -lstdc++ -Wl,-stack_size -Wl,4000000
 
 compile:
 	gcc ${FLAGS} ${s}
