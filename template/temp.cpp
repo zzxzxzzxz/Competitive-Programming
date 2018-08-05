@@ -33,7 +33,7 @@ template<class T> constexpr inline T end(const T& x) {return max(T(0), x);}
 #define REP4(i,m,n,s) CHECK(m,n) for(auto i=(m);((s)>0 and i<(n)) or ((s)<0 and i>(n));i+=(s))
 #define REP(...) GET_MACRO(__VA_ARGS__, REP4, REP3, REP2)(__VA_ARGS__)
 
-template<class T> void _read(T &x) {cin>>x;}
+template<class T> void _read(T &x) {cin >> x;}
 void _read(size_t &x) {scanf("%zu", &x);}
 void _read(int &x) {scanf("%d", &x);}
 void _read(LL &x) {scanf("%lld", &x);}
@@ -53,18 +53,19 @@ void _print(const size_t &x) {printf("%zu", x);}
 void _print(const int &x) {printf("%d", x);}
 void _print(const LL &x) {printf("%lld", x);}
 void _print(const ULL &x) {printf("%llu", x);}
-void _print(const double &x) {printf("%.16lf",x);}
+void _print(const double &x) {printf("%.16lf", x);}
 void _print(const char &x) {putchar(x);}
-void _print(const char *x) {printf("%s",x);}
+void _print(const char *x) {printf("%s", x);}
+void _print(const string &x) {printf("%s", x.c_str());}
 template<class T> void _print(const vector<T> &x) {
     for(auto i = x.begin(); i != x.end(); _print(*i++)) {
         if (i != x.cbegin()) putchar(' ');
     }
 }
-void print() {}
+void print() {putchar('\n');}
 template<class T, class... U> void print(const T& head, const U&... tail) {
     _print(head);
-    putchar(sizeof...(tail) ? ' ' : '\n');
+    if(sizeof...(tail)) putchar(' ');
     print(tail...);
 }
 
