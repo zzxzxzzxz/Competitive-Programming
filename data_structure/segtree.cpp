@@ -4,12 +4,13 @@ using namespace std;
 const int MOD = 1000000007;
 #define MAX_N (1 << 20)
 
-int N;
-int dat[2 * MAX_N];
+using DTYPE = int;
+DTYPE dat[2 * MAX_N];
 
 struct SegTree {
-    int zero = INT_MAX;
-    int func(const int a, const int b) {
+    int N;
+    DTYPE zero = INT_MAX;  //identity of (DTYPE, func)
+    DTYPE func(const DTYPE a, const DTYPE b) {
         return min(a, b);
     }
 
@@ -27,7 +28,7 @@ struct SegTree {
         }
     }
 
-    void update(int k, int a) {
+    void update(int k, DTYPE a) {
         k += N;
         dat[k] = a;
         while(k > 1) {
@@ -36,7 +37,10 @@ struct SegTree {
         }
     }
 
-    int query(int a, int b, int k = 1, int l = 0, int r = N) {
+    DTYPE query(int a, int b, int k = 1, int l = 0, int r = -1) {
+        if(r < 0) {
+            r = N;
+        }
         if(r <= a or b <= l) {
             return zero;
         }
@@ -44,8 +48,8 @@ struct SegTree {
             return dat[k];
         }
         int mid = l + (r - l) / 2;
-        int vl = query(a, b, k * 2, l, mid);
-        int vr = query(a, b, k * 2 + 1, mid, r);
+        DTYPE vl = query(a, b, k * 2, l, mid);
+        DTYPE vr = query(a, b, k * 2 + 1, mid, r);
         return func(vl, vr);
     }
 };
@@ -55,14 +59,14 @@ int main()
     vector<int> v = {2, 3, 5, 1, 5, 6, 2};
     int n = v.size();
     SegTree t(n);
-    for(int i = 0; i < v.size(); i++) {
-        dat[i + N] = v[i];
+    for(int i = 0; i < int(v.size()); i++) {
+        dat[i + t.N] = v[i];
     }
     t.build();
-    printf("%d\n", t.query(0, 3));
-    printf("%d\n", t.query(1, 3));
-    printf("%d\n", t.query(0, 4));
+    cout << t.query(0, 3) << endl;
+    cout << t.query(1, 3) << endl;
+    cout << t.query(0, 4) << endl;
     t.update(3, 6);
-    printf("%d\n", t.query(0, 4));
+    cout << t.query(0, 4) << endl;
     return 0;
 }

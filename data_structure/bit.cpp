@@ -3,58 +3,69 @@ using namespace std;
 
 const int MOD = 1000000007;
 #define MAX_N 300005
+using DTYPE = int;
 
-int bit[MAX_N + 1], n;
+DTYPE dat[MAX_N + 1];
 
-void build() {
-    for(int i = 1; i <= n; i++) {
-        int j = i + (i & -i);
-        if(j <= n) {
-            bit[j] += bit[i];
+struct BIT {
+    int n;
+
+    BIT(int n_) {
+        n = n_;
+        memset(dat, 0, sizeof(dat));
+    }
+
+    void _add(DTYPE& a, DTYPE b) {
+        a += b;
+    }
+
+    void build() {
+        for(int i = 1; i <= n; i++) {
+            int j = i + (i & -i);
+            if(j <= n) {
+                _add(dat[j], dat[i]);
+            }
         }
     }
-}
 
-
-int sum(int i) {
-    int s = 0;
-    while (i > 0) {
-        s += bit[i];
-        i -= i & -i;
+    DTYPE sum(int i) {
+        DTYPE s = 0;
+        while (i > 0) {
+            _add(s, dat[i]);
+            i -= i & -i;
+        }
+        return s;
     }
-    return s;
-}
 
-
-void add(int i, int x) {
-    while (i <= n) {
-        bit[i] += x;
-        i += i & -i;
+    void add(int i, DTYPE x) {
+        while (i <= n) {
+            _add(dat[i], x);
+            i += i & -i;
+        }
     }
-}
-
+};
 
 int main()
 {
     vector<int> v = {1, 2, 3, 4, 5};
-    n = v.size();
+    int n = int(v.size());
+    BIT bit(n);
     for(int i = 1; i <= n; ++i) {
-        bit[i] = v[i - 1];
+        dat[i] = v[i - 1];
     }
-    build();
+    bit.build();
 
     for(int i = 1; i <= n; ++i) {
-        printf("%d%c", sum(i), " \n"[i == n]);
+        cout << bit.sum(i) << " \n"[i == n];
     }
 
     vector<pair<int, int>> M = {{1, 2}, {4, 5}, {3, -1}};
     for(auto& m: M) {
-        int idx, value;
-        tie(idx, value) = m;
-        add(idx, value);
-        printf("%d %d\n", idx, value);
+        auto [idx, value] = m;
+        bit.add(idx, value);
+        cout << idx << " " << value << '\n';
         for(int j = 1; j <= n; ++j) {
-            printf("%d%c", sum(j), " \n"[j == n]);
+            cout << bit.sum(j) << " \n"[j == n];
         }
     }
     return 0;

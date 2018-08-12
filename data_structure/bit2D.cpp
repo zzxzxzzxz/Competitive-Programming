@@ -4,73 +4,86 @@ using namespace std;
 const int MOD = 1000000007;
 #define MAX_N 5005
 
-int bit[MAX_N + 1][MAX_N + 1], n, m;
+using DTYPE = int;
+DTYPE dat[MAX_N + 1][MAX_N + 1];
 
-void build() {
-    for(int i = 1; i <= n; i++) {
-        for(int j = 1; j <= m; j++) {
-            int l = j + (j & -j);
-            if(l <= m) {
-                bit[i][l] += bit[i][j];
-            }
-        }
+struct BIT2D {
+    int n, m;
+
+    BIT2D(int n_, int m_) {
+        n = n_;
+        m = m_;
     }
-    for(int i = 1; i <= n; i++) {
-        int k = i + (i & -i);
-        if(k <= n) {
+    void _add(DTYPE& a, DTYPE b) {
+        a += b;
+    }
+
+    void build() {
+        for(int i = 1; i <= n; i++) {
             for(int j = 1; j <= m; j++) {
-                bit[k][j] += bit[i][j];
+                int l = j + (j & -j);
+                if(l <= m) {
+                    _add(dat[i][l], dat[i][j]);
+                }
+            }
+        }
+        for(int i = 1; i <= n; i++) {
+            int k = i + (i & -i);
+            if(k <= n) {
+                for(int j = 1; j <= m; j++) {
+                    _add(dat[k][j], dat[i][j]);
+                }
             }
         }
     }
-}
 
 
-int sum(int i, int j) {
-    int s = 0;
-    while (i > 0) {
-        int k = j;
-        while(k > 0) {
-            s += bit[i][k];
-            k -= k & -k;
+    DTYPE sum(int i, int j) {
+        DTYPE s = 0;
+        while (i > 0) {
+            int k = j;
+            while(k > 0) {
+                _add(s, dat[i][k]);
+                k -= k & -k;
+            }
+            i -= i & -i;
         }
-        i -= i & -i;
+        return s;
     }
-    return s;
-}
 
 
-void add(int i, int j, int x) {
-    while (i <= n) {
-        int k = j;
-        while(k <= m) {
-            bit[i][k] += x;
-            k += k & -k;
+    void add(int i, int j, DTYPE x) {
+        while (i <= n) {
+            int k = j;
+            while(k <= m) {
+                _add(dat[i][k], x);
+                k += k & -k;
+            }
+            i += i & -i;
         }
-        i += i & -i;
     }
-}
+};
 
 int main()
 {
-    n = 4;
-    m = 4;
+    int n = 4, m = 4;
     vector<vector<int>> v = {
         {1, 0, 1, 1},
         {1, 0, 1, 0},
         {0, 1, 0, 1},
         {1, 0, 0, 1}
     };
+    BIT2D bit(n, m);
     for(int i = 1; i <= n; ++i) {
         for(int j = 1; j <= m; ++j) {
-            bit[i][j] = v[i-1][j-1];
+            dat[i][j] = v[i-1][j-1];
         }
     }
-    build();
+    bit.build();
 
     for(int i = 1; i <= n; ++i) {
         for(int j = 1; j <= m; ++j) {
-            printf("%d%c", sum(i, j), " \n"[j == m]);
+            cout << bit.sum(i, j) << " \n"[j == m];
         }
     }
     putchar('\n');
@@ -81,13 +94,12 @@ int main()
         {3, 2, -1}
     };
     for(auto& q: Q) {
-        int row, col, value;
-        tie(row, col, value) = q;
-        add(row, col, value);
-        printf("%d %d %d\n", row, col, value);
+        auto [row, col, value] = q;
+        bit.add(row, col, value);
+        cout << row << " " << col << " " << value << "\n";
         for(int i = 1; i <= n; ++i) {
             for(int j = 1; j <= m; ++j) {
-                printf("%d%c", sum(i, j), " \n"[j == m]);
+                cout << bit.sum(i, j) << " \n"[j == m];
             }
         }
         putchar('\n');
