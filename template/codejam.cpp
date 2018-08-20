@@ -16,7 +16,6 @@ template<class T> constexpr inline T begin(const T&) {return 0;}
 template<class T> constexpr inline T end(const T& x) {return max(T(0), x);}
 
 #define SZ(x) int((x).size())
-#define PN() putchar('\n')
 #define PB push_back
 #define EB emplace_back
 #define GET_MACRO(_1,_2,_3,_4,NAME,...) NAME

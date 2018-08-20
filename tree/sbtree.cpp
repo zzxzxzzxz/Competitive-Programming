@@ -27,8 +27,8 @@ struct SBTree {
         Node* node;
         iterator(): tree(nullptr), node(nullptr) {}
         iterator(SBTree* tree, Node* node): tree(tree), node(node) {}
-        T& operator*() const { return node->data; }
-        T* operator->() { return &(node->data); }
+        reference operator*() const { return node->data; }
+        pointer operator->() { return &(node->data); }
         iterator& increment(bool rev = false) {
             if(node->child[!rev]->sz) {
                 node = node->child[!rev];
@@ -93,7 +93,7 @@ struct SBTree {
         maintain(node, 0);
     }
 
-    iterator insert(Node *&node, const T& data, Node* parent) {
+    iterator insert(Node*& node, const T& data, Node* parent) {
         if(!node->sz) {
             node = new Node(data, parent);
             node->child[0] = nil;
@@ -106,7 +106,7 @@ struct SBTree {
         return ii;
     }
 
-    bool erase(Node *&node, const T& data) {
+    bool erase(Node*& node, const T& data) {
         if(!node->sz) {
             return false;
         }
@@ -178,7 +178,7 @@ struct SBTree {
         return rank(ii.node->data);
     }
 
-    iterator kth(size_t k) {
+    iterator kth(int k) {
         Node* node = root;
         while(node->sz) {
             if(k < node->child[0]->sz) {
@@ -353,9 +353,9 @@ void test(T& t) {
 
 int main() {
     SBTree<int> t;
-    //test(t);
-    //set<int> t2;
-    //test(t2);
+    test(t);
+    set<int> t2;
+    test(t2);
 
     t.clear();
     vector<int> v = {1, 1, 2, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10};
