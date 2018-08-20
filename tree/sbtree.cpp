@@ -8,12 +8,13 @@ struct SBTree {
         Node* parent;
         size_t sz;
         T data;
-        Node(const T& data, Node* p): parent(p), sz(1), data(data) {}
+        Node(const T& data, Node* p, Node* ch0, Node* ch1):
+            child{ch0, ch1}, parent(p), sz(1), data(data) {}
         Node(): parent(nullptr), sz(0) {
             child[0] = this;
             child[1] = this;
         }
-    } *nil, *_end, *root, *_begin;
+    } *nil, *root, *_end, *_begin;
 
     struct iterator {
         using difference_type = int;
@@ -95,9 +96,7 @@ struct SBTree {
 
     iterator insert(Node*& node, const T& data, Node* parent) {
         if(!node->sz) {
-            node = new Node(data, parent);
-            node->child[0] = nil;
-            node->child[1] = nil;
+            node = new Node(data, parent, nil, nil);
             return iterator(this, node);
         }
         ++(node->sz);
@@ -215,6 +214,7 @@ struct SBTree {
     bool erase(const T& data) {
         bool new_begin = (data == _begin->data);
         bool succ = erase(root, data);
+        _end->child[0] = root;
         if(succ and new_begin) {
             maintain_begin();
         }
@@ -240,11 +240,7 @@ struct SBTree {
         return root->sz;
     }
 
-    SBTree(): nil(new Node), _end(new Node), root(nil), _begin(_end) {
-        _end->child[0] = root;
-        _end->child[1] = nil;
-    };
-
+    SBTree(): nil(new Node), root(nil), _end(new Node(T(), nullptr, root, nil)), _begin(_end) {}
     SBTree(const initializer_list<T>& init) {
         new (this) SBTree();
         for(auto& t: init) {
@@ -262,6 +258,7 @@ struct SBTree {
     const_iterator begin() const { return begin(); }
     const_iterator end() const { return end(); }
 };
+
 
 template<class Key, class Value>
 struct SBMap: public SBTree<pair<Key, Value>> {
