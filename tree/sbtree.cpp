@@ -181,9 +181,9 @@ struct SBTree {
     iterator kth(int k) {
         Node* node = root;
         while(node->sz) {
-            if(k < node->child[0]->sz) {
+            if(k < int(node->child[0]->sz)) {
                 node = node->child[0];
-            } else if(k == node->child[0]->sz) {
+            } else if(k == int(node->child[0]->sz)) {
                 return iterator(this, node);
             } else {
                 k -= node->child[0]->sz + 1;
