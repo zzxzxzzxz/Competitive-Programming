@@ -113,9 +113,7 @@ struct SBTree {
             if(!node->child[1]->sz) {
                 Node* tmp = node;
                 node = node->child[0];
-                if(node->sz) {
-                    node->parent = tmp->parent;
-                }
+                node->parent = tmp->parent;
                 delete tmp;
             } else {
                 --(node->sz);

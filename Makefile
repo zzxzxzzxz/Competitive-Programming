@@ -1,10 +1,8 @@
 FLAGS = -std=c++17 -Ofast -Wall -Wextra -Wno-unused-result -Wno-unused-const-variable -Wno-pragmas -lstdc++ -Wl,-stack_size -Wl,1000000000
+OUTPUT ?= "a.out"
 
 compile:
-	gcc ${FLAGS} ${s}
-
-openmp_compile:
-	gcc ${FLAGS} -fopenmp ${s}
+	gcc ${FLAGS} ${s} -o ${OUTPUT}
 
 pA:
 	gcc ${FLAGS} A.cpp -o A
