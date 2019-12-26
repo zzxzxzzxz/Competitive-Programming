@@ -74,66 +74,95 @@ const int MOD = 1000000007;
 #define LLINF 0x3f3f3f3f3f3f3f3f
 #define INF 0x3f3f3f3f
 
-#define MAX_N 705
+#define MAX_N 200005
 
-int dp[MAX_N][2][MAX_N];
-int D[MAX_N];
-
-int solve(int j, int idx, bool tight, int required) {
-    if(idx < 0) {
-        return required == 0;
-    }
-
-    if(dp[idx][tight][required] >= 0) {
-        return dp[idx][tight][required];
-    }
-
-    int ret = 0;
-    int limit = tight? D[idx]: 9;
-    for(int k = 0; k <= limit; ++k) {
-        bool new_tight = (k == D[idx]) and tight;
-        int new_required = max(0, required - int(k >= j));
-        // How many numbers has at least `new_required` digits that is at least j?
-        ret = (ret + solve(j, idx - 1, new_tight, new_required)) % MOD;
-    }
-    dp[idx][tight][required] = ret;
-    return ret;
-}
-
-// https://codeforces.com/contest/908/problem/G
-/*
- * This is a digit dp problem. Let's try to solve the subproblem "How many ways can
- * the i-th digit be at least j?". Let's fix j, and solve this with dp. We have
- * a dp state dp[a][b][c] = number of ways given we've considered the first `a` digits
- * of X, we need `b` more occurrences of digits at least j, and `c` is a boolean saying
- * whether or not we are strictly less than X or not yet.
- *
- * For a fixed digit, we can compute this dp table in O(n^2) time, and then compute
- * the answers to our subproblem for each i (i.e. by varying b in our table).
- */
-
-char tmp[1000];
+int a[MAX_N];
+TI3 trap[MAX_N];
 
 int main()
 {
-    read(tmp);
-    int n = strlen(tmp);
-
-    // reverse the number
-    REP(i, n) {
-        D[i] = tmp[n - i - 1] - '0';
+    int m, n, k, t;
+    read(m, n, k, t);
+    REP(i, m) {
+        read(a[i]);
     }
 
-    LL ans = 0;
-    REP(j, 1, 10) {
-        memset(dp, -1, sizeof(dp));
-        LL pow10 = 1;
-        REP(i, 1, n + 1) {
-            // solve: "How many numbers have at least i digits that are at least j?"
-            solve(j, n - 1, true, i);
+    REP(i, k) {
+        int l, r, d;
+        read(l, r, d);
+        trap[i] = {l - 1, r, d};
+    }
+    sort(trap, trap + k,
+         [&](const TI3 t1, const TI3 t2) {
+            int l1, r1, d1, l2, r2, d2;
+            tie(l1, r1, d1) = t1;
+            tie(l2, r2, d2) = t2;
+            return d1 > d2;
+         }
+    );
 
-            ans = (ans + dp[n - 1][1][i] * pow10) % MOD;
-            pow10 = (pow10 * 10) % MOD;
+    int extra = 0;
+    int remove = -1;
+    set<PII> S;
+
+    REP(i, k) {
+        int l, r, d;
+        tie(l, r, d) = trap[i];
+
+        extra += r - l;
+        auto it = S.lower_bound(PII(l, r));
+        if(it != S.begin()) {
+            --it;
+        }
+        int l1 = INT_MAX, r1 = INT_MAX, new_l = l, new_r = r;
+        if(it != S.end()) {
+            tie(l1, r1) = *it;
+        }
+
+        while(l1 <= r) {
+
+            if(r1 < l) {
+                ++it;
+            } else if(l1 <= l and r1 <= r) {
+                extra -= r1 - l;
+                it = S.erase(it);
+                new_l = l1;
+            } else if(l <= l1 and r1 <= r) {
+                extra -= r1 - l1;
+                it = S.erase(it);
+            } else if(l <= l1 and r <= r1) {
+                extra -= r - l1;
+                it = S.erase(it);
+                new_r = r1;
+            } else if(l1 <= l and r <= r1){
+                extra -= r - l;
+                it = S.erase(it);
+                new_l = l1;
+                new_r = r1;
+            }
+            if(it == S.end()) {
+                break;
+            }
+            tie(l1, r1) = *it;
+        }
+        S.insert(PII(new_l, new_r));
+
+        if(t < n + 1 + extra * 2) {
+            break;
+        }
+        remove = i;
+    }
+    int M = 0;
+    if(remove < k - 1) {
+        int l, r, d;
+        tie(l, r, d) = trap[remove + 1];
+        M = d;
+    }
+
+    int ans = 0;
+    REP(i, m) {
+        if(a[i] >= M) {
+            ans += 1;
         }
     }
     print(ans);

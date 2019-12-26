@@ -74,68 +74,30 @@ const int MOD = 1000000007;
 #define LLINF 0x3f3f3f3f3f3f3f3f
 #define INF 0x3f3f3f3f
 
-#define MAX_N 705
+#define MAX_N 300005
 
-int dp[MAX_N][2][MAX_N];
-int D[MAX_N];
-
-int solve(int j, int idx, bool tight, int required) {
-    if(idx < 0) {
-        return required == 0;
-    }
-
-    if(dp[idx][tight][required] >= 0) {
-        return dp[idx][tight][required];
-    }
-
-    int ret = 0;
-    int limit = tight? D[idx]: 9;
-    for(int k = 0; k <= limit; ++k) {
-        bool new_tight = (k == D[idx]) and tight;
-        int new_required = max(0, required - int(k >= j));
-        // How many numbers has at least `new_required` digits that is at least j?
-        ret = (ret + solve(j, idx - 1, new_tight, new_required)) % MOD;
-    }
-    dp[idx][tight][required] = ret;
-    return ret;
+void test_l(int k, set<int>& S) {
+    auto it = S.lower_bound(k);
+    print("lower", k, (it == S.end())? -1: *it);
 }
 
-// https://codeforces.com/contest/908/problem/G
-/*
- * This is a digit dp problem. Let's try to solve the subproblem "How many ways can
- * the i-th digit be at least j?". Let's fix j, and solve this with dp. We have
- * a dp state dp[a][b][c] = number of ways given we've considered the first `a` digits
- * of X, we need `b` more occurrences of digits at least j, and `c` is a boolean saying
- * whether or not we are strictly less than X or not yet.
- *
- * For a fixed digit, we can compute this dp table in O(n^2) time, and then compute
- * the answers to our subproblem for each i (i.e. by varying b in our table).
- */
-
-char tmp[1000];
+void test_r(int k, set<int>& S) {
+    auto it = S.upper_bound(k);
+    print("upper", k, (it == S.end())? -1: *it);
+}
 
 int main()
 {
-    read(tmp);
-    int n = strlen(tmp);
-
-    // reverse the number
-    REP(i, n) {
-        D[i] = tmp[n - i - 1] - '0';
+    set<int> S = {1, 3, 5, 7, 9};
+    REPP(ii, S) {
+        _print(*ii);
     }
 
-    LL ans = 0;
-    REP(j, 1, 10) {
-        memset(dp, -1, sizeof(dp));
-        LL pow10 = 1;
-        REP(i, 1, n + 1) {
-            // solve: "How many numbers have at least i digits that are at least j?"
-            solve(j, n - 1, true, i);
-
-            ans = (ans + dp[n - 1][1][i] * pow10) % MOD;
-            pow10 = (pow10 * 10) % MOD;
-        }
+    for(auto i: {0, 1, 2, 9, 10}) {
+        test_l(i, S);
     }
-    print(ans);
+    for(auto i: {0, 1, 2, 9, 10}) {
+        test_r(i, S);
+    }
     return 0;
 }

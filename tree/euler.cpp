@@ -5,10 +5,9 @@ using namespace std;
 
 vector<vector<int>> G;
 int sz = 0;
-int pos[MAX_N], from[MAX_N], to[MAX_N];
+int from[MAX_N], to[MAX_N];
 
 void euler(int v) {
-    pos[v] = sz;
     from[v] = sz;
     to[v] = sz;
     ++sz;
@@ -42,7 +41,7 @@ int main()
 
     vector<int> id(10);
     for(int i = 1; i <= 8; i++) {
-        id[pos[i]] = i;
+        id[from[i]] = i;
     }
     for(int i = 0; i < 8; i++) {
         cout << i << " \n"[i == 7];

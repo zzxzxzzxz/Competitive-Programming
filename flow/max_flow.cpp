@@ -58,18 +58,17 @@ int dfs(int v, int t, int f) {
 
 int max_flow(int s, int t) {
     int flow = 0;
-    while(true) {
-        bfs(s);
-        if(level[t] < 0) {
-            return flow;
-        }
+    bfs(s);
+    while(level[t] != -1) {
         memset(iter, 0, sizeof(iter));
         int f = dfs(s, t, INF);
         while(f > 0) {
             flow += f;
             f = dfs(s, t, INF);
         }
+        bfs(s);
     }
+    return flow;
 }
 
 int main()

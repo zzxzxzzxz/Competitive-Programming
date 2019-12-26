@@ -7,7 +7,7 @@ const int MOD = 1000000007;
 
 int main()
 {
-    auto myhash = [](vector<int> vec)->size_t {
+    auto myhash = [](vector<int> vec) -> size_t {
         size_t seed = vec.size();
         for(auto& i : vec) {
             seed ^= i + 0x9e3779b9 + (seed << 6) + (seed >> 2);

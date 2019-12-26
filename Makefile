@@ -1,4 +1,5 @@
-FLAGS = -std=c++17 -Ofast -Wall -Wextra -Wno-unused-result -Wno-unused-const-variable -Wno-pragmas -lstdc++ -Wl,-stack_size -Wl,1000000000
+#FLAGS = -std=c++17 -Ofast -Wall -Wextra -Wno-unused-result -Wno-unused-const-variable -Wno-pragmas -lstdc++ -Wl,-stack_size -Wl,1000000000
+FLAGS = -std=c++17 -Wall -Wextra -Wno-unused-result -Wno-unused-const-variable -Wno-pragmas -lstdc++
 OUTPUT ?= "a.out"
 
 compile:
@@ -26,4 +27,4 @@ pG:
 	gcc ${FLAGS} G.cpp -o G
 
 clean:
-	@rm -f in*.txt a.out A B C D E F G *.in *.out *input* *output*
+	@rm -f in*.txt a.out A B C D E F G *.tu* *.in *.out *input* *output*
