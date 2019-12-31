@@ -117,6 +117,7 @@ class Monarchy {
             auto person = name_map[name];
             person.insert(person->children->begin(), person->children->end());
             person.erase();
+            name_map.erase(name);
         }
 
         vector<string> getOrderOfSuccession() {
