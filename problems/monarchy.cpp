@@ -20,12 +20,9 @@ struct List {
         Node* prv;
         Node* nxt;
         List* children;
-        Node(string s, bool has_child = true): name(s), prv(NULL), nxt(NULL) {
-            if(has_child) { children = new List(); }
-        }
-        ~Node() {
-            if(children) { delete children; }
-        }
+
+        Node(): name(""), prv(NULL), nxt(NULL), children(NULL) {}
+        Node(const string& s): name(s), prv(NULL), nxt(NULL), children(new List()) {}
     };
     struct iterator {
         Node* ptr;
@@ -63,8 +60,8 @@ struct List {
     Node* head;
     Node* tail;
     List() {
-        head = new Node("", false);
-        tail = new Node("", false);
+        head = new Node();
+        tail = new Node();
         head->nxt = tail;
         tail->prv = head;
     }
@@ -72,7 +69,7 @@ struct List {
     iterator begin() { return ++iterator(head); };
     iterator end() { return iterator(tail); }
 
-    iterator push_back(string s) {
+    iterator push_back(const string& s) {
         Node* node = new Node(s);
         auto prv = tail->prv;
         prv->nxt = node;
@@ -99,7 +96,7 @@ class Monarchy {
         }
 
     public:
-        void birth(string child, string parent) {
+        void birth(const string& child, const string& parent) {
             print("birth:", child, parent);
 
             if(first) {
@@ -115,7 +112,7 @@ class Monarchy {
             name_map[child] = --(par->children->end());
         }
 
-        void death(string name) {
+        void death(const string& name) {
             print("death:", name);
             auto person = name_map[name];
             person.insert(person->children->begin(), person->children->end());
