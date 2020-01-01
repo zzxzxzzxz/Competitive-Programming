@@ -31,7 +31,7 @@ struct List {
             return nxt;
         }
 
-        shared_ptr<Node> insert(shared_ptr<Node> start, shared_ptr<Node> stop = nullptr) {
+        shared_ptr<Node> insert(shared_ptr<Node> start, shared_ptr<Node> stop) {
             if(start == stop) {
                 return shared_from_this();
             }
@@ -42,6 +42,10 @@ struct List {
             prv->nxt = start;
             start->prv = prv;
             return start;
+        }
+
+        shared_ptr<Node> insert(shared_ptr<Node> start) {
+            return insert(start, start->nxt);
         }
     };
 

@@ -14,21 +14,24 @@ template<class T, class... U> inline void print(const T& head, const U&... tail)
 }
 //}}}
 
+struct Person;
+
+template<class T>
 struct List {
     struct Node {
-        string name;
-        Node* prv;
-        Node* nxt;
-        List* children;
+        T data;
+        shared_ptr<Node> prv;
+        shared_ptr<Node> nxt;
 
-        Node(): name(""), prv(NULL), nxt(NULL), children(NULL) {}
-        Node(const string& s): name(s), prv(NULL), nxt(NULL), children(new List()) {}
+        Node(): data(), prv(nullptr), nxt(nullptr) {}
+        Node(const T& data): data(data), prv(nullptr), nxt(nullptr) {}
     };
+
     struct iterator {
-        Node* ptr;
-        iterator(): ptr(NULL) {}
-        iterator(Node* ptr): ptr(ptr) {}
-        Node* operator->() { return ptr; };
+        shared_ptr<Node> ptr;
+        iterator(): ptr(nullptr) {}
+        iterator(shared_ptr<Node> ptr): ptr(ptr) {}
+        shared_ptr<Node> operator->() { return ptr; };
         iterator operator++() { ptr = ptr->nxt; return *this; }
         iterator operator--() { ptr = ptr->prv; return *this; }
         friend bool operator==(const iterator& lhs, const iterator& rhs) { return lhs.ptr == rhs.ptr; }
@@ -39,7 +42,6 @@ struct List {
             auto nxt = ptr->nxt;
             prv->nxt = nxt;
             nxt->prv = prv;
-            delete ptr;
             return iterator(nxt);
         }
 
@@ -57,11 +59,10 @@ struct List {
         }
     };
 
-    Node* head;
-    Node* tail;
+    shared_ptr<Node> head, tail;
     List() {
-        head = new Node();
-        tail = new Node();
+        head = make_shared<Node>();
+        tail = make_shared<Node>();
         head->nxt = tail;
         tail->prv = head;
     }
@@ -69,8 +70,8 @@ struct List {
     iterator begin() { return ++iterator(head); };
     iterator end() { return iterator(tail); }
 
-    iterator push_back(const string& s) {
-        Node* node = new Node(s);
+    iterator push_back(const T& data) {
+        shared_ptr<Node> node = make_shared<Node>(data);
         auto prv = tail->prv;
         prv->nxt = node;
         node->prv = prv;
@@ -80,16 +81,25 @@ struct List {
     }
 };
 
+struct Person {
+    string name;
+    shared_ptr<List<Person>> children;
+    Person(): name("") {}
+    Person(const string& s): name(s) {
+        children = make_shared<List<Person>>();
+    }
+};
+
 class Monarchy {
     private:
         bool first = true;
-        List dummy_list;
-        List::iterator dummy;
-        unordered_map<string, List::iterator> name_map;
+        List<Person> dummy_list;
+        List<Person>::iterator dummy;
+        unordered_map<string, List<Person>::iterator> name_map;
 
-        void dfs(List::iterator person, vector<string>& res) {
-            res.push_back(person->name);
-            auto ch = person->children;
+        void dfs(List<Person>::iterator node, vector<string>& res) {
+            res.push_back(node->data.name);
+            auto& ch = node->data.children;
             for(auto it = ch->begin(); it != ch->end(); ++it) {
                 dfs(it, res);
             }
@@ -101,21 +111,20 @@ class Monarchy {
 
             if(first) {
                 first = false;
-                dummy_list.push_back("");
+                dummy_list.push_back(Person(""));
                 dummy = dummy_list.begin();
 
-                dummy->children->push_back(parent);
-                name_map[parent] = --(dummy->children->end());
+                name_map[parent] = dummy->data.children->push_back(Person(parent));
             }
             auto par = name_map[parent];
-            par->children->push_back(child);
-            name_map[child] = --(par->children->end());
+            name_map[child] = par->data.children->push_back(Person(child));
         }
 
         void death(const string& name) {
             print("death:", name);
+
             auto person = name_map[name];
-            person.insert(person->children->begin(), person->children->end());
+            person.insert(person->data.children->begin(), person->data.children->end());
             person.erase();
             name_map.erase(name);
         }
