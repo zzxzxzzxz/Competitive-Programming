@@ -8,14 +8,19 @@ using DTYPE = int;
 DTYPE dat[2 * MAX_N];
 DTYPE lazy[2 * MAX_N];
 
+void modify(DTYPE& val1, DTYPE val2, int width = 1) {
+    //val1 = val2 * width;
+    val1 += val2; width += 0;
+}
+
 struct SegTree {
-    const DTYPE zero_m = INT_MIN;
-    const DTYPE zero_c = 0;
-    void modify(DTYPE& val1, DTYPE val2, int width = 1) {
-        val1 = val2 * width;
-    }
+    //const DTYPE zero_m = INT_MIN;
+    //const DTYPE zero_c = 0;
+    const DTYPE zero_m = 0;
+    const DTYPE zero_c = INT_MAX;
     DTYPE combine(DTYPE val1, DTYPE val2) {
-        return val1 + val2;
+        //return val1 + val2;
+        return min(val1, val2);
     }
 
     int N;
@@ -116,13 +121,15 @@ int main()
     cout << "(1, 3): " << t.query(1, 3) << endl;
     cout << "(0, 5): " << t.query(0, 5) << endl;
     t.update_range(0, 4, 10);
-    for(int i = 0; i < 4; ++i) v[i] = 10;
+    for(int i = 0; i < 4; ++i) modify(v[i], 10);
     for(auto i: v) cout << i << " "; cout << endl;
     cout << "(0, 5): " << t.query(0, 5) << endl;
+    cout << "(0, 4): " << t.query(0, 4) << endl;
     cout << "(3, 6): " << t.query(3, 6) << endl;
-    v[2] = 1; cout << "v[2] = 1" << endl;
+    modify(v[2], 1); cout << "v[2] = 1" << endl;
     t.update(2, 1);
     for(auto i: v) cout << i << " "; cout << endl;
     cout << "(0, 5): " << t.query(0, 5) << endl;
+    cout << "(0, 4): " << t.query(0, 4) << endl;
     return 0;
 }
