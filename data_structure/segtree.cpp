@@ -38,7 +38,7 @@ struct SegTree {
         }
     }
 
-    void update(int a, int val, int l = 0, int r = -1, int k = 1) {
+    void update(int a, DTYPE val, int l = 0, int r = -1, int k = 1) {
         r = (r < 0)? N : r;
 
         if(r <= a or a < l) {
@@ -54,7 +54,7 @@ struct SegTree {
         dat[k] = combine(dat[k * 2], dat[k * 2 + 1]);
     }
 
-    int query(int a, int b, int l = 0, int r = -1, int k = 1) {
+    DTYPE query(int a, int b, int l = 0, int r = -1, int k = 1) {
         r = (r < 0)? N : r;
 
         if(r <= a or b <= l) {
@@ -65,8 +65,8 @@ struct SegTree {
             return dat[k];
         }
         int mid = l + (r - l) / 2;
-        int vl = query(a, b, l, mid, k * 2);
-        int vr = query(a, b, mid, r, k * 2 + 1);
+        DTYPE vl = query(a, b, l, mid, k * 2);
+        DTYPE vr = query(a, b, mid, r, k * 2 + 1);
         return combine(vl, vr);
     }
 };

@@ -101,51 +101,27 @@ int main()
          }
     );
 
-    int extra = 0;
-    int remove = -1;
-    set<PII> S;
+    int extra = 0, remove = -1;
+    set<PII> S = {{INT_MIN, INT_MIN}};
 
     REP(i, k) {
         int l, r, d;
         tie(l, r, d) = trap[i];
 
-        extra += r - l;
-        auto it = S.lower_bound(PII(l, r));
-        if(it != S.begin()) {
-            --it;
-        }
-        int l1 = INT_MAX, r1 = INT_MAX, new_l = l, new_r = r;
-        if(it != S.end()) {
-            tie(l1, r1) = *it;
-        }
-
-        while(l1 <= r) {
-
-            if(r1 < l) {
-                ++it;
-            } else if(l1 <= l and r1 <= r) {
-                extra -= r1 - l;
-                it = S.erase(it);
-                new_l = l1;
-            } else if(l <= l1 and r1 <= r) {
+        auto it = --S.upper_bound(PII(l, INT_MAX));
+        while(it != S.end() and it->first < r) {
+            auto [l1, r1] = *it;
+            if(l1 < r and l < r1) {
                 extra -= r1 - l1;
+                l = min(l, l1);
+                r = max(r, r1);
                 it = S.erase(it);
-            } else if(l <= l1 and r <= r1) {
-                extra -= r - l1;
-                it = S.erase(it);
-                new_r = r1;
-            } else if(l1 <= l and r <= r1){
-                extra -= r - l;
-                it = S.erase(it);
-                new_l = l1;
-                new_r = r1;
+            } else {
+                ++it;
             }
-            if(it == S.end()) {
-                break;
-            }
-            tie(l1, r1) = *it;
         }
-        S.insert(PII(new_l, new_r));
+        extra += r - l;
+        S.insert({l, r});
 
         if(t < n + 1 + extra * 2) {
             break;

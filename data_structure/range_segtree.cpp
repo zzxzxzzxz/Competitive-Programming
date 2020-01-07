@@ -41,7 +41,7 @@ struct SegTree {
         }
     }
 
-    void push_down(int& val, int l, int r, int k) {
+    void push_down(DTYPE& val, int l, int r, int k) {
         if(val != zero_m) {
             modify(dat[k], val, r - l);
             if(l != r - 1) {
@@ -52,7 +52,7 @@ struct SegTree {
         }
     }
 
-    void update(int a, int val, int l = 0, int r = -1, int k = 1) {
+    void update(int a, DTYPE val, int l = 0, int r = -1, int k = 1) {
         r = (r < 0)? N : r;
 
         push_down(lazy[k], l, r, k);
@@ -69,7 +69,7 @@ struct SegTree {
         dat[k] = combine(dat[k * 2], dat[k * 2 + 1]);
     }
 
-    void update_range(int a, int b, int val, int l = 0, int r = -1, int k = 1) {
+    void update_range(int a, int b, DTYPE val, int l = 0, int r = -1, int k = 1) {
         r = (r < 0)? N : r;
 
         push_down(lazy[k], l, r, k);
@@ -87,7 +87,7 @@ struct SegTree {
         dat[k] = combine(dat[k * 2], dat[k * 2 + 1]);
     }
 
-    int query(int a, int b, int l = 0, int r = -1, int k = 1) {
+    DTYPE query(int a, int b, int l = 0, int r = -1, int k = 1) {
         r = (r < 0)? N : r;
 
         if(r <= a or b <= l) {
@@ -99,8 +99,8 @@ struct SegTree {
             return dat[k];
         }
         int mid = l + (r - l) / 2;
-        int vl = query(a, b, l, mid, k * 2);
-        int vr = query(a, b, mid, r, k * 2 + 1);
+        DTYPE vl = query(a, b, l, mid, k * 2);
+        DTYPE vr = query(a, b, mid, r, k * 2 + 1);
         return combine(vl, vr);
     }
 };
