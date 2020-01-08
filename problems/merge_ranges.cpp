@@ -79,6 +79,10 @@ const int MOD = 1000000007;
 int a[MAX_N];
 TI3 trap[MAX_N];
 
+/*
+ * https://codeforces.com/problemset/problem/1260/D
+ */
+
 int main()
 {
     int m, n, k, t;

@@ -47,19 +47,18 @@ class Treap{
                 return {nullptr, nullptr};
             }
             NodePtr a, b;
+            auto root_ptr = root.get();
+            root_ptr->push();
 
             if(k <= size(root->left)) {
                 b = move(root);
-                b->push();
                 tie(a, b->left) = split(b->left, k);
-                b->pull();
             } else {
                 size_t left_sz = size(root->left) + 1;
                 a = move(root);
-                a->push();
                 tie(a->right, b) = split(a->right, k - left_sz);
-                a->pull();
             }
+            root_ptr->pull();
             return {move(a), move(b)};
         }
 
