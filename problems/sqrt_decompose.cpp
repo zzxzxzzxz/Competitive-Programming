@@ -29,14 +29,11 @@ public:
         B = floor(sqrt(n));
         maj.resize(ceil(n / B));
         for(int i = 0; i < int(maj.size()); ++i) {
-            int maxval = 0, best = -1;
+            int count = 0, best = -1;
             unordered_map<int, int> cnt;
             for(int j = i * B; j < min((i + 1) * B, n); ++j) {
-                cnt[arr[j]] += 1;
-                if(maxval < cnt[arr[j]]) {
-                    maxval = cnt[arr[j]];
-                    best = arr[j];
-                }
+                best = (count == 0) ? arr[j] : best;
+                count += (arr[j] == best) ? 1 : -1;
             }
             maj[i] = best;
         }
@@ -51,20 +48,21 @@ public:
     int query(int left, int right, int threshold) {
         int l = left, r = right + 1;
         while(l < r and l % B != 0) {
-            if(count(left, right, arr[l]) >= threshold) {
-                return arr[l];
+            int num = arr[l++];
+            if(count(left, right, num) >= threshold) {
+                return num;
             }
-            ++l;
         }
         while(l < r and r % B != 0) {
-            --r;
-            if(count(left, right, arr[r]) >= threshold) {
-                return arr[r];
+            int num = arr[--r];
+            if(count(left, right, num) >= threshold) {
+                return num;
             }
         }
         while(l < r) {
-            if(count(left, right, maj[l / B]) >= threshold) {
-                return maj[l / B];
+            int b = l / B;
+            if(count(left, right, maj[b]) >= threshold) {
+                return maj[b];
             }
             l += B;
         }
