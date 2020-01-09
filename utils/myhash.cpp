@@ -1,21 +1,21 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-const int MOD = 1000000007;
-#define MAX_N 300005
-
-class myHash {
-public:
-    size_t operator()(vector<int> const& vec) const {
-        std::size_t seed = vec.size();
-        for(auto& i : vec) {
-            seed ^= i + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+struct VecHash {
+    size_t operator()(const vector<int>& vec) const {
+        hash<int> h;
+        auto hash_combine = [&h](size_t& seed, const int& v) {
+            seed ^= h(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        };
+        size_t seed = 20200109;
+        for(auto& val: vec) {
+            hash_combine(seed, val);
         }
         return seed;
     }
 };
 
-unordered_set<vector<int>, myHash> s;
+unordered_set<vector<int>, VecHash> s;
 
 int main()
 {
