@@ -1,51 +1,47 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+#define IGNORE(x) static_assert(is_same<decltype(x), decltype(x)>::value);
+
 const int MOD = 1000000007;
 #define MAX_N (1 << 20)
 
 using DTYPE = int;
 DTYPE dat[2 * MAX_N];
 
-struct SegTree {
-    const DTYPE zero_c = INT_MAX;
-    void modify(DTYPE& val1, DTYPE val2) {
-        val1 = val2;
-    }
-    DTYPE combine(DTYPE val1, DTYPE val2) {
-        return min(val1, val2);
-    }
+const DTYPE zero_c = INT_MAX;
+DTYPE modify(const DTYPE& val1, const DTYPE& val2) {
+    IGNORE(val1);
+    return val2;
+}
+DTYPE combine(const DTYPE& val1, const DTYPE& val2) {
+    return min(val1, val2);
+}
 
+
+struct SegTree {
     int N;
     SegTree(int n_, DTYPE *a = NULL) {
         N = 1;
-        while(N < n_) {
-            N <<= 1;
-        }
+        while(N < n_) N <<= 1;
         fill(dat, dat + 2 * N, zero_c);
 
         if(a != NULL) {
-            for(int i = 0; i < n_; i++) {
-                dat[i + N] = a[i];
+            for(int i = 0; i < n_; i++) dat[i + N] = a[i];
+            for(int k = N - 1; k >= 0; k--) {
+                dat[k] = combine(dat[k * 2], dat[k * 2 + 1]);
             }
-            build();
         }
     }
 
-    void build() {
-        for(int k = N - 1; k >= 0; k--) {
-            dat[k] = combine(dat[k * 2], dat[k * 2 + 1]);
-        }
-    }
-
-    void update(int a, DTYPE val, int l = 0, int r = -1, int k = 1) {
+    void update(int a, const DTYPE& val, int l = 0, int r = -1, int k = 1) {
         r = (r < 0)? N : r;
 
         if(r <= a or a < l) {
             return;
         }
         if(l == r - 1) {
-            modify(dat[k], val);
+            dat[k] = modify(dat[k], val);
             return;
         }
         int mid = l + (r - l) / 2;
@@ -60,7 +56,6 @@ struct SegTree {
         if(r <= a or b <= l) {
             return zero_c;
         }
-
         if(a <= l and r <= b) {
             return dat[k];
         }
