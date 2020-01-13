@@ -119,24 +119,35 @@ struct SegTree {
 
 int main()
 {
-    vector<int> v = {2, 3, 5, 1, 5, 6, 2};
+    vector<int> v = {11, 15, 12, 13, 5, 6, 2, 8};
     int n = v.size();
     SegTree t(n, &v[0]);
 
-    for(auto i: v) cout << i << " "; cout << endl;
+    for(auto i: v) printf("%2d ", i); printf("\n\n");
+
     cout << "(0, 3): " << t.query(0, 3) << endl;
     cout << "(1, 3): " << t.query(1, 3) << endl;
     cout << "(0, 5): " << t.query(0, 5) << endl;
-    t.update_range(0, 4, 10);
-    for(int i = 0; i < 4; ++i) v[i] = modify(v[i], 10);
-    for(auto i: v) cout << i << " "; cout << endl;
-    cout << "(0, 5): " << t.query(0, 5) << endl;
-    cout << "(0, 4): " << t.query(0, 4) << endl;
+
+    cout << "\nadd 10 to (4, 8)" << endl;
+    t.update_range(4, 8, 10);
+    for(int i = 4; i < 8; ++i) v[i] = modify(v[i], 10);
+    for(auto i: v) printf("%2d ", i); printf("\n\n");
+
+    cout << "\nadd -10 to (0, 6)" << endl;
+    t.update_range(0, 6, -10);
+    for(int i = 0; i < 6; ++i) v[i] = modify(v[i], -10);
+    for(auto i: v) printf("%2d ", i); printf("\n\n");
+
+    cout << "(4, 8): " << t.query(4, 8) << endl;
     cout << "(3, 6): " << t.query(3, 6) << endl;
-    v[2] = modify(v[2], 1); cout << "v[2] = 1" << endl;
-    t.update(2, 1);
-    for(auto i: v) cout << i << " "; cout << endl;
-    cout << "(0, 5): " << t.query(0, 5) << endl;
+    cout << "(0, 4): " << t.query(0, 4) << endl;
+
+    cout << "\nadd 10 to idx=0" << endl;
+    t.update(0, 10);
+    v[0] = modify(v[0], 10);
+    for(auto i: v) printf("%2d ", i); printf("\n\n");
+
     cout << "(0, 4): " << t.query(0, 4) << endl;
     return 0;
 }
