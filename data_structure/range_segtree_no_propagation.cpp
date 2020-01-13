@@ -10,19 +10,16 @@ using DTYPE = int;
 DTYPE dat[4 * MAX_N];
 DTYPE lazy[4 * MAX_N];
 
-//const DTYPE zero_m = INT_MIN, zero_c = 0;
-//const DTYPE zero_m = 0, zero_c = 0;
-const DTYPE zero_m = 0, zero_c = INT_MAX;
+//const DTYPE zero_m = 0, zero_c = INT_MAX;
+const DTYPE zero_m = 0, zero_c = 0;
 
 DTYPE modify(const DTYPE& val1, const DTYPE& val2, int width = 1) {
-    //IGNORE(val1); return val2 * width;
-    //return val1 + val2 * width;
-    IGNORE(width); return val1 + val2;
+    //IGNORE(width); return val1 + val2;
+    IGNORE(width); return val1 + val2 * width;
 }
 DTYPE combine(const DTYPE& val1, const DTYPE& val2) {
-    //return val1 + val2;
-    //return val1 + val2;
-    return min(val1, val2);
+    //return min(val1, val2);
+    return val1 + val2;
 }
 
 struct SegTree {
@@ -45,39 +42,7 @@ struct SegTree {
 
     void pull(int k, int l, int r) {
         int lc = (k << 1), rc = (k << 1) | 1;
-        dat[k] = combine(
-            modify(dat[lc], lazy[lc], (r - l) / 2),
-            modify(dat[rc], lazy[rc], (r - l) / 2)
-        );
-    }
-
-    void push(int k, int l, int r) {
-        int lc = (k << 1), rc = (k << 1) | 1;
-        if(lazy[k] != zero_m) {
-            dat[k] = modify(dat[k], lazy[k], r - l);
-            if(l != r - 1) {
-                lazy[lc] = modify(lazy[lc], lazy[k]);
-                lazy[rc] = modify(lazy[rc], lazy[k]);
-            }
-            lazy[k] = zero_m;
-        }
-    }
-
-    void update(int a, const DTYPE& val, int l = 0, int r = -1, int k = 1) {
-        r = (r < 0)? N : r;
-
-        if(r <= a or a < l) {
-            return;
-        }
-        if(l == r - 1) {
-            dat[k] = modify(dat[k], val);
-            return;
-        }
-        int mid = l + (r - l) / 2;
-        push(k, l, r);
-        update(a, val, l, mid, k << 1);
-        update(a, val, mid, r, k << 1 | 1);
-        pull(k, l, r);
+        dat[k] = modify(combine(dat[lc], dat[rc]), lazy[k], r - l);
     }
 
     void update_range(int a, int b, const DTYPE& val, int l = 0, int r = -1, int k = 1) {
@@ -88,12 +53,11 @@ struct SegTree {
         }
         if(a <= l and r <= b) {
             lazy[k] = modify(lazy[k], val);
-            push(k, l, r);
+            dat[k] = modify(dat[k], val, r - l);
             return;
         }
 
         int mid = l + (r - l) / 2;
-        push(k, l, r);
         update_range(a, b, val, l, mid, k << 1);
         update_range(a, b, val, mid, r, k << 1 | 1);
         pull(k, l, r);
@@ -105,15 +69,14 @@ struct SegTree {
         if(r <= a or b <= l) {
             return zero_c;
         }
-        push(k, l, r);
-
         if(a <= l and r <= b) {
             return dat[k];
         }
         int mid = l + (r - l) / 2;
         DTYPE vl = query(a, b, l, mid, k << 1);
         DTYPE vr = query(a, b, mid, r, k << 1 | 1);
-        return combine(vl, vr);
+        DTYPE ret = modify(combine(vl, vr), lazy[k], min(r, b) - max(l, a));
+        return ret;
     }
 };
 
@@ -141,13 +104,6 @@ int main()
 
     cout << "(4, 8): " << t.query(4, 8) << endl;
     cout << "(3, 6): " << t.query(3, 6) << endl;
-    cout << "(0, 4): " << t.query(0, 4) << endl;
-
-    cout << "\nadd 10 to idx=0" << endl;
-    t.update(0, 10);
-    v[0] = modify(v[0], 10);
-    for(auto i: v) printf("%2d ", i); printf("\n\n");
-
     cout << "(0, 4): " << t.query(0, 4) << endl;
     return 0;
 }
