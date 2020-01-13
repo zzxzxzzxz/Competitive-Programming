@@ -1,40 +1,39 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-const int MOD = 1000000007;
-#define MAX_N 300005
-
-tuple<long long, long long, long long> extgcd(long long a, long long b) {
+int extgcd(int a, int b, int& x, int& y) {
     if(b == 0) {
-        return {a, 1, 0};
+        x = 1;
+        y = 0;
+        return a;
     }
-    long long d, x, y;
-    tie(d, y, x) = extgcd(b, a % b);
+    int d = extgcd(b, a % b, y, x);
     y -= (a / b) * x;
-    return {d, x, y};
+    return d;
 }
 
-void minnnzx(long long a, long long &x, long long b, long long &y, long long d) {
-    long long r = (x % (b/d) + (b/d)) % (b/d);
-    long long m = (x - r) / (b/d);
-    x -= b/d * m;
-    y += a/d * m;
+void min_nnzx(int a, int& x, int b, int& y, int d) {
+    int r = (x % (b / d) + (b / d)) % (b / d);
+    int m = (x - r) / (b / d);
+    x -= b / d * m;
+    y += a / d * m;
 }
 
 int main()
 {
-    long long n, a, b;
-    scanf("%lld%lld%lld", &n, &a, &b);
-    long long d, x, y;
-    tie(d, x, y) = extgcd(a, b);
+    int n = 100, a = 13, b = 11;
+    int x, y;
+    int d = extgcd(a, b, x, y);
     if(n % d) {
-        printf("No\n");
+        printf("No solutions\n");
         return 0;
     }
     x *= n / d;
     y *= n / d;
-    minnnzx(a, x, b, y, d);
-    printf("%lld %lld %lld %lld %lld\n", a, x, b, y, d);
-    printf("%lld\n", a * x + b * y);
+    min_nnzx(a, x, b, y, d);
+
+    printf("gcd = %d\n", d);
+    printf("%d x %d + %d x %d = %d\n",
+            a, x, b, y, a * x + b * y);
     return 0;
 }
