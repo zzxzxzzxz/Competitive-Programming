@@ -24,18 +24,18 @@ struct DSU {
     }
 
     void unite(int x, int y) {
-        x = find(x);
-        y = find(y);
-        if(x == y) {
+        int px = find(x);
+        int py = find(y);
+        if(px == py) {
             return;
         }
 
-        if(rnk[x] < rnk[y]) {
-            parent[x] = y;
+        if(rnk[px] < rnk[py]) {
+            parent[px] = py;
         } else {
-            parent[y] = x;
-            if(rnk[x] == rnk[y]) {
-                rnk[x]++;
+            parent[py] = px;
+            if(rnk[px] == rnk[py]) {
+                rnk[px]++;
             }
         }
     }

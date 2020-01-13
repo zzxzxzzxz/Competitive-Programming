@@ -1,6 +1,11 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+random_device rd;
+mt19937 mt(rd());
+uniform_int_distribution<size_t> dist(0, SIZE_MAX);
+size_t seed = dist(mt);
+
 struct Node {
     size_t sz;
     int val, maxv, lazy;
@@ -31,7 +36,6 @@ using NodePtr = unique_ptr<Node>;
 class Treap{
     private:
         NodePtr root;
-        size_t seed;
         bool prior(NodePtr& node1, NodePtr& node2) {
             seed = 0xdefaced * seed + 1;
             size_t r = seed % (node1->sz + node2->sz);
@@ -81,7 +85,7 @@ class Treap{
         }
 
     public:
-        Treap(size_t seed = 0): root(nullptr), seed(seed) {}
+        Treap(): root(nullptr) {}
 
         void insert(const int val, const int k) {
             auto node = make_unique<Node>(val);
@@ -131,10 +135,7 @@ int main(){
     vector<int> v = {5, 3, 6, 4, 0, 7, 9, 1, 8, 2};
     int n = v.size();
 
-    random_device rd;
-    mt19937 mt(rd());
-    uniform_int_distribution<size_t> dist(0, SIZE_MAX);
-    Treap t(dist(mt));
+    Treap t;
 
     for(int i = 0; i < n; ++i) {
         t.insert(v[i], i);

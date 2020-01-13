@@ -55,7 +55,7 @@ int Make(int b, int e, int val) {
 }
 
 template<typename F>
-void DFS(int node, int b, int e, F f) {
+void DFS(int node, int b, int e, const F& f) {
     if (node == 0) return;
     if (b == e) {
         f(b);
