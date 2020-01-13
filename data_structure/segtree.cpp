@@ -4,10 +4,10 @@ using namespace std;
 #define IGNORE(x) static_assert(is_same<decltype(x), decltype(x)>::value);
 
 const int MOD = 1000000007;
-#define MAX_N (1 << 20)
+#define MAX_N 200005
 
 using DTYPE = int;
-DTYPE dat[2 * MAX_N];
+DTYPE dat[4 * MAX_N];
 
 const DTYPE zero_c = INT_MAX;
 DTYPE modify(const DTYPE& val1, const DTYPE& val2) {
