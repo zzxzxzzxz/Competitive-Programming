@@ -7,7 +7,14 @@ struct Node {
     size_t sz, pri;
     int idx, val, maxv, lazy;
     unique_ptr<Node> left, right;
-    Node(int v, int idx): sz(1), pri(rand()), idx(idx), val(v), maxv(val), lazy(0) {}
+    Node(int v, int idx): sz(1), pri(randpri()), idx(idx), val(v), maxv(val), lazy(0) {}
+
+    size_t randpri() {
+        static size_t x = 199412285566105;
+        x = 0xdefaced * x + 1;
+        return x;
+    }
+
     void pull() {
         sz = 1;
         maxv = val;
@@ -33,13 +40,8 @@ using NodePtr = unique_ptr<Node>;
 class Treap{
     private:
         NodePtr root;
-        size_t seed;
         bool prior(NodePtr& node1, NodePtr& node2) {
-            seed = 0xdefaced * seed + 1;
             return node1->pri < node2->pri;
-
-            //size_t r = seed % (node1->sz + node2->sz);
-            //return r < node1->sz;
         }
 
         size_t size(NodePtr& node) {
@@ -88,8 +90,6 @@ class Treap{
         }
 
     public:
-        Treap(size_t seed = 0): root(nullptr), seed(seed) {}
-
         void insert(const int val, const int k) {
             auto node = make_unique<Node>(val, k);
             auto [a, b] = split(root, k);
@@ -194,12 +194,10 @@ class Treap{
 };
 
 int main(){
-    srand(4351341);
     vector<int> v = {1, 3, 2, 0, 2, 1, 2, 1, 1, 2};
     int n = v.size();
 
-    Treap t(0);
-
+    Treap t;
     for(int i = 0; i < n; ++i) {
         t.insert(v[i], i);
     }

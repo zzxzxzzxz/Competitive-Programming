@@ -15,7 +15,7 @@ const DTYPE zero_m = 0, zero_c = 0;
 
 DTYPE modify(const DTYPE& val1, const DTYPE& val2, int width = 1) {
     //IGNORE(width); return val1 + val2;
-    IGNORE(width); return val1 + val2 * width;
+    return val1 + val2 * width;
 }
 DTYPE combine(const DTYPE& val1, const DTYPE& val2) {
     //return min(val1, val2);
