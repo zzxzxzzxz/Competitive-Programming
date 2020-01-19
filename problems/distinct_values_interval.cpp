@@ -74,10 +74,82 @@ const int MOD = 1000000007;
 
 #define MAX_N 300005
 
-int main()
-{
-    return 0;
+int N;
+int bit[MAX_N * 2];
+int a[MAX_N * 2];
+int last[MAX_N];
+int maxi[MAX_N], mini[MAX_N];
+
+int sum(int i) {
+    int s = 0;
+    while (i > 0) {
+        s += bit[i];
+        i -= i & -i;
+    }
+    return s;
 }
 
-// check array size
-// maybe use Python when number is huge
+void add(int i, int x) {
+    while (i <= N) {
+        bit[i] += x;
+        i += i & -i;
+    }
+}
+
+/*
+ * https://codeforces.com/contest/1288/problem/E
+ *
+ * input:
+ * 5 4
+ * 3 5 1 4
+ *
+ * output:
+ * 1 3
+ * 2 5
+ * 1 4
+ * 1 5
+ * 1 5
+ */
+
+int main()
+{
+    int n, m;
+    read(n, m);
+    N = n + m;
+
+    REP(i, n) {
+        a[i] = n - i;
+        mini[i + 1] = i + 1;
+        maxi[i + 1] = i + 1;
+    }
+    REP(i, m) {
+        read(a[i + n]);
+    }
+
+    //REPP(i, n + m) {
+    //    _print(a[i]);
+    //}
+
+    memset(last, -1, sizeof(last));
+    REP(i, n + m) {
+        if(i >= n) {
+            mini[a[i]] = 1;
+        }
+        if(last[a[i]] != -1) {
+            int l = last[a[i]];
+            // number of distinct values in [l, i)
+            int n_distinct = sum(i) - sum(l);
+            maxi[a[i]] = max(maxi[a[i]], n_distinct);
+            add(l + 1, -1);
+        }
+        add(i + 1, 1);
+        last[a[i]] = i;
+    }
+    REP(i, 1, n + 1) {
+        maxi[i] = max(maxi[i], sum(n + m) - sum(last[i]));
+    }
+    REP(i, 1, n + 1) {
+        print(mini[i], maxi[i]);
+    }
+    return 0;
+}
