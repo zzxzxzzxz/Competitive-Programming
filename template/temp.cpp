@@ -6,78 +6,106 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-using PII = pair<int, int>;
-using LL = long long;
-using ULL = unsigned long long;
-using MAT = array<array<LL, 2>, 2>;
+#define putchar(x) cout << (x)
 
-template<class T> constexpr inline T begin(const T&) {return T(0);}
-template<class T> constexpr inline T end(const T& x) {return max(T(0), x);}
+template<typename T>
+struct range {
+    struct iterator {
+        using difference_type = T;
+        using value_type = T;
+        using pointer = T*;
+        using reference = T&;
+        using iterator_category = random_access_iterator_tag;
 
-#define SZ(x) int((x).size())
-#define PB push_back
-#define EB emplace_back
-#define GET_MACRO(_1,_2,_3,_4,NAME,...) NAME
-#define RM_REF_T(x) remove_reference<decltype(x)>::type
-#define CHECK(a,b) static_assert(std::is_same<RM_REF_T(a), RM_REF_T(b)>::value, "REP diff types");
+        T i, step;
+        bool operator!=(const iterator& other) const { return i != other.i; }
+        auto& operator++() { i += step; return *this; }
+        auto& operator*() const { return i; }
+        auto& operator+=(const int& n) { i += step * n; return *this; }
+        T operator-(const iterator& other) { return i - other.i; };
+    };
+    T start, stop, step;
+    auto begin() const { return iterator{start, step}; }
+    auto end() const { return iterator{stop, step}; }
+    range(T start_, T stop_, T step_): start(start_), stop(stop_), step(step_) {
+        stop = step > 0 ? max(start, stop) : min(start, stop);
+        stop += (step - (stop - start) % step) % step;
+    }
+    range(T start_, T stop_): range(start_, stop_, T(1)) {}
+    range(T stop_): range(T(0), stop_, T(1)) {}
+};
 
-#define REPP__(d,c,t,f,m,n) CHECK(m,n) for(auto d; ((f) and (c)) or (putchar("\n "[c]) and (c)); (t))
-#define REP__(d,c,t,f,m,n) CHECK(m,n) for(auto d; c; t)
-#define REPP_(...) REPP__(__VA_ARGS__)
-#define REP_(...) REP__(__VA_ARGS__)
+template<typename T, typename TIter = decltype(begin(declval<T>())),
+    typename = decltype(end(declval<T>()))>
+struct enumerate {
+    struct iterator {
+        size_t i;
+        TIter iter;
+        bool operator!=(const iterator& other) const { return iter != other.iter; }
+        auto& operator++() { ++i; ++iter; return *this; }
+        auto operator*() const { return tie(i, *iter); }
+    };
+    T&& iterable;
+    auto begin() const { return iterator{ 0, iterable.begin() }; }
+    auto end() const { return iterator{ 0, iterable.end() }; }
+    enumerate(T& iterable): iterable(forward<T>(iterable)) {}
+    enumerate(T&& iterable): iterable(forward<T>(iterable)) {}
+};
 
-#define FOR4(i,m,n,s) i=(m),((s)>0 and i<(n)) or ((s)<0 and i>(n)),i+=(s),i==(m),m,n
-#define FOR3(i,m,n) i=(m),i<(n),++i,i==(m),m,n
-#define FOR2(i,n) i=begin(n),i!=end(n),++i,i==begin(n),n,n
-#define FOR(...) GET_MACRO(__VA_ARGS__, FOR4, FOR3, FOR2)(__VA_ARGS__)
-
-#define REPP(...) REPP_(FOR(__VA_ARGS__))
-#define REP(...) REP_(FOR(__VA_ARGS__))
-
-template<class T> inline void _read(T &x) {cin >> x;}
-inline void _read(size_t &x) {scanf("%zu", &x);}
-inline void _read(int &x) {scanf("%d", &x);}
-inline void _read(LL &x) {scanf("%lld", &x);}
-inline void _read(ULL &x) {scanf("%llu", &x);}
-inline void _read(double &x) {scanf("%lf", &x);}
-inline void _read(char &x) {scanf(" %c", &x);}
-inline void _read(char *x) {scanf("%s", x);}
+template<typename T, typename TIter = decltype(begin(declval<T>())),
+    typename = decltype(end(declval<T>()))>
+struct printer {
+    struct iterator {
+        size_t i;
+        TIter iter, ed;
+        bool operator!=(const iterator& other) const { return iter != other.iter; }
+        auto& operator++() { ++i; ++iter; putchar(iter != ed ? ' ' : '\n'); return *this; }
+        auto operator*() const { return *iter; }
+    };
+    T&& iterable;
+    auto begin() const { return iterator{ 0, iterable.begin(), iterable.end() }; }
+    auto end() const { return iterator{ 0, iterable.end(), iterable.end() }; }
+    printer(T& iterable): iterable(forward<T>(iterable)) {}
+    printer(T&& iterable): iterable(forward<T>(iterable)) {}
+};
 
 inline void read() {}
 template<class T, class... U> inline void read(T& head, U&... tail) {
-    _read(head);
-    read(tail...);
+    cin >> head; read(tail...);
 }
-
-template<class T> inline void _print(const T &x) {cout << x;}
-inline void _print(const size_t &x) {printf("%zu", x);}
-inline void _print(const int &x) {printf("%d", x);}
-inline void _print(const LL &x) {printf("%lld", x);}
-inline void _print(const ULL &x) {printf("%llu", x);}
-inline void _print(const double &x) {printf("%.16lf", x);}
-inline void _print(const char &x) {putchar(x);}
-inline void _print(const char *x) {printf("%s", x);}
-inline void _print(const string &x) {printf("%s", x.c_str());}
-
-inline void print() {putchar('\n');}
-template<class T, class... U> inline void print(const T& head, const U&... tail) {
-    _print(head);
-    if(sizeof...(tail)) putchar(' ');
-    print(tail...);
+template<class T> inline void print_1(const T& x) { cout << x; }
+template<class T> inline void print_1(const vector<T>& v) {
+    for(auto it = v.begin(); it != v.end(); ++it) {
+        if(it != v.begin()) putchar(' '); print_1(*it);
+    }
 }
+inline void print_n() {}
+template<class T, class... U> inline void print_n(const T& head, const U&... tail) {
+    print_1(head); if(sizeof...(tail)) putchar(' '); print_n(tail...);
+}
+template<class... T> inline void print(const T&... args) { print_n(args...); putchar('\n'); }
+static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); return 0; }();
 
+#define repeat(x) [[maybe_unused]] auto _: range(x)
+
+// for c++14 (no template constructor deduction)
+#define GET_MACRO(_1,_2,_3,NAME,...) NAME
+#define range3(x,y,z) range<decltype(x)>(x,y,z)
+#define range2(x,y) range<decltype(x)>(x,y)
+#define range1(x) range<decltype(x)>(x)
+#define range(...) GET_MACRO(__VA_ARGS__, range3, range2, range1)(__VA_ARGS__)
+#define enumerate(x) enumerate<decltype(x)>(x)
+#define printer(x) printer<decltype(x)>(x)
 //}}}
-const int MOD = 1000000007;
+using PII = pair<int, int>;
+using LL = long long;
 
-#define LLINF 0x3f3f3f3f3f3f3f3f
-#define INF 0x3f3f3f3f
+const int MOD = 1e9 + 7;
+const int INF = 1e9 + 10;
+const LL LLINF = 1e18 + 10;
+const int MAX_N = 300005;
 
-#define MAX_N 300005
 
-int main()
-{
+int main() {
     return 0;
 }
-
-// check array size
-// maybe use Python when number is huge
