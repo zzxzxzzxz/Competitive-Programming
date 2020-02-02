@@ -36,8 +36,7 @@ template<typename T, size_t L, size_t I>
 bool zip_it_ne(const T& t1, const T& t2) {
     if(not (get<I>(t1) != get<I>(t2))) return false;
     if(I + 1 == L) return true;
-    const size_t I1 = I + 1 < L ? I + 1 : I;
-    return zip_it_ne<T, L, I1>(t1, t2);
+    return zip_it_ne<T, L, (I + 1) % L>(t1, t2);
 }
 
 template<class T, class TIter, size_t ...Is>
