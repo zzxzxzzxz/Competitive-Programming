@@ -64,16 +64,19 @@ template<typename T, typename TIter = decltype(begin(declval<T>())),
     typename = decltype(end(declval<T>()))>
 constexpr auto printer(T&& iterable) {
     struct iterator {
-        size_t i;
         TIter iter, ed;
-        bool operator!=(const iterator& other) { return iter != other.iter; }
-        auto& operator++() { ++i; ++iter; putchar(iter != ed ? ' ' : '\n'); return *this; }
+        auto operator!=(const iterator& other) {
+            auto ret = (iter != other.iter);
+            if(not ret) putchar('\n');
+            return ret;
+        }
+        auto& operator++() { ++iter; if(iter != ed) cout << " "; return *this; }
         auto operator*() { return *iter; }
     };
     struct iterable_wrapper {
         T iterable;
-        auto begin() const { return iterator{ 0, iterable.begin(), iterable.end() }; }
-        auto end() const { return iterator{ 0, iterable.end(), iterable.end() }; }
+        auto begin() const { return iterator{ iterable.begin(), iterable.end() }; }
+        auto end() const { return iterator{ iterable.end(), iterable.end() }; }
     };
     return iterable_wrapper{ forward<T>(iterable) };
 };
