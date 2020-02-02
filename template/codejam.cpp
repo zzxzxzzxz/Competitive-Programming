@@ -32,23 +32,13 @@ constexpr auto range(T start, T stop, T step) {
 template<typename T> constexpr auto range(T start, T stop) { return range(start, stop, T(1)); }
 template<typename T> constexpr auto range(T stop) { return range(T(0), stop, T(1)); }
 
-template<typename T, size_t L, size_t I>
-bool zip_it_ne(const T& t1, const T& t2) {
-    if(not (get<I>(t1) != get<I>(t2))) return false;
-    if(I + 1 == L) return true;
-    return zip_it_ne<T, L, (I + 1) % L>(t1, t2);
-}
-
 template<class T, class TIter, size_t ...Is>
 auto zip(T&& t, TIter, index_sequence<Is...>) {
     struct iterator {
         TIter iter;
         auto operator*() { return tie(*get<Is>(iter)...); }
-        auto& operator++() { iter = tie(++get<Is>(iter)...); return *this; }
-        bool operator!=(const iterator& other) {
-            const size_t L = sizeof...(Is);
-            return zip_it_ne<TIter, L, 0>(iter, other.iter);
-        }
+        auto& operator++() { ((++get<Is>(iter)), ...); return *this; }
+        bool operator!=(const iterator& other) { return ((get<Is>(iter) != get<Is>(other.iter)) and ...); }
     };
     struct iterable_wrapper {
         T t;
@@ -94,19 +84,15 @@ constexpr auto printer(T&& iterable) {
 template <size_t ... Is, typename T>
 auto tuple_slice(const T& t) { return tie(get<Is>(t)...); }
 
-inline void read() {}
-template<class T, class ...U> inline void read(T& head, U&... tail) {
-    cin >> head; read(tail...);
-}
+template<class ...T> void read(T& ...args) { (cin >> ... >> args); }
 template<class T> inline void print_1(const T& x) { cout << x; }
 template<class T> inline void print_1(const vector<T>& v) {
     for(auto it = v.begin(); it != v.end(); ++it) {
         if(it != v.begin()) putchar(' '); print_1(*it);
     }
 }
-inline void print_n() {}
-template<class T, class ...U> inline void print_n(const T& head, const U&... tail) {
-    print_1(head); if(sizeof...(tail)) putchar(' '); print_n(tail...);
+template<class T, class ...U> void print_n(const T& head, const U& ...args) {
+    print_1(head); ((cout << ' ' << args), ...);
 }
 template<class ...T> inline void print(const T& ...args) { print_n(args...); putchar('\n'); }
 
