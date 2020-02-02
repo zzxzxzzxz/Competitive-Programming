@@ -10,35 +10,57 @@ using namespace std;
 #define repeat(x) [[maybe_unused]] auto _: range(x)
 
 template<typename T>
-constexpr auto range(T start, T stop, T step) {
+struct range {
     struct iterator {
+        using difference_type = T;
+        using value_type = T;
+        using pointer = T*;
+        using reference = T&;
+        using iterator_category = random_access_iterator_tag;
+
         T i, step;
         bool operator!=(const iterator& other) const { return i != other.i; }
+        T operator-(const iterator& other) { return i - other.i; };
         auto& operator++() { i += step; return *this; }
+        auto& operator+=(const int& n) { i += step * n; return *this; }
         auto& operator*() { return i; }
     };
-    struct iterable_wrapper {
-        T start, stop, step;
-        auto begin() const { return iterator{start, step}; }
-        auto end() const { return iterator{stop, step}; }
-        size_t size() const { return (stop - start) / step; }
-        iterable_wrapper(T start_, T stop_, T step_): start(start_), stop(stop_), step(step_) {
-            stop = step > 0 ? max(start, stop) : min(start, stop);
-            stop += (step - (stop - start) % step) % step;
-        }
-    };
-    return iterable_wrapper(start, stop, step);
+    T start, stop, step;
+    auto begin() const { return iterator{start, step}; }
+    auto end() const { return iterator{stop, step}; }
+    size_t size() const { return (stop - start) / step; }
+    range(T start_, T stop_, T step_): start(start_), stop(stop_), step(step_) {
+        stop = step > 0 ? max(start, stop) : min(start, stop);
+        stop += (step - (stop - start) % step) % step;
+    }
+    range(T start_, T stop_): range(start_, stop_, T(1)) {}
+    range(T stop_): range(T(0), stop_, T(1)) {}
 };
-template<typename T> constexpr auto range(T start, T stop) { return range(start, stop, T(1)); }
-template<typename T> constexpr auto range(T stop) { return range(T(0), stop, T(1)); }
+// for c++14 (no template constructor deduction)
+#define GET_MACRO(_1,_2,_3,NAME,...) NAME
+#define range3(x,y,z) range<decltype(x)>(x,y,z)
+#define range2(x,y) range<decltype(x)>(x,y)
+#define range1(x) range<decltype(x)>(x)
+#define range(...) GET_MACRO(__VA_ARGS__, range3, range2, range1)(__VA_ARGS__)
+
+template<typename T, size_t L, size_t I>
+bool zip_it_ne(const T& t1, const T& t2) {
+    if(not (get<I>(t1) != get<I>(t2))) return false;
+    if(I + 1 == L) return true;
+    const size_t I1 = I + 1 < L ? I + 1 : I;
+    return zip_it_ne<T, L, I1>(t1, t2);
+}
 
 template<class T, class TIter, size_t ...Is>
 auto zip(T&& t, TIter, index_sequence<Is...>) {
     struct iterator {
         TIter iter;
+        bool operator!=(const iterator& other) {
+            const size_t L = sizeof...(Is);
+            return zip_it_ne<TIter, L, 0>(iter, other.iter);
+        }
+        iterator& operator++() { iter = tie(++get<Is>(iter)...); return *this; }
         auto operator*() { return tie(*get<Is>(iter)...); }
-        auto& operator++() { ((++get<Is>(iter)), ...); return *this; }
-        bool operator!=(const iterator& other) { return ((get<Is>(iter) != get<Is>(other.iter)) and ...); }
     };
     struct iterable_wrapper {
         T t;
@@ -47,12 +69,14 @@ auto zip(T&& t, TIter, index_sequence<Is...>) {
     };
     return iterable_wrapper{ forward<T>(t) };
 }
+
 template<class ...Cs>
 auto zip(Cs&& ...cs) {
     return zip(
             tuple<Cs...>{ forward<Cs>(cs)... },
             tuple<decltype(begin(declval<Cs>()))...>{ begin(cs)... },
-            index_sequence_for<Cs...>{});
+            index_sequence_for<Cs...>{}
+        );
 }
 
 template<typename T>
@@ -81,15 +105,19 @@ constexpr auto printer(T&& iterable) {
 template <size_t ... Is, typename T>
 auto tuple_slice(const T& t) { return tie(get<Is>(t)...); }
 
-template<class ...T> void read(T& ...args) { (cin >> ... >> args); }
+inline void read() {}
+template<class T, class ...U> inline void read(T& head, U&... tail) {
+    cin >> head; read(tail...);
+}
 template<class T> inline void print_1(const T& x) { cout << x; }
 template<class T> inline void print_1(const vector<T>& v) {
     for(auto it = v.begin(); it != v.end(); ++it) {
         if(it != v.begin()) putchar(' '); print_1(*it);
     }
 }
-template<class T, class ...U> void print_n(const T& head, const U& ...args) {
-    print_1(head); ((cout << ' ' << args), ...);
+inline void print_n() {}
+template<class T, class ...U> inline void print_n(const T& head, const U&... tail) {
+    print_1(head); if(sizeof...(tail)) putchar(' '); print_n(tail...);
 }
 template<class ...T> inline void print(const T& ...args) { print_n(args...); putchar('\n'); }
 
@@ -105,5 +133,25 @@ const int MAX_N = 300005;
 
 
 int main() {
+    vector<int> v1 = {1, 2, 3};
+    vector<int> v2 = {4, 5, 6};
+    vector<int> v3 = {11, 12, 13, 14};
+    for(const auto& t : zip(v1, v2, v3)) {
+        int k1, k2, k3;
+        tie(k1, k2, k3) = t;
+        print(k1, k2, k3);
+    }
+    for(const auto& p : enumerate(v2)) {
+        int i, k;
+        tie(i, k) = p;
+        print(i, k);
+    }
+    for(const auto& p : printer(enumerate(range(5, 20, 4)))) {
+        int i, k;
+        tie(i, k) = p;
+        print_n(i, ",", k, "|");
+    }
+    auto r = range(5, 50, 7);
+    print(*lower_bound(r.begin(), r.end(), 20));
     return 0;
 }

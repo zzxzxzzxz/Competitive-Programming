@@ -10,34 +10,39 @@ using namespace std;
 #define repeat(x) [[maybe_unused]] auto _: range(x)
 
 template<typename T>
-constexpr auto range(T start, T stop, T step) {
+struct range {
     struct iterator {
+        using difference_type = T;
+        using value_type = T;
+        using pointer = T*;
+        using reference = T&;
+        using iterator_category = random_access_iterator_tag;
+
         T i, step;
-        bool operator!=(const iterator& other) const { return i != other.i; }
+        bool operator!=(const iterator& other) { return i != other.i; }
+        T operator-(const iterator& other) { return i - other.i; };
         auto& operator++() { i += step; return *this; }
+        auto& operator+=(const int& n) { i += step * n; return *this; }
         auto& operator*() { return i; }
     };
-    struct iterable_wrapper {
-        T start, stop, step;
-        auto begin() const { return iterator{start, step}; }
-        auto end() const { return iterator{stop, step}; }
-        size_t size() const { return (stop - start) / step; }
-        iterable_wrapper(T start_, T stop_, T step_): start(start_), stop(stop_), step(step_) {
-            stop = step > 0 ? max(start, stop) : min(start, stop);
-            stop += (step - (stop - start) % step) % step;
-        }
-    };
-    return iterable_wrapper(start, stop, step);
+    T start, stop, step;
+    auto begin() const { return iterator{start, step}; }
+    auto end() const { return iterator{stop, step}; }
+    size_t size() const { return (stop - start) / step; }
+    range(T start_, T stop_, T step_): start(start_), stop(stop_), step(step_) {
+        stop = step > 0 ? max(start, stop) : min(start, stop);
+        stop += (step - (stop - start) % step) % step;
+    }
+    range(T start_, T stop_): range(start_, stop_, T(1)) {}
+    range(T stop_): range(T(0), stop_, T(1)) {}
 };
-template<typename T> constexpr auto range(T start, T stop) { return range(start, stop, T(1)); }
-template<typename T> constexpr auto range(T stop) { return range(T(0), stop, T(1)); }
 
 template<class T, class TIter, size_t ...Is>
 auto zip(T&& t, TIter, index_sequence<Is...>) {
     struct iterator {
         TIter iter;
         auto operator*() { return tie(*get<Is>(iter)...); }
-        auto& operator++() { ((++get<Is>(iter)), ...); return *this; }
+        auto& operator++() { ((++get<Is>(iter)),...); return *this; }
         bool operator!=(const iterator& other) { return ((get<Is>(iter) != get<Is>(other.iter)) and ...); }
     };
     struct iterable_wrapper {
@@ -105,5 +110,25 @@ const int MAX_N = 300005;
 
 
 int main() {
+    vector<int> v1 = {1, 2, 3};
+    vector<int> v2 = {4, 5, 6};
+    vector<int> v3 = {11, 12, 13, 14};
+    for(const auto& t : zip(v1, v2, v3)) {
+        int k1, k2, k3;
+        tie(k1, k2, k3) = t;
+        print(k1, k2, k3);
+    }
+    for(const auto& p : enumerate(v2)) {
+        int i, k;
+        tie(i, k) = p;
+        print(i, k);
+    }
+    for(const auto& p : printer(enumerate(range(5, 20, 4)))) {
+        int i, k;
+        tie(i, k) = p;
+        print_n(i, ",", k, "|");
+    }
+    auto r = range(5, 50, 7);
+    print(*lower_bound(r.begin(), r.end(), 20));
     return 0;
 }

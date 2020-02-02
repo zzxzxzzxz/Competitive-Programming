@@ -7,67 +7,90 @@
 using namespace std;
 
 #define putchar(x) cout << (x)
+#define repeat(x) [[maybe_unused]] auto _: range(x)
 
 template<typename T>
-struct range {
+constexpr auto range(T start, T stop, T step) {
     struct iterator {
-        using difference_type = T;
-        using value_type = T;
-        using pointer = T*;
-        using reference = T&;
-        using iterator_category = random_access_iterator_tag;
-
         T i, step;
         bool operator!=(const iterator& other) const { return i != other.i; }
         auto& operator++() { i += step; return *this; }
-        auto& operator*() const { return i; }
-        auto& operator+=(const int& n) { i += step * n; return *this; }
-        T operator-(const iterator& other) { return i - other.i; };
+        auto& operator*() { return i; }
     };
-    T start, stop, step;
-    auto begin() const { return iterator{start, step}; }
-    auto end() const { return iterator{stop, step}; }
-    range(T start_, T stop_, T step_): start(start_), stop(stop_), step(step_) {
-        stop = step > 0 ? max(start, stop) : min(start, stop);
-        stop += (step - (stop - start) % step) % step;
-    }
-    range(T start_, T stop_): range(start_, stop_, T(1)) {}
-    range(T stop_): range(T(0), stop_, T(1)) {}
+    struct iterable_wrapper {
+        T start, stop, step;
+        auto begin() const { return iterator{start, step}; }
+        auto end() const { return iterator{stop, step}; }
+        size_t size() const { return (stop - start) / step; }
+        iterable_wrapper(T start_, T stop_, T step_): start(start_), stop(stop_), step(step_) {
+            stop = step > 0 ? max(start, stop) : min(start, stop);
+            stop += (step - (stop - start) % step) % step;
+        }
+    };
+    return iterable_wrapper(start, stop, step);
 };
+template<typename T> constexpr auto range(T start, T stop) { return range(start, stop, T(1)); }
+template<typename T> constexpr auto range(T stop) { return range(T(0), stop, T(1)); }
 
-template<typename T, typename TIter = decltype(begin(declval<T>())),
-    typename = decltype(end(declval<T>()))>
-struct enumerate {
+template<typename T, size_t L, size_t I>
+bool zip_it_ne(const T& t1, const T& t2) {
+    if(not (get<I>(t1) != get<I>(t2))) return false;
+    if(I + 1 == L) return true;
+    const size_t I1 = I + 1 < L ? I + 1 : I;
+    return zip_it_ne<T, L, I1>(t1, t2);
+}
+
+template<class T, class TIter, size_t ...Is>
+auto zip(T&& t, TIter, index_sequence<Is...>) {
     struct iterator {
-        size_t i;
         TIter iter;
-        bool operator!=(const iterator& other) const { return iter != other.iter; }
-        auto& operator++() { ++i; ++iter; return *this; }
-        auto operator*() const { return tie(i, *iter); }
+        auto operator*() { return tie(*get<Is>(iter)...); }
+        auto& operator++() { iter = tie(++get<Is>(iter)...); return *this; }
+        bool operator!=(const iterator& other) {
+            const size_t L = sizeof...(Is);
+            return zip_it_ne<TIter, L, 0>(iter, other.iter);
+        }
     };
-    T&& iterable;
-    auto begin() const { return iterator{ 0, iterable.begin() }; }
-    auto end() const { return iterator{ 0, iterable.end() }; }
-    enumerate(T& iterable): iterable(forward<T>(iterable)) {}
-    enumerate(T&& iterable): iterable(forward<T>(iterable)) {}
-};
+    struct iterable_wrapper {
+        T t;
+        auto begin() const { return iterator{ TIter{std::begin(get<Is>(t))...} }; }
+        auto end() const { return iterator{ TIter{std::end(get<Is>(t))...} }; }
+    };
+    return iterable_wrapper{ forward<T>(t) };
+}
+template<class ...Cs>
+auto zip(Cs&& ...cs) {
+    return zip(
+            tuple<Cs...>{ forward<Cs>(cs)... },
+            tuple<decltype(begin(declval<Cs>()))...>{ begin(cs)... },
+            index_sequence_for<Cs...>{});
+}
+
+template<typename T>
+auto enumerate(T&& iterable) {
+    return zip(range(iterable.size()), forward<T>(iterable));
+}
 
 template<typename T, typename TIter = decltype(begin(declval<T>())),
     typename = decltype(end(declval<T>()))>
-struct printer {
+constexpr auto printer(T&& iterable) {
     struct iterator {
         size_t i;
         TIter iter, ed;
-        bool operator!=(const iterator& other) const { return iter != other.iter; }
+        bool operator!=(const iterator& other) { return iter != other.iter; }
         auto& operator++() { ++i; ++iter; putchar(iter != ed ? ' ' : '\n'); return *this; }
-        auto operator*() const { return *iter; }
+        auto operator*() { return *iter; }
     };
-    T&& iterable;
-    auto begin() const { return iterator{ 0, iterable.begin(), iterable.end() }; }
-    auto end() const { return iterator{ 0, iterable.end(), iterable.end() }; }
-    printer(T& iterable): iterable(forward<T>(iterable)) {}
-    printer(T&& iterable): iterable(forward<T>(iterable)) {}
+    struct iterable_wrapper {
+        T iterable;
+        auto begin() const { return iterator{ 0, iterable.begin(), iterable.end() }; }
+        auto end() const { return iterator{ 0, iterable.end(), iterable.end() }; }
+    };
+    return iterable_wrapper{ forward<T>(iterable) };
 };
+
+template <size_t ... Is, typename T>
+auto tuple_slice(const T& t) { return tie(get<Is>(t)...); }
 
 inline void read() {}
 template<class T, class ...U> inline void read(T& head, U&... tail) {
@@ -83,19 +106,9 @@ inline void print_n() {}
 template<class T, class ...U> inline void print_n(const T& head, const U&... tail) {
     print_1(head); if(sizeof...(tail)) putchar(' '); print_n(tail...);
 }
-template<class ...T> inline void print(const T&... args) { print_n(args...); putchar('\n'); }
+template<class ...T> inline void print(const T& ...args) { print_n(args...); putchar('\n'); }
+
 static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); return 0; }();
-
-#define repeat(x) [[maybe_unused]] auto _: range(x)
-
-// for c++14 (no template constructor deduction)
-#define GET_MACRO(_1,_2,_3,NAME,...) NAME
-#define range3(x,y,z) range<decltype(x)>(x,y,z)
-#define range2(x,y) range<decltype(x)>(x,y)
-#define range1(x) range<decltype(x)>(x)
-#define range(...) GET_MACRO(__VA_ARGS__, range3, range2, range1)(__VA_ARGS__)
-#define enumerate(x) enumerate<decltype(x)>(x)
-#define printer(x) printer<decltype(x)>(x)
 //}}}
 using PII = pair<int, int>;
 using LL = long long;
