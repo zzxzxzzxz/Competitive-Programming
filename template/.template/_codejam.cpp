@@ -1,12 +1,11 @@
 void solve() {
 }
 
-int main()
-{
+int main() {
     int T;
-    scanf("%d", &T);
-    for(int i = 0; i < T; i++) {
-        printf("Case #%d: ", i+1);
+    read(T);
+    for(int i : range(1, T + 1)) {
+        cout << "Case #" << i << ": ";
         solve();
     }
 
