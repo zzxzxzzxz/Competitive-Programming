@@ -42,8 +42,8 @@ auto zip(T&& t, TIter, index_sequence<Is...>) {
     };
     struct iterable_wrapper {
         T t;
-        auto begin() const { return iterator{ TIter{std::begin(get<Is>(t))...} }; }
-        auto end() const { return iterator{ TIter{std::end(get<Is>(t))...} }; }
+        auto begin() const { return iterator{ TIter{ std::begin(get<Is>(t))... } }; }
+        auto end() const { return iterator{ TIter{ std::end(get<Is>(t))... } }; }
     };
     return iterable_wrapper{ forward<T>(t) };
 }
@@ -51,7 +51,7 @@ template<class ...Cs>
 auto zip(Cs&& ...cs) {
     return zip(
             tuple<Cs...>{ forward<Cs>(cs)... },
-            tuple<decltype(begin(declval<Cs>()))...>{ begin(cs)... },
+            tuple<decltype(begin(declval<Cs>()))...>{},
             index_sequence_for<Cs...>{});
 }
 
