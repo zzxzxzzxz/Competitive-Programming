@@ -1,10 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#define INF 0x3f3f3f3f
-
-int main()
-{
+int main() {
     int n = 12;
     vector<pair<int, int>> edges = {
         {1, 2}, {1, 3}, {1, 4},
@@ -27,7 +24,7 @@ int main()
     }
 
     vector<int> vs;
-    vector<bool> visited(n + 1, false);
+    vector<char> visited(n + 1, false);
 
     auto dfs = [&](auto self, const int v) -> void {
         visited[v] = true;

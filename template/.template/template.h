@@ -32,7 +32,7 @@ constexpr auto range(T start, T stop, T step) {
 template<typename T> constexpr auto range(T start, T stop) { return range(start, stop, T(1)); }
 template<typename T> constexpr auto range(T stop) { return range(T(0), stop, T(1)); }
 
-template<class ...T> void absorb(T&& ...t) {}
+template<class ...T> void absorb(T&&...) {}
 template<size_t L, size_t I, class T>
 bool zip_it_ne(const T& t1, const T& t2) {
     if(not (get<I>(t1) != get<I>(t2))) return false;
@@ -44,7 +44,7 @@ constexpr auto zip(index_sequence<Is...>, Iter be, Iter ed) {
     struct iterator {
         Iter iter;
         bool operator!=(const iterator& other) { return zip_it_ne<sizeof...(Is), 0>(iter, other.iter); }
-        void operator++() { absorb(++get<Is>(iter)...); }
+        auto& operator++() { absorb(++get<Is>(iter)...); return *this; }
         auto operator*() { return tie(*get<Is>(iter)...); }
     };
     struct iterable_wrapper {

@@ -32,10 +32,10 @@ struct List {
         iterator(): ptr(nullptr) {}
         iterator(shared_ptr<Node> ptr): ptr(ptr) {}
         shared_ptr<Node> operator->() { return ptr; };
-        iterator operator++() { ptr = ptr->nxt; return *this; }
-        iterator operator--() { ptr = ptr->prv; return *this; }
-        friend bool operator==(const iterator& lhs, const iterator& rhs) { return lhs.ptr == rhs.ptr; }
-        friend bool operator!=(const iterator& lhs, const iterator& rhs) { return not operator==(lhs, rhs); }
+        iterator& operator++() { ptr = ptr->nxt; return *this; }
+        iterator& operator--() { ptr = ptr->prv; return *this; }
+        bool operator==(const iterator& other) { return ptr == other.ptr; }
+        bool operator!=(const iterator& other) { return not operator==(other); }
 
         iterator erase() {
             auto prv = ptr->prv;

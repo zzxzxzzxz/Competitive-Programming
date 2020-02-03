@@ -1,4 +1,4 @@
-.*~
+*.tu*
 a.out
 in.txt
 Workspace

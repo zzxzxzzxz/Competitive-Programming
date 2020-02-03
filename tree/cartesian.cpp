@@ -7,8 +7,8 @@ struct Node {
     Node(int i, int v): idx(i), val(v) {}
 };
 
-template<class Cmp = less<>>
-unique_ptr<Node> cartesian(vector<int>& v, Cmp cmp = Cmp()) {
+template<class T, class Cmp = less<T>>
+unique_ptr<Node> cartesian(vector<T>& v, Cmp cmp = Cmp()) {
 
     auto dummy = make_unique<Node>(-1, 0);
     vector<Node*> stack = {dummy.get()};

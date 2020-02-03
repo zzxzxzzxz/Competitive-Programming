@@ -37,7 +37,7 @@ constexpr auto zip(index_sequence<Is...>, Iter be, Iter ed) {
     struct iterator {
         Iter iter;
         bool operator!=(const iterator& other) { return ((get<Is>(iter) != get<Is>(other.iter)) and ...); }
-        void operator++() { ((++get<Is>(iter)), ...); }
+        auto& operator++() { ((++get<Is>(iter)), ...); return *this; }
         auto operator*() { return tie(*get<Is>(iter)...); }
     };
     struct iterable_wrapper {

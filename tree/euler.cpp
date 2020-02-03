@@ -1,64 +1,55 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#define MAX_N (1 << 20)
+const int MAX_N = 300005;
 
-vector<vector<int>> G;
-int sz = 0;
-int from[MAX_N], to[MAX_N];
+vector<int> G[MAX_N];
+int pos[MAX_N], vs[MAX_N], to[MAX_N];
 
-void euler(int v) {
-    from[v] = sz;
-    to[v] = sz;
+void euler(int p, int v, int& sz) {
+    pos[v] = sz;
+    vs[sz] = v;
     ++sz;
-
-    for(auto ii = G[v].begin(); ii != G[v].end(); ++ii) {
-        euler(*ii);
-        to[v] = max(to[v], to[*ii]);
+    for(int u: G[v]) {
+        if(u == p) continue;
+        euler(v, u, sz);
+        //vs[sz] = v;
+        //++sz;
     }
+    to[v] = sz;
 }
 
-
-int main()
-{
-    vector<pair<int, int>> edges = {
-        {1, 2},
-        {1, 3},
-        {2, 4},
-        {2, 5},
-        {3, 6},
-        {1, 7},
-        {5, 8},
-    };
-
-    G.resize(10);
-    for(auto e: edges) {
-        G[e.first].push_back(e.second);
-    }
-
-    sz = 0;
-    euler(1);
-
-    vector<int> id(10);
-    for(int i = 1; i <= 8; i++) {
-        id[from[i]] = i;
-    }
-    for(int i = 0; i < 8; i++) {
-        cout << i << " \n"[i == 7];
-    }
-    for(int i = 0; i < 8; i++) {
-        cout << id[i] << " \n"[i == 7];
-    }
+int main() {
+    cout << "          1" << endl;
+    cout << "         / \\" << endl;
+    cout << "        2   4" << endl;
+    cout << "       / \\   \\" << endl;
+    cout << "      3   5   7" << endl;
+    cout << "     / \\" << endl;
+    cout << "    6   8" << endl;
     cout << endl;
 
-    for(int i = 1; i <= 8; i++) {
-        cout << i << " \n"[i == 8];
+    int n = 8;
+    vector<int> p = {1, 2, 1, 2, 3, 4, 3};
+    for(int i = 2; i <= n; i++) {
+        int u = i, v = p[i - 2];
+        G[u].push_back(v);
+        G[v].push_back(u);
     }
-    for(int i = 1; i <= 8; i++) {
-        cout << from[i] << " \n"[i == 8];
-    }
-    for(int i = 1; i <= 8; i++) {
-        cout << to[i] << " \n"[i == 8];
-    }
+
+    int root = 1, sz = 0;
+    euler(-1, root, sz);
+
+    auto show = [](const int v) {
+        cout << "children of " << v << ": ";
+        for(int i = pos[v] + 1; i < to[v]; ++i) {
+            cout << vs[i] << " ";
+        }
+        cout << endl;
+    };
+    show(1);
+    show(2);
+    show(3);
+    show(4);
     return 0;
 }
