@@ -32,27 +32,24 @@ constexpr auto range(T start, T stop, T step) {
 template<typename T> constexpr auto range(T start, T stop) { return range(start, stop, T(1)); }
 template<typename T> constexpr auto range(T stop) { return range(T(0), stop, T(1)); }
 
-template<class T, class TIter, size_t ...Is>
-auto zip(T&& t, TIter, index_sequence<Is...>) {
+template<size_t ...Is, class Iter>
+constexpr auto zip(index_sequence<Is...>, Iter be, Iter ed) {
     struct iterator {
-        TIter iter;
-        auto operator*() { return tie(*get<Is>(iter)...); }
-        auto& operator++() { ((++get<Is>(iter)), ...); return *this; }
+        Iter iter;
         bool operator!=(const iterator& other) { return ((get<Is>(iter) != get<Is>(other.iter)) and ...); }
+        void operator++() { ((++get<Is>(iter)), ...); }
+        auto operator*() { return tie(*get<Is>(iter)...); }
     };
     struct iterable_wrapper {
-        T t;
-        auto begin() const { return iterator{ TIter{ std::begin(get<Is>(t))... } }; }
-        auto end() const { return iterator{ TIter{ std::end(get<Is>(t))... } }; }
+        Iter be, ed;
+        auto begin() const { return iterator{ be }; }
+        auto end() const { return iterator{ ed }; }
     };
-    return iterable_wrapper{ forward<T>(t) };
+    return iterable_wrapper{ be, ed };
 }
-template<class ...Cs>
-auto zip(Cs&& ...cs) {
-    return zip(
-            tuple<Cs...>{ forward<Cs>(cs)... },
-            tuple<decltype(begin(declval<Cs>()))...>{},
-            index_sequence_for<Cs...>{});
+template<class ...Cs, class Iter = tuple<decltype(begin(declval<Cs>()))...>>
+constexpr auto zip(Cs&& ...cs) {
+    return zip(index_sequence_for<Cs...>{}, Iter{ begin(cs)... }, Iter{ end(cs)... });
 }
 
 template<typename T>

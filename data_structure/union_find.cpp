@@ -1,18 +1,13 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-const int MOD = 1000000007;
-#define MAX_N 300005
-
-int parent[MAX_N];
-int rnk[MAX_N];
+vector<int> parent, rnk;
 
 struct DSU {
     DSU(int n) {
-        for(int i = 0; i < n; i++) {
-            parent[i] = i;
-            rnk[i] = 0;
-        }
+        rnk.assign(n, 0);
+        parent.resize(n);
+        iota(parent.begin(), parent.end(), 0);
     }
 
     int find(int x) {
@@ -39,19 +34,15 @@ struct DSU {
             }
         }
     }
-
-    bool same(int x, int y) {
-        return find(x) == find(y);
-    }
 };
 
 int main()
 {
     int n = 10;
-    DSU dsu(n + 1);
+    auto dsu = DSU(n + 1);
     dsu.unite(1, 2);
-    cout << dsu.same(1, 3) << endl;
+    cout << (dsu.find(1) == dsu.find(3)) << endl;
     dsu.unite(2, 3);
-    cout << dsu.same(1, 3) << endl;
+    cout << (dsu.find(1) == dsu.find(3)) << endl;
     return 0;
 }

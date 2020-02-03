@@ -1,36 +1,30 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#define IGNORE(x) static_assert(is_same<decltype(x), decltype(x)>::value);
+using Data = int;
+vector<Data> dat, lazy;
 
-const int MOD = 1000000007;
-#define MAX_N 200005
+//const Data zero_m = 0, zero_c = INT_MAX;
+const Data zero_m = 0, zero_c = 0;
 
-using DTYPE = int;
-DTYPE dat[4 * MAX_N];
-DTYPE lazy[4 * MAX_N];
-
-//const DTYPE zero_m = 0, zero_c = INT_MAX;
-const DTYPE zero_m = 0, zero_c = 0;
-
-DTYPE modify(const DTYPE& val1, const DTYPE& val2, int width = 1) {
-    //IGNORE(width); return val1 + val2;
+Data modify(const Data& val1, const Data& val2, int width = 1) {
+    //ignore = width; return val1 + val2;
     return val1 + val2 * width;
 }
-DTYPE combine(const DTYPE& val1, const DTYPE& val2) {
+Data combine(const Data& val1, const Data& val2) {
     //return min(val1, val2);
     return val1 + val2;
 }
 
 struct SegTree {
     int N;
-    SegTree(int n_, DTYPE *a = NULL) {
+    SegTree(int n_, Data *a = NULL) {
         N = 1;
         while(N < n_) {
             N <<= 1;
         }
-        fill(dat, dat + 2 * N, zero_c);
-        fill(lazy, lazy + 2 * N, zero_m);
+        dat.assign(N * 2, zero_c);
+        lazy.assign(N * 2, zero_m);
 
         if(a != NULL) {
             for(int i = 0; i < n_; i++) dat[i + N] = a[i];
@@ -45,7 +39,7 @@ struct SegTree {
         dat[k] = modify(combine(dat[lc], dat[rc]), lazy[k], r - l);
     }
 
-    void update_range(int a, int b, const DTYPE& val, int l = 0, int r = -1, int k = 1) {
+    void update_range(int a, int b, const Data& val, int l = 0, int r = -1, int k = 1) {
         r = (r < 0)? N : r;
 
         if(r <= a or b <= l) {
@@ -63,7 +57,7 @@ struct SegTree {
         pull(k, l, r);
     }
 
-    DTYPE query(int a, int b, int l = 0, int r = -1, int k = 1) {
+    Data query(int a, int b, int l = 0, int r = -1, int k = 1) {
         r = (r < 0)? N : r;
 
         if(r <= a or b <= l) {
@@ -73,9 +67,9 @@ struct SegTree {
             return dat[k];
         }
         int mid = l + (r - l) / 2;
-        DTYPE vl = query(a, b, l, mid, k << 1);
-        DTYPE vr = query(a, b, mid, r, k << 1 | 1);
-        DTYPE ret = modify(combine(vl, vr), lazy[k], min(r, b) - max(l, a));
+        Data vl = query(a, b, l, mid, k << 1);
+        Data vr = query(a, b, mid, r, k << 1 | 1);
+        Data ret = modify(combine(vl, vr), lazy[k], min(r, b) - max(l, a));
         return ret;
     }
 };

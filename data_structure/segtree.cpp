@@ -1,40 +1,34 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#define IGNORE(x) static_assert(is_same<decltype(x), decltype(x)>::value);
+using Data = int;
+vector<Data> dat;
 
-const int MOD = 1000000007;
-#define MAX_N 200005
-
-using DTYPE = int;
-DTYPE dat[4 * MAX_N];
-
-const DTYPE zero_c = INT_MAX;
-DTYPE modify(const DTYPE& val1, const DTYPE& val2) {
-    IGNORE(val1);
-    return val2;
+const Data zero_c = INT_MAX;
+Data modify(const Data& val1, const Data& val2) {
+    ignore = val1; return val2;
 }
-DTYPE combine(const DTYPE& val1, const DTYPE& val2) {
+Data combine(const Data& val1, const Data& val2) {
     return min(val1, val2);
 }
 
 
 struct SegTree {
     int N;
-    SegTree(int n_, DTYPE *a = NULL) {
+    SegTree(int n_, Data *ptr = nullptr) {
         N = 1;
         while(N < n_) N <<= 1;
-        fill(dat, dat + 2 * N, zero_c);
+        dat.assign(N * 2, zero_c);
 
-        if(a != NULL) {
-            for(int i = 0; i < n_; i++) dat[i + N] = a[i];
+        if(ptr != NULL) {
+            for(int i = 0; i < n_; i++) dat[i + N] = ptr[i];
             for(int k = N - 1; k >= 0; k--) {
                 dat[k] = combine(dat[k * 2], dat[k * 2 + 1]);
             }
         }
     }
 
-    void update(int a, const DTYPE& val, int l = 0, int r = -1, int k = 1) {
+    void update(int a, const Data& val, int l = 0, int r = -1, int k = 1) {
         r = (r < 0)? N : r;
 
         if(r <= a or a < l) {
@@ -50,7 +44,7 @@ struct SegTree {
         dat[k] = combine(dat[k * 2], dat[k * 2 + 1]);
     }
 
-    DTYPE query(int a, int b, int l = 0, int r = -1, int k = 1) {
+    Data query(int a, int b, int l = 0, int r = -1, int k = 1) {
         r = (r < 0)? N : r;
 
         if(r <= a or b <= l) {
@@ -60,8 +54,8 @@ struct SegTree {
             return dat[k];
         }
         int mid = l + (r - l) / 2;
-        DTYPE vl = query(a, b, l, mid, k * 2);
-        DTYPE vr = query(a, b, mid, r, k * 2 + 1);
+        Data vl = query(a, b, l, mid, k * 2);
+        Data vr = query(a, b, mid, r, k * 2 + 1);
         return combine(vl, vr);
     }
 };
