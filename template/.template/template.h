@@ -111,6 +111,6 @@ using LL = long long;
 
 const int MOD = 1e9 + 7;
 const int INF = 1e9 + 10;
-const LL LLINF = 1e18 + 10;
+const LL LLINF = 1e18 + 1e10;
 const int MAX_N = 300005;
 
