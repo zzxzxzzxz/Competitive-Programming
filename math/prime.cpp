@@ -2,21 +2,20 @@
 using namespace std;
 
 const int MOD = 1000000007;
-#define MAX_N 300005
-#define MAX_P 10000005
+#define MAX_P 1000005
 
 int minp[MAX_P];
-//vector<int> primes;
+vector<int> primes;
 
 void Sieve() {
-    for(int i = 2; i < MAX_P; i++) {
+    for(int i = 2; i < MAX_P; ++i) {
         if(minp[i] == 0) {
-            //primes.push_back(i);
-            for(int j = i; j < MAX_P; j += i) {
-                if(minp[j] == 0) {
-                    minp[j] = i;
-                }
-            }
+            primes.push_back(i);
+            minp[i] = i;
+        }
+        for(int j = 0; j < int(primes.size()) and i * primes[j] < MAX_P; ++j) {
+            minp[i * primes[j]] = primes[j];
+            if(i % primes[j] == 0) break;
         }
     }
 }
@@ -24,10 +23,11 @@ void Sieve() {
 vector<int> getpdiv(int x) {
     vector<int> ps;
     while(x > 1) {
-        if(ps.empty() or ps.back() != minp[x]) {
-            ps.push_back(minp[x]);
+        int d = minp[x];
+        ps.push_back(d);
+        while(x % d == 0) {
+            x /= d;
         }
-        x /= minp[x];
     }
     return ps;
 }
@@ -35,11 +35,10 @@ vector<int> getpdiv(int x) {
 int main()
 {
     Sieve();
-    int x;
-    scanf("%d", &x);
+    int x = 734132;
+    cout << x << " : ";
     auto ps = getpdiv(x);
-    for(auto v: ps) {
-        printf("%d\n", v);
-    }
+    for(auto v: ps) cout << v << " ";
+    cout << endl;
     return 0;
 }
