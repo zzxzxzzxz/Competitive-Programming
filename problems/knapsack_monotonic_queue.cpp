@@ -103,6 +103,8 @@ const int INF = 1e9 + 10;
 const LL LLINF = 1e18 + 1e10;
 const int MAX_N = 1005;
 
+// https://codeforces.com/problemset/problem/106/C
+
 int main() {
     int n, m, c0, d0;
     read(n, m, c0, d0);
