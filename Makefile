@@ -28,3 +28,6 @@ pG:
 
 clean:
 	@rm -f in*.txt a.out A B C D E F G *.tu* *.in *.out *input* *output*
+
+clean_tu:
+	find . -name '*.tu*' -delete
