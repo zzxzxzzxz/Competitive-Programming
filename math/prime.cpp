@@ -1,8 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-const int MOD = 1000000007;
-#define MAX_P 1000005
+const int MAX_P = 1000005;
 
 int minp[MAX_P];
 vector<int> primes;
