@@ -32,12 +32,19 @@ constexpr auto range(T start, T stop, T step) {
 template<typename T> constexpr auto range(T start, T stop) { return range(start, stop, T(1)); }
 template<typename T> constexpr auto range(T stop) { return range(T(0), stop, T(1)); }
 
+template<class ...T> void absorb(T&&...) {}
+template<size_t L, size_t I, class T>
+bool zip_it_ne(const T& t1, const T& t2) {
+    if(not (get<I>(t1) != get<I>(t2))) return false;
+    if(I + 1 == L) return true;
+    return zip_it_ne<L, (I + 1) % L>(t1, t2);
+}
 template<size_t ...Is, class Iter>
 constexpr auto zip(index_sequence<Is...>, Iter be, Iter ed) {
     struct iterator {
         Iter iter;
-        bool operator!=(const iterator& other) { return ((get<Is>(iter) != get<Is>(other.iter)) and ...); }
-        auto& operator++() { ((++get<Is>(iter)), ...); return *this; }
+        bool operator!=(const iterator& other) { return zip_it_ne<sizeof...(Is), 0>(iter, other.iter); }
+        auto& operator++() { absorb(++get<Is>(iter)...); return *this; }
         auto operator*() { return tie(*get<Is>(iter)...); }
     };
     struct iterable_wrapper {
@@ -81,15 +88,19 @@ constexpr auto printer(T&& iterable) {
 template <size_t ... Is, typename T>
 auto tuple_slice(const T& t) { return tie(get<Is>(t)...); }
 
-template<class ...T> void read(T& ...args) { (cin >> ... >> args); }
+inline void read() {}
+template<class T, class ...U> inline void read(T& head, U&... tail) {
+    cin >> head; read(tail...);
+}
 template<class T> inline void print_1(const T& x) { cout << x; }
 template<class T> inline void print_1(const vector<T>& v) {
     for(auto it = v.begin(); it != v.end(); ++it) {
         if(it != v.begin()) putchar(' '); print_1(*it);
     }
 }
-template<class T, class ...U> void print_n(const T& head, const U& ...args) {
-    print_1(head); ((cout << ' ' << args), ...);
+inline void print_n() {}
+template<class T, class ...U> inline void print_n(const T& head, const U&... tail) {
+    print_1(head); if(sizeof...(tail)) putchar(' '); print_n(tail...);
 }
 template<class ...T> inline void print(const T& ...args) { print_n(args...); putchar('\n'); }
 
