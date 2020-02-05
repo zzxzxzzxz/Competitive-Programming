@@ -9,14 +9,14 @@ size_t seed = dist(mt);
 struct VecHash {
     size_t operator()(const vector<int>& vec) const {
         hash<int> h;
-        auto hash_combine = [&h](size_t& seed, const int& v) {
-            seed ^= h(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        auto hash_combine = [&h](size_t& hval, const int& v) {
+            hval ^= h(v) + 0x9e3779b9 + (hval << 6) + (hval >> 2);
         };
         auto hval = seed;
         for(auto& val: vec) {
             hash_combine(hval, val);
         }
-        return seed;
+        return hval;
     }
 };
 
