@@ -1,15 +1,20 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+random_device rd;
+mt19937 mt(rd());
+uniform_int_distribution<size_t> dist(0, SIZE_MAX);
+size_t seed = dist(mt);
+
 struct VecHash {
     size_t operator()(const vector<int>& vec) const {
         hash<int> h;
         auto hash_combine = [&h](size_t& seed, const int& v) {
             seed ^= h(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
         };
-        size_t seed = 20200109;
+        auto hval = seed;
         for(auto& val: vec) {
-            hash_combine(seed, val);
+            hash_combine(hval, val);
         }
         return seed;
     }
