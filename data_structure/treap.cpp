@@ -6,35 +6,35 @@ mt19937 mt(rd());
 uniform_int_distribution<size_t> dist(0, SIZE_MAX);
 size_t seed = dist(mt);
 
-struct Node {
-    size_t sz;
-    int val, maxv, lazy;
-    unique_ptr<Node> left, right;
-    Node(int v): sz(1), val(v), maxv(INT_MIN), lazy(0) {}
-    void pull() {
-        sz = 1;
-        maxv = val;
-        if(left) {
-            sz += left->sz;
-            maxv = max(maxv, left->maxv + left->lazy);
-        }
-        if(right) {
-            sz += right->sz;
-            maxv = max(maxv, right->maxv + right->lazy);
-        }
-    };
-    void push() {
-        val += lazy;
-        if(left) left->lazy += lazy;
-        if(right) right->lazy += lazy;
-        lazy = 0;
-    };
-};
-
-using NodePtr = unique_ptr<Node>;
-
+template<class T>
 class Treap{
     private:
+        struct Node {
+            size_t sz;
+            T val, maxv, lazy;
+            unique_ptr<Node> left, right;
+            Node(const T& v): sz(1), val(v), maxv(INT_MIN), lazy(0) {}
+            void pull() {
+                sz = 1;
+                maxv = val;
+                if(left) {
+                    sz += left->sz;
+                    maxv = max(maxv, left->maxv + left->lazy);
+                }
+                if(right) {
+                    sz += right->sz;
+                    maxv = max(maxv, right->maxv + right->lazy);
+                }
+            };
+            void push() {
+                val += lazy;
+                if(left) left->lazy += lazy;
+                if(right) right->lazy += lazy;
+                lazy = 0;
+            };
+        };
+
+        using NodePtr = unique_ptr<Node>;
         NodePtr root;
         bool prior(NodePtr& node1, NodePtr& node2) {
             seed = 0xdefaced * seed + 1;
@@ -87,14 +87,14 @@ class Treap{
     public:
         Treap(): root(nullptr) {}
 
-        void insert(const int val, const int k) {
+        void insert(const T& val, const size_t k) {
             auto node = make_unique<Node>(val);
             auto [a, b] = split(root, k);
             a = merge(a, node);
             root = merge(a, b);
         }
 
-        int ask(int l, int r) {
+        int ask(const size_t l, const size_t r) {
             NodePtr a, b, c;
             tie(a, b) = split(root, l);
             tie(b, c) = split(b, r - l);
@@ -109,7 +109,7 @@ class Treap{
             return ans;
         }
 
-        void add(int l, int r, int v) {
+        void add(const size_t l, const size_t r, const T& v) {
             NodePtr a, b, c;
             tie(a, b) = split(root, l);
             tie(b, c) = split(b, r - l);
@@ -118,16 +118,14 @@ class Treap{
             root = merge(a, b);
         }
 
-        void dfs(NodePtr& node) {
-            if(not node) {
-                return;
-            }
-            dfs(node->left);
-            printf("%2d ", node->val);
-            dfs(node->right);
-        }
-        void dfs() {
-            dfs(root); putchar('\n');
+        template<class F> void dfs(F f) {
+            auto traverse = [](auto self, NodePtr& node, F f) {
+                if(not node) return;
+                self(self, node->left, f);
+                f(node);
+                self(self, node->right, f);
+            };
+            traverse(traverse, root, f);
         }
 };
 
@@ -135,12 +133,16 @@ int main(){
     vector<int> v = {5, 3, 6, 4, 0, 7, 9, 1, 8, 2};
     int n = v.size();
 
-    Treap t;
-
+    Treap<int> t;
     for(int i = 0; i < n; ++i) {
         t.insert(v[i], i);
     }
-    t.dfs();
+
+    auto f = [](const auto& node) {
+        cout << node->val << " ";
+    };
+    t.dfs(f);
+    cout << endl;
 
     for(int i = 0; i < 10; ++i) {
         int l = dist(mt) % n, r = dist(mt) % n;
