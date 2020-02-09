@@ -104,7 +104,7 @@ template<class T, class ...U> inline void print_n(const T& head, const U&... tai
 }
 template<class ...T> inline void print(const T& ...args) { print_n(args...); putchar('\n'); }
 
-static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); return 0; }();
+static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); cout.precision(17); return 0; }();
 //}}}
 using PII = pair<int, int>;
 using LL = long long;

@@ -18,15 +18,17 @@ using PIS = pair<int, string>;
 
 class Solution {
 private:
-    const int INF = 0x3f3f3f3f;
-    int h_dist(string& s, string& t) {
-        int ans = 0;
-        for(size_t i = 0; i < s.size(); ++i) {
-            int d = abs(s[i] - t[i]);
-            ans += min(d, 10 - d);
+    template<class F> struct DefaultDict {
+        DefaultDict(F f): f(f) {}
+        F f;
+        unordered_map<string, int> dict;
+        int& operator[](const string& s) {
+            if(dict.find(s) == dict.end()) {
+                dict[s] = f(s);
+            }
+            return dict[s];
         }
-        return ans;
-    }
+    };
 
 public:
     int openLock(vector<string>& deadends, string target) {
@@ -37,35 +39,36 @@ public:
             return -1;
         }
 
-        unordered_map<string, int> g_dict, h_dict;
-        auto h = [&](string& s) -> int {
-            if(h_dict.count(s) == 0) h_dict[s] = h_dist(s, target);
-            return h_dict[s];
+        auto h_dist = [&](const string& s) {
+            int ans = 0;
+            for(size_t i = 0; i < s.size(); ++i) {
+                int d = abs(s[i] - target[i]);
+                ans += min(d, 10 - d);
+            }
+            return ans;
         };
 
-        auto g = [&](string& s) -> int& {
-            if(g_dict.count(s) == 0) g_dict[s] = INF;
-            return g_dict[s];
-        };
+        auto h = DefaultDict(h_dist);
+        auto g = DefaultDict([](const string&) { return 1e9 + 10; });
 
         priority_queue<PIS, vector<PIS>, greater<PIS>> pq;
-        g(s) = 0;
-        pq.push({g(s) + h(s), s});
+        g[s] = 0;
+        pq.push({g[s] + h[s], s});
 
         while(pq.size()) {
             auto [dist, v] = pq.top();
             pq.pop();
 
             if(v == target) return dist;
-            if(dist > g(v) + h(v)) continue;
+            if(dist > g[v] + h[v]) continue;
 
             string u = v;
             for(int i = 0; i < n; ++i) {
                 for(int j: vector<int>({1, 9})) {
                     u[i] = (v[i] - '0' + j) % 10 + '0';
-                    if(dead_set.count(u) == 0 and g(u) > g(v) + 1) {
-                        g(u) = g(v) + 1;
-                        pq.push({g(u) + h(u), u});
+                    if(dead_set.count(u) == 0 and g[u] > g[v] + 1) {
+                        g[u] = g[v] + 1;
+                        pq.push({g[u] + h[u], u});
                     }
                     u[i] = v[i];
                 }
