@@ -86,7 +86,7 @@ constexpr auto printer(T&& iterable) {
 };
 
 template <size_t ... Is, typename T>
-auto tuple_slice(const T& t) { return tie(get<Is>(t)...); }
+auto subarr(const T& t) { return tie(get<Is>(t)...); }
 
 inline void read() {}
 template<class T, class ...U> inline void read(T& head, U&... tail) {
