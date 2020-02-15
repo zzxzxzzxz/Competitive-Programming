@@ -74,7 +74,7 @@ struct ACA {
             if(q->id > -1) {
                 res.push_back({q->id, i});
             }
-            while(q->fail->id > -1) {
+            while(q->fail != NULL and q->fail->id > -1) {
                 q = q->fail;
                 res.push_back({q->id, i});
             }
