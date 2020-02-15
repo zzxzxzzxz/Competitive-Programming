@@ -67,6 +67,16 @@ auto enumerate(T&& iterable) {
     return zip(range(iterable.size()), forward<T>(iterable));
 }
 
+template<typename T>
+auto reversed(T&& iterable) {
+    struct iterable_wrapper {
+        T iterable;
+        auto begin() const { return iterable.rbegin(); }
+        auto end() const { return iterable.rend(); }
+    };
+    return iterable_wrapper{ forward<T>(iterable) };
+}
+
 template<typename T, typename TIter = decltype(begin(declval<T>())),
     typename = decltype(end(declval<T>()))>
 constexpr auto printer(T&& iterable) {
