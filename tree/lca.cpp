@@ -14,6 +14,7 @@ struct LCA {
     LCA(int n, int root): n(n), root(root) {
         parent.resize(n);
         depth.resize(n);
+        build();
     }
 
     void build() {
@@ -63,17 +64,26 @@ struct LCA {
 
 int main()
 {
-    int n = 5;
-    LCA lca(n + 1, 1);
-    vector<int> g = {1, 2, 1, 2};
+    cout << "          1" << endl;
+    cout << "         / \\" << endl;
+    cout << "        2   4" << endl;
+    cout << "       / \\   \\" << endl;
+    cout << "      3   5   7" << endl;
+    cout << "     / \\" << endl;
+    cout << "    6   8" << endl;
+    cout << endl;
+
+    int n = 8;
+    vector<int> p = {1, 2, 1, 2, 3, 4, 3};
     for(int i = 2; i <= n; i++) {
-        int u = i, v = g[i - 2];
+        int u = i, v = p[i - 2];
         G[u].push_back(v);
         G[v].push_back(u);
     }
-    lca.build();
-    cout << lca.get(1, 2) << endl;
-    cout << lca.get(3, 4) << endl;
-    cout << lca.get(3, 5) << endl;
+
+    LCA lca(n + 1, 1);
+    cout << "lca(6, 8): " << lca.get(6, 8) << endl;
+    cout << "lca(6, 7): " << lca.get(6, 7) << endl;
+    cout << "lca(2, 6): " << lca.get(2, 6) << endl;
     return 0;
 }
