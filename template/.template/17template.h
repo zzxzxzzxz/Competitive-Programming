@@ -9,15 +9,17 @@ using namespace std;
 #define putchar(x) cout << (x)
 #define repeat(x) [[maybe_unused]] auto _: range(x)
 
-#define GET_MACRO(_1, _2, _3, _4, _5, _6, NAME,...) NAME
-#define show(x) cout << #x << " = " << x;
-#define debug1(_1) show(_1) cout << endl;
-#define debug2(_1, _2) show(_1) cout << ", "; debug1(_2);
-#define debug3(_1, _2, _3) show(_1) cout << ", "; debug2(_2, _3);
-#define debug4(_1, _2, _3, _4) show(_1) cout << ", "; debug3(_2, _3, _4);
-#define debug5(_1, _2, _3, _4, _5) show(_1) cout << ", "; debug4(_2, _3, _4, _5);
-#define debug6(_1, _2, _3, _4, _5, _6) show(_1) cout << ", "; debug5(_2, _3, _4, _5, _6);
-#define debug(...) GET_MACRO(__VA_ARGS__, debug6, debug5, debug4, debug3, debug2, debug1)(__VA_ARGS__)
+#define SELECT(_1, _2, _3, _4, _5, _6, _7, _8, NAME,...) NAME
+#define showvar(x) cout << #x << " = " << x;
+#define dbg1(a) showvar(a) cout << endl;
+#define dbg2(a, b) showvar(a) cout << ", "; dbg1(b);
+#define dbg3(a, b, c) showvar(a) cout << ", "; dbg2(b, c);
+#define dbg4(a, b, c, d) showvar(a) cout << ", "; dbg3(b, c, d);
+#define dbg5(a, b, c, d, e) showvar(a) cout << ", "; dbg4(b, c, d, e);
+#define dbg6(a, b, c, d, e, f) showvar(a) cout << ", "; dbg5(b, c, d, e, f);
+#define dbg7(a, b, c, d, e, f, g) showvar(a) cout << ", "; dbg6(b, c, d, e, f, g);
+#define dbg8(a, b, c, d, e, f, g, h) showvar(a) cout << ", "; dbg7(b, c, d, e, f, g, h);
+#define debug(...) SELECT(__VA_ARGS__, dbg8, dbg7, dbg6, dbg5, dbg4, dbg3, dbg2, dbg1)(__VA_ARGS__)
 
 template<typename T>
 constexpr auto range(T start, T stop, T step) {
