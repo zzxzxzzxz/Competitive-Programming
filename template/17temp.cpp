@@ -7,7 +7,7 @@
 using namespace std;
 
 #define putchar(x) cout << (x)
-#define repeat(x) [[maybe_unused]] auto _: range(x)
+#define repeat(x) int _ = 0; _ < (x); ++_
 
 template<typename T>
 constexpr auto range(T start, T stop, T step) {
