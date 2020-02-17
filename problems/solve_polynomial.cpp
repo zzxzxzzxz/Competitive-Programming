@@ -128,17 +128,41 @@ int ask(int x) {
     return y;
 }
 
-LL inv(LL x) {
-    return mypow(x, MOD - 2);
+int k = 10;
+vector<LL> y, inv;
+
+void calc_inv() {
+    inv.resize(MOD);
+    vector<int> a(MOD - 1);
+    a[1] = 2;
+    for(int i = 2; i < MOD - 1; ++i) {
+        a[i] = a[i - 1] * 2 % MOD;
+    }
+    for(int i = 1; i < MOD - 1; ++i) {
+        inv[a[i]] = a[MOD - 1 - i];
+    }
 }
+
+LL test(const int i) {
+    LL p = 1;
+    for(LL j : range(k + 1)) {
+        p = p * (MOD + i - j) % MOD;
+    }
+    LL sum = 0;
+    for(LL j : range(k + 1)) {
+        LL invj = inv[(MOD + i - j) % MOD];
+        sum = (sum + y[j] * invj) % MOD;
+    }
+    return (sum * p) % MOD;
+};
+
 
 /*
  * https://codeforces.com/contest/1155/problem/E
  */
 
 int main() {
-    int k = 10;
-    vector<LL> y(k + 1), inv_i(MOD);
+    y.resize(k + 1);
     for(LL i : range(k + 1)) {
         LL yi = ask(i);
         if(yi == 0) {
@@ -148,10 +172,7 @@ int main() {
         }
         y[i] = yi;
     }
-
-    for(int i = 1; i < MOD; ++i) {
-        inv_i[i] = inv(i);
-    }
+    calc_inv();
 
     for(LL i : range(k + 1)) {
         LL d = 1;
@@ -161,21 +182,8 @@ int main() {
             }
             d = d * (MOD + i - j) % MOD;
         }
-        y[i] = (y[i] * inv(d)) % MOD;
+        y[i] = (y[i] * inv[d]) % MOD;
     }
-
-    auto test = [&](const int i) {
-        LL p = 1;
-        for(LL j : range(k + 1)) {
-            p = p * (MOD + i - j) % MOD;
-        }
-        LL sum = 0;
-        for(LL j : range(k + 1)) {
-            LL inv_ij = inv_i[(MOD + i - j) % MOD];
-            sum = (sum + y[j] * inv_ij) % MOD;
-        }
-        return (sum * p) % MOD;
-    };
 
     for(LL i : range(k + 1, MOD)) {
         if(test(i) == 0) {
