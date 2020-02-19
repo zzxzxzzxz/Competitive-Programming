@@ -100,22 +100,29 @@ constexpr auto printer(T&& iterable) {
     return iterable_wrapper{ forward<T>(iterable) };
 };
 
-template <size_t ... Is, typename T>
+template <size_t ...Is, typename T>
 auto subarr(const T& t) { return tie(get<Is>(t)...); }
 
 template <typename T, typename = void> struct is_std_container : false_type {};
 template <typename T> struct is_std_container<T, void_t<decltype(begin(declval<T>()))>> : true_type {};
+template <typename> struct is_tuple : false_type {};
+template <typename ...T> struct is_tuple<std::tuple<T...>> : true_type {};
+
+template<class T> using Tpl = typename enable_if<is_tuple<T>::value>::type;
 template<class T> using C = typename enable_if<is_std_container<T>::value and
-    not std::is_same<T, string>::value>::type;
-template<class T> using NotC = typename enable_if<not is_std_container<T>::value or
-    std::is_same<T, string>::value>::type;
+    not std::is_same<T, string>::value and not is_tuple<T>::value>::type;
+template<class T> using NotC = typename enable_if<(not is_std_container<T>::value or
+    std::is_same<T, string>::value) and not is_tuple<T>::value>::type;
 
 template<class ...T> void read(T& ...args) { (cin >> ... >> args); }
 template<class T> inline NotC<T> print_1(const T& x) { cout << x; }
 template<class T> inline C<T> print_1(const T& v) {
-    for(auto it = v.begin(); it != v.end(); ++it) {
-        if(it != v.begin()) putchar(' '); print_1(*it);
-    }
+    for(auto it = v.begin(); it != v.end(); ++it) { if(it != v.begin()) putchar(' '); print_1(*it); }
+}
+template<class T, class ...U> void print_n(const T& head, const U& ...args);
+template<class T> inline Tpl<T> print_1(const T& x) {
+    auto print_tuple = [](const auto& ...ts) { print_n(ts...); };
+    apply(print_tuple, x);
 }
 inline void print_n() {}
 template<class T, class ...U> void print_n(const T& head, const U& ...args) {
