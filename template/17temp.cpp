@@ -105,26 +105,23 @@ auto subarr(const T& t) { return tie(get<Is>(t)...); }
 
 template <typename T, typename = void> struct is_std_container : false_type {};
 template <typename T> struct is_std_container<T, void_t<decltype(begin(declval<T>()))>> : true_type {};
-template <typename> struct is_tuple : false_type {};
-template <typename ...T> struct is_tuple<std::tuple<T...>> : true_type {};
-
-template<class T> using Tpl = typename enable_if<is_tuple<T>::value>::type;
 template<class T> using C = typename enable_if<is_std_container<T>::value and
-    not std::is_same<T, string>::value and not is_tuple<T>::value>::type;
-template<class T> using NotC = typename enable_if<(not is_std_container<T>::value or
-    std::is_same<T, string>::value) and not is_tuple<T>::value>::type;
+    not std::is_same<T, string>::value>::type;
+template<class T> using NotC = typename enable_if<not is_std_container<T>::value or
+    std::is_same<T, string>::value>::type;
 
 template<class ...T> void read(T& ...args) { (cin >> ... >> args); }
 template<class T> inline NotC<T> print_1(const T& x) { cout << x; }
 template<class T> inline C<T> print_1(const T& v) {
     for(auto it = v.begin(); it != v.end(); ++it) { if(it != v.begin()) putchar(' '); print_1(*it); }
 }
+inline void print_n() {}
 template<class T, class ...U> void print_n(const T& head, const U& ...args);
-template<class T> inline Tpl<T> print_1(const T& x) {
+template<class ...T> inline void print_1(const tuple<T...>& x) {
     auto print_tuple = [](const auto& ...ts) { print_n(ts...); };
     apply(print_tuple, x);
 }
-inline void print_n() {}
+template<class T, class U> inline void print_1(const pair<T, U>& p) { print_n(p.first, p.second); }
 template<class T, class ...U> void print_n(const T& head, const U& ...args) {
     print_1(head); ((cout << ' ', print_1(args)), ...);
 }
@@ -136,8 +133,8 @@ using PII = pair<int, int>;
 using LL = long long;
 
 const int MOD = 1e9 + 7;
-const int INF = 1e9 + 10;
-const LL LLINF = 1e18 + 1e10;
+const int INF = 0x3f3f3f3f;
+const LL LLINF = 0x3f3f3f3f3f3f3f3f;
 const int MAX_N = 300005;
 
 
