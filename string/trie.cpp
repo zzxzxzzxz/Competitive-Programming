@@ -2,43 +2,33 @@
 using namespace std;
 
 struct TrieNode {
-    TrieNode *next[26];
+    array<TrieNode*, 26> next;
     bool is_end;
-
-    TrieNode() {
-        memset(next, 0, sizeof(next));
-        is_end = false;
-    }
+    TrieNode(): next({}), is_end(false) {}
 };
 
 struct Trie {
     TrieNode *root;
+    Trie(): root(new TrieNode()) {}
 
-    Trie() {
-        root = new TrieNode();
-    }
-
-    void insert(const string& s)
-    {
-        TrieNode *p = root;
-        for(int i = 0; i < s.size(); ++i)
-        {
-            int c = s[i] - 'a';
-            if(p->next[c] == NULL) {
-                p->next[c] = new TrieNode();
+    void insert(const string& s) {
+        TrieNode* p = root;
+        for(char c : s) {
+            int i = c - 'a';
+            if(p->next[i] == nullptr) {
+                p->next[i] = new TrieNode();
             }
-            p = p->next[c];
+            p = p->next[i];
         }
         p->is_end = true;
     }
 
-    bool search(const string& s)
-    {
-        TrieNode *p = root;
-        for(int i = 0; i < s.size(); ++i) {
-            int c = s[i] - 'a';
-            if(p->next[c]) {
-                p = p->next[c];
+    bool search(const string& s) {
+        TrieNode* p = root;
+        for(char c : s) {
+            int i = c - 'a';
+            if(p->next[i]) {
+                p = p->next[i];
             } else {
                 return false;
             }
@@ -54,5 +44,6 @@ int main() {
     cout << t.search("abc") << endl;
     cout << t.search("abf") << endl;
     cout << t.search("abce") << endl;
+    cout << t.search("abcde") << endl;
     return 0;
 }
