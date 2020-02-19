@@ -114,7 +114,7 @@ template<typename T, typename = void> struct is_std_container : false_type {};
 template<typename T>
 struct is_std_container<T, conditional_t<false, decltype(begin(declval<T>())), void>> : true_type {};
 
-template<class T> using C = typename enable_if<is_std_container<T>::value and
+template<class T> using IsC = typename enable_if<is_std_container<T>::value and
     not std::is_same<T, string>::value>::type;
 template<class T> using NotC = typename enable_if<not is_std_container<T>::value or
     std::is_same<T, string>::value>::type;
@@ -122,7 +122,7 @@ template<class T> using NotC = typename enable_if<not is_std_container<T>::value
 inline void read() {}
 template<class T, class ...U> inline void read(T& head, U&... tail) { cin >> head; read(tail...); }
 template<class T> inline NotC<T> print_1(const T& x) { cout << x; }
-template<class T> inline C<T> print_1(const T& v) {
+template<class T> inline IsC<T> print_1(const T& v) {
     for(auto it = v.begin(); it != v.end(); ++it) { if(it != v.begin()) putchar(' '); print_1(*it); }
 }
 inline void print_1(const tuple<>& t) {};
