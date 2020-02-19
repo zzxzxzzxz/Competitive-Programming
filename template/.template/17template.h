@@ -9,6 +9,18 @@ using namespace std;
 #define putchar(x) cout << (x)
 #define repeat(x) int _ = 0; _ < (x); ++_
 
+#define SELECT(_1, _2, _3, _4, _5, _6, _7, _8, NAME,...) NAME
+#define showvar(x) print_n(#x, "=", x);
+#define dbg1(a) showvar(a) cout << endl;
+#define dbg2(a, b) showvar(a) cout << ", "; dbg1(b);
+#define dbg3(a, b, c) showvar(a) cout << ", "; dbg2(b, c);
+#define dbg4(a, b, c, d) showvar(a) cout << ", "; dbg3(b, c, d);
+#define dbg5(a, b, c, d, e) showvar(a) cout << ", "; dbg4(b, c, d, e);
+#define dbg6(a, b, c, d, e, f) showvar(a) cout << ", "; dbg5(b, c, d, e, f);
+#define dbg7(a, b, c, d, e, f, g) showvar(a) cout << ", "; dbg6(b, c, d, e, f, g);
+#define dbg8(a, b, c, d, e, f, g, h) showvar(a) cout << ", "; dbg7(b, c, d, e, f, g, h);
+#define debug(...) SELECT(__VA_ARGS__, dbg8, dbg7, dbg6, dbg5, dbg4, dbg3, dbg2, dbg1)(__VA_ARGS__)
+
 template<typename T>
 constexpr auto range(T start, T stop, T step) {
     struct iterator {
@@ -91,9 +103,16 @@ constexpr auto printer(T&& iterable) {
 template <size_t ... Is, typename T>
 auto subarr(const T& t) { return tie(get<Is>(t)...); }
 
+template <typename T, typename = void> struct is_std_container : false_type {};
+template <typename T> struct is_std_container<T, void_t<decltype(begin(declval<T>()))>> : true_type {};
+template<class T> using C = typename enable_if<is_std_container<T>::value and
+    not std::is_same<T, string>::value>::type;
+template<class T> using NotC = typename enable_if<not is_std_container<T>::value or
+    std::is_same<T, string>::value>::type;
+
 template<class ...T> void read(T& ...args) { (cin >> ... >> args); }
-template<class T> inline void print_1(const T& x) { cout << x; }
-template<class T> inline void print_1(const vector<T>& v) {
+template<class T> inline NotC<T> print_1(const T& x) { cout << x; }
+template<class T> inline C<T> print_1(const T& v) {
     for(auto it = v.begin(); it != v.end(); ++it) {
         if(it != v.begin()) putchar(' '); print_1(*it);
     }
@@ -105,18 +124,6 @@ template<class T, class ...U> void print_n(const T& head, const U& ...args) {
 template<class ...T> inline void print(const T& ...args) { print_n(args...); putchar('\n'); }
 
 static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); cout.precision(17); return 0; }();
-
-#define SELECT(_1, _2, _3, _4, _5, _6, _7, _8, NAME,...) NAME
-#define showvar(x) print_n(#x, "=", x);
-#define dbg1(a) showvar(a) cout << endl;
-#define dbg2(a, b) showvar(a) cout << ", "; dbg1(b);
-#define dbg3(a, b, c) showvar(a) cout << ", "; dbg2(b, c);
-#define dbg4(a, b, c, d) showvar(a) cout << ", "; dbg3(b, c, d);
-#define dbg5(a, b, c, d, e) showvar(a) cout << ", "; dbg4(b, c, d, e);
-#define dbg6(a, b, c, d, e, f) showvar(a) cout << ", "; dbg5(b, c, d, e, f);
-#define dbg7(a, b, c, d, e, f, g) showvar(a) cout << ", "; dbg6(b, c, d, e, f, g);
-#define dbg8(a, b, c, d, e, f, g, h) showvar(a) cout << ", "; dbg7(b, c, d, e, f, g, h);
-#define debug(...) SELECT(__VA_ARGS__, dbg8, dbg7, dbg6, dbg5, dbg4, dbg3, dbg2, dbg1)(__VA_ARGS__)
 //}}}
 using PII = pair<int, int>;
 using LL = long long;
