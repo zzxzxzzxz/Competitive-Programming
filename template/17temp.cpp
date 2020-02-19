@@ -121,7 +121,7 @@ template<class T> inline void print_1(const T& x) {
     } else if constexpr(is_pair<T>::value) {
         print_n(x.first, x.second);
     } else if constexpr(is_container<T>::value) {
-        for(const auto& [i, val] : enumerate(x)) { if(i != 0) cout << ' '; print_1(val); }
+        for(auto it = x.begin(); it != x.end(); ++it) { if(it != x.begin()) cout << ' '; print_1(*it); }
     } else {
         cout << x;
     }
