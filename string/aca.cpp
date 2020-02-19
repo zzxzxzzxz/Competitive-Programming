@@ -3,28 +3,24 @@ using namespace std;
 
 struct Node {
     int id;
-    Node *fail;
-    Node *next[26];
+    Node* fail;
+    array<Node*, 26> next;
 
-    Node(): id(-1), fail(NULL), next() {}
+    Node(): id(-1), fail(nullptr), next({}) {}
 };
 
 struct ACA {
     Node *root;
-
-    ACA() {
-        root = new Node();
-    }
+    ACA(): root(new Node()) {}
 
     void insert(const string& s, int id) {
-        Node *p = root;
-        for(int i = 0; i < int(s.size()); ++i)
-        {
-            int c = s[i] - 'a';
-            if(p->next[c] == NULL) {
-                p->next[c] = new Node();
+        Node* p = root;
+        for(auto c : s) {
+            int i = c - 'a';
+            if(p->next[i] == NULL) {
+                p->next[i] = new Node();
             }
-            p = p->next[c];
+            p = p->next[i];
         }
         p->id = id;
     }
@@ -58,41 +54,45 @@ struct ACA {
         }
     }
 
-    void search(const string& s, vector<pair<int, int>>& res) {
+    auto search(const string& s) {
+        vector<pair<int, int>> res;
         Node *p = root;
-        for(int i = 0; i < int(s.size()); ++i) {
-            int c = s[i] - 'a';
-            while(p != root and not p->next[c]) {
+        for(int j = 0; j < int(s.size()); ++j) {
+            int i = s[j] - 'a';
+            while(p != root and not p->next[i]) {
                 p = p->fail;
             }
-            if(p->next[c]) {
-                p = p->next[c];
+            if(p->next[i]) {
+                p = p->next[i];
             } else {
                 p = root;
             }
             auto q = p;
             if(q->id > -1) {
-                res.push_back({q->id, i});
+                res.push_back({q->id, j});
             }
             while(q->fail != NULL and q->fail->id > -1) {
                 q = q->fail;
-                res.push_back({q->id, i});
+                res.push_back({q->id, j});
             }
         }
+        return res;
     }
 };
 
 int main() {
     ACA t;
-    vector<string> words = {"a", "b", "ab", "bc", "aab", "aac", "bd"};
+    vector<string> words = {"z", "y", "zy", "yx", "zzy", "zzx", "yw"};
     for(int i = 0; i < int(words.size()); ++i) {
         t.insert(words[i], i);
+        if(i != 0) cout << ", ";
+        cout << "\"" << words[i] << "\"";
     }
+    cout << endl;
     t.build_failure();
 
-    vector<pair<int, int>> res;
-    string s("aabd");
-    t.search(s, res);
+    string s("wzzyww");
+    auto res = t.search(s);
 
     cout << s << endl;
     for(auto it = res.begin(); it != res.end(); ++it) {
