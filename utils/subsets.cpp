@@ -2,22 +2,21 @@
 
 using namespace std;
 
+/*
+ * sigma_{0, N} C(N, K) * 2^K = O(3^N)
+ */
+
 int main() {
-    vector<int> s = {4, 5, 11, 15};
-    int sup = 0;
-    for(int i: s) {
-        sup |= (1 << i);
-    }
-    int sub = (sup - 1) & sup;
-    while(sub != sup) { // -1 & sup == sup
-        for(int i = 0; i < 31; ++i) {
-            if((sub >> i) & 1) {
-                cout << i << " ";
-            }
+    const int n = 3;
+    // iterate over all the masks
+    for (int mask = 0; mask < (1 << n); ++mask){
+        cout << bitset<n>(mask) << " : ";
+        // iterate over all the subsets of the mask
+        for(int i = mask; i > 0; i = (i - 1) & mask){
+            if(i != mask) cout << ", ";
+            cout << bitset<n>(i);
         }
         cout << endl;
-
-        sub = (sub - 1) & sup;
     }
     return 0;
 }
