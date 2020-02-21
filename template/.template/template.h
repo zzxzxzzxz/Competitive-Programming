@@ -24,8 +24,16 @@ using namespace std;
 template<typename T>
 constexpr auto range(T start, T stop, T step) {
     struct iterator {
+        using difference_type = T;
+        using value_type = T;
+        using pointer = T*;
+        using reference = T&;
+        using iterator_category = random_access_iterator_tag;
+
         T i, step;
+        T operator-(const iterator& other) { return i - other.i; };
         bool operator!=(const iterator& other) const { return i != other.i; }
+        auto& operator+=(const int& n) { i += step * n; return *this; }
         auto& operator++() { i += step; return *this; }
         auto& operator*() { return i; }
     };
@@ -44,67 +52,34 @@ constexpr auto range(T start, T stop, T step) {
 template<typename T> constexpr auto range(T start, T stop) { return range(start, stop, T(1)); }
 template<typename T> constexpr auto range(T stop) { return range(T(0), stop, T(1)); }
 
-template<class ...T> void absorb(T&&...) {}
-template<size_t L, size_t I, class T>
-bool zip_it_ne(const T& t1, const T& t2) {
-    if(not (get<I>(t1) != get<I>(t2))) return false;
-    if(I + 1 == L) return true;
-    return zip_it_ne<L, (I + 1) % L>(t1, t2);
-}
-template<size_t ...Is, class Iter>
-constexpr auto zip(index_sequence<Is...>, Iter be, Iter ed) {
-    struct iterator {
-        Iter iter;
-        bool operator!=(const iterator& other) { return zip_it_ne<sizeof...(Is), 0>(iter, other.iter); }
-        auto& operator++() { absorb(++get<Is>(iter)...); return *this; }
-        auto operator*() { return tie(*get<Is>(iter)...); }
-    };
-    struct iterable_wrapper {
-        Iter be, ed;
-        auto begin() const { return iterator{ be }; }
-        auto end() const { return iterator{ ed }; }
-    };
-    return iterable_wrapper{ be, ed };
-}
-template<class ...Cs, class Iter = tuple<decltype(begin(declval<Cs>()))...>>
-constexpr auto zip(Cs&& ...cs) {
-    return zip(index_sequence_for<Cs...>{}, Iter{ begin(cs)... }, Iter{ end(cs)... });
-}
-
-template<typename T>
-auto enumerate(T&& iterable) {
-    return zip(range(iterable.size()), forward<T>(iterable));
-}
-
-template<typename T>
+template<typename T, typename Iter = decltype(rbegin(declval<T>()))>
 auto reversed(T&& iterable) {
     struct iterable_wrapper {
-        T iterable;
-        auto begin() const { return iterable.rbegin(); }
-        auto end() const { return iterable.rend(); }
+        Iter be, ed;
+        auto begin() const { return be; }
+        auto end() const { return ed; }
     };
-    return iterable_wrapper{ forward<T>(iterable) };
+    return iterable_wrapper{ rbegin(iterable), rend(iterable) };
 }
 
-template<typename T, typename TIter = decltype(begin(declval<T>())),
-    typename = decltype(end(declval<T>()))>
+template<typename T, typename Iter = decltype(begin(declval<T>()))>
 constexpr auto printer(T&& iterable) {
     struct iterator {
-        TIter iter, ed;
+        Iter iter, ed;
         auto operator!=(const iterator& other) {
             auto ret = (iter != other.iter);
-            if(not ret) putchar('\n');
+            if(not ret) cout << '\n';
             return ret;
         }
-        auto& operator++() { ++iter; if(iter != ed) cout << " "; return *this; }
+        auto& operator++() { ++iter; if(iter != ed) cout << ' '; return *this; }
         auto operator*() { return *iter; }
     };
     struct iterable_wrapper {
-        T iterable;
-        auto begin() const { return iterator{ iterable.begin(), iterable.end() }; }
-        auto end() const { return iterator{ iterable.end(), iterable.end() }; }
+        Iter be, ed;
+        auto begin() const { return iterator{ be, ed }; }
+        auto end() const { return iterator{ ed, ed }; }
     };
-    return iterable_wrapper{ forward<T>(iterable) };
+    return iterable_wrapper{ begin(iterable), end(iterable) };
 };
 
 template <size_t ...Is, typename T>
