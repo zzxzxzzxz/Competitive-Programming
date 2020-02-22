@@ -5,7 +5,7 @@ using namespace std;
 struct Node {
     int l, r;
 };
-Node T[30000000];
+vector<Node> T(2);
 int nodes = 1;
 
 pair<int, int> Split(int node, int b, int e, int k) {
@@ -17,6 +17,7 @@ pair<int, int> Split(int node, int b, int e, int k) {
     }
 
     int clone = nodes++;
+    T.push_back(Node());
 
     int m = (b + e) / 2;
     if (k <= m) {
@@ -42,6 +43,7 @@ int Merge(int node1, int node2) {
 
 int Make(int b, int e, int val) {
     int ret = nodes++;
+    T.push_back(Node());
     if (b == e) return ret;
 
     int m = (b + e) / 2;
