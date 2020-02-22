@@ -72,7 +72,7 @@ constexpr auto printer(T&& iterable) {
             return ret;
         }
         auto& operator++() { ++iter; if(iter != ed) cout << ' '; return *this; }
-        auto operator*() { return *iter; }
+        auto& operator*() { return *iter; }
     };
     struct iterable_wrapper {
         Iter be, ed;

@@ -1,6 +1,6 @@
 //{{{
 #pragma comment(linker, "/stack:200000000")
-#pragma GCC optimize("Ofast")
+#pragma GCC optimize("O2")
 #pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native")
 
 #include <bits/stdc++.h>
@@ -72,7 +72,7 @@ constexpr auto printer(T&& iterable) {
             return ret;
         }
         auto& operator++() { ++iter; if(iter != ed) cout << ' '; return *this; }
-        auto& operator*() { return *iter; }
+        auto operator*() { return *iter; }
     };
     struct iterable_wrapper {
         Iter be, ed;
@@ -116,11 +116,69 @@ template<class ...T> void read(T& ...args) { (cin >> ... >> args); }
 
 static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); cout.precision(17); return 0; }();
 //}}}
-using PII = pair<int, int>;
-using LL = long long;
 
-const int MOD = 1e9 + 7;
-const int INF = 0x3f3f3f3f;
-const LL LLINF = 0x3f3f3f3f3f3f3f3f;
-const int MAX_N = 300005;
+void solve() {
+    array<array<int, 2005>, 20> a = {};
 
+    int n, m;
+    read(n, m);
+
+    // n * m
+    vector<int> col_max(m, 0), idx(m);
+    for(int i : range(n)) {
+        for(int j : range(m)) {
+            read(a[i][j]);
+            col_max[j] = max(col_max[j], a[i][j]);
+        }
+    }
+
+    // n * 2^n
+    vector<int> min_mask(1 << n);
+    for(int i : range(1, 1 << n)) {
+        min_mask[i] = i;
+        for(int s : range(n)) {
+            int j = (i >> s) + (i << (n - s)) & ((1 << n) - 1);
+            min_mask[i] = min(min_mask[i], j);
+        }
+    }
+
+    // m
+    iota(idx.begin(), idx.end(), 0);
+    m = min(n, m);
+    nth_element(idx.begin(), idx.begin() + m - 1, idx.end(),
+            [&col_max](int i, int j) { return col_max[i] > col_max[j]; });
+
+    // min(n, m) * (2^n + 3^n)
+    array<int, 5000> dp = {}, tmp = {}, mask_max = {};
+    for(int u : range(m)) {
+        mask_max = {};
+        tmp[0] = 0;
+        for(int i : range(1, 1 << n)) {
+            int l = (31 - __builtin_clz(i));
+            tmp[i] = a[l][idx[u]] + tmp[i ^ (1 << l)];
+
+            int k = min_mask[i];
+            mask_max[k] = max(mask_max[k], tmp[i]);
+        }
+
+        tmp = dp;
+        for(int i : range(1, 1 << n)) {
+            for(int j = i; j > 0; j = (j - 1) & i){
+                int k = min_mask[j];
+                dp[i] = max(dp[i], mask_max[k] + tmp[i - j]);
+            }
+        }
+    }
+    print(dp[(1 << n) - 1]);
+}
+
+// https://codeforces.com/contest/1209/problem/E2
+
+int main() {
+    int t;
+    read(t);
+    for(repeat(t)) {
+        solve();
+    }
+    return 0;
+}
