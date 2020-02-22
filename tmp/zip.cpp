@@ -3,34 +3,41 @@
 #include <set>
 using namespace std;
 
-template<size_t ...Is, class Iter>
-constexpr auto zip(index_sequence<Is...>, Iter be, Iter ed) {
+template<size_t ...Is, class T, class ...Cs,
+    class Iter = tuple<decltype(begin(declval<Cs>()))...>,
+    class Val = tuple<decltype(*begin(declval<Cs>()))&...>
+    >
+constexpr auto zip(index_sequence<Is...>, T&& iterables, Cs&&...) {
     struct iterator {
         Iter iter;
+        unique_ptr<Val> tref = nullptr;
         bool operator!=(const iterator& other) { return ((get<Is>(iter) != get<Is>(other.iter)) and ...); }
-        void operator++() { ((++get<Is>(iter)), ...); }
-        auto operator*() { return tie(*get<Is>(iter)...); }
+        auto& operator++() { ((++get<Is>(iter)), ...); return *this; }
+        auto& operator*() {
+            tref.reset();
+            tref = make_unique<Val>(tie(*get<Is>(iter)...));
+            return *tref;
+        }
     };
     struct iterable_wrapper {
-        Iter be, ed;
-        auto begin() const { return iterator{ be }; }
-        auto end() const { return iterator{ ed }; }
+        T iterables;
+        auto begin() const { return iterator { Iter{ std::begin(get<Is>(iterables))... } }; }
+        auto end() const { return iterator { Iter{ std::end(get<Is>(iterables))... } }; }
     };
-    return iterable_wrapper{ be, ed };
+    return iterable_wrapper{ forward<T>(iterables) };
 }
-template<class ...Cs, class Iter = tuple<decltype(begin(declval<Cs>()))...>>
+template<class ...Cs, class = tuple<decltype(begin(declval<Cs>()))...>>
 constexpr auto zip(Cs&& ...cs) {
-    return zip(index_sequence_for<Cs...>{}, Iter{ begin(cs)... }, Iter{ end(cs)... });
+    return zip(index_sequence_for<Cs...>{}, tie(cs...), forward<Cs>(cs)...);
 }
 
 int main() {
-    vector<int> v1 = {1, 2, 3, 4};
-    set<int> v2 = {11, 12, 13, 14, 15, 16, 17};
-    vector<double> v3 = {4.5, 5.5, 6.5};
-    for(const auto& [k1, k2, k3] : zip(v1, v2, v3)) {
-        cout << k1 << " ";
-        cout << k2 << " ";
-        cout << k3 << endl;
-    }
+    vector<int> v = {1, 2, 3};
+    for(auto [x] : zip(v)) cout << x << " "; cout << endl;
+    for(auto [x] : zip(zip(v))) cout << get<0>(x) << " "; cout << endl;
+    for(auto [x] : zip(zip(v))) cout << get<0>(x) << " "; cout << endl;
+    v[1] = 100;
+    for(auto [x] : zip(v)) cout << x << " "; cout << endl;
+    for(auto [x] : zip(zip(v))) cout << get<0>(x) << " "; cout << endl;
     return 0;
 }
