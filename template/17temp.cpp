@@ -39,9 +39,10 @@ constexpr auto range(T start, T stop, T step) {
     };
     struct iterable_wrapper {
         T start, stop, step;
-        auto begin() const { return iterator{start, step}; }
-        auto end() const { return iterator{stop, step}; }
+        auto begin() const { return iterator{ start, step }; }
+        auto end() const { return iterator{ stop, step }; }
         size_t size() const { return (stop - start) / step; }
+
         iterable_wrapper(T start_, T stop_, T step_): start(start_), stop(stop_), step(step_) {
             stop = step > 0 ? max(start, stop) : min(start, stop);
             stop += (step - (stop - start) % step) % step;
@@ -55,11 +56,11 @@ template<typename T> constexpr auto range(T stop) { return range(T(0), stop, T(1
 template<typename T, typename Iter = decltype(rbegin(declval<T>()))>
 auto reversed(T&& iterable) {
     struct iterable_wrapper {
-        Iter be, ed;
-        auto begin() const { return be; }
-        auto end() const { return ed; }
+        T iterable;
+        auto begin() const { return std::rbegin(iterable); }
+        auto end() const { return std::rend(iterable); }
     };
-    return iterable_wrapper{ rbegin(iterable), rend(iterable) };
+    return iterable_wrapper{ forward<T>(iterable) };
 }
 
 template<typename T, typename Iter = decltype(begin(declval<T>()))>
@@ -75,11 +76,11 @@ constexpr auto printer(T&& iterable) {
         auto& operator*() { return *iter; }
     };
     struct iterable_wrapper {
-        Iter be, ed;
-        auto begin() const { return iterator{ be, ed }; }
-        auto end() const { return iterator{ ed, ed }; }
+        T iterable;
+        auto begin() const { return iterator{ std::begin(iterable), std::end(iterable) }; }
+        auto end() const { return iterator{ std::end(iterable), std::end(iterable) }; }
     };
-    return iterable_wrapper{ begin(iterable), end(iterable) };
+    return iterable_wrapper{ forward<T>(iterable) };
 };
 
 template <size_t ...Is, typename T>

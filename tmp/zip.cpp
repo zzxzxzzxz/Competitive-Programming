@@ -103,11 +103,17 @@ constexpr auto enumerate(T&& iterable) {
 }
 
 int main() {
-    vector<int> v1 = {4, 5, 6, 7};
-    vector<int> v2 = {8, 9, 10};
+    vector<int> v1 = {4, 5, 6, 7, 8};
+    vector<int> v2 = {9, 10, 11};
 
     auto p = printer(enumerate(zip(v1, reversed(v2))));
-    v2[1] = 100;
+
+    for(auto [i, x] : p) {
+        auto [a, b] = x;
+        cout << "(" << i << ", " << a << ", " << b << ")";
+    }
+
+    v2[1] = -1;
 
     for(auto [i, x] : p) {
         auto [a, b] = x;
