@@ -6,18 +6,18 @@ using namespace std;
 template<typename T>
 constexpr auto range(T start, T stop, T step) {
     struct iterator {
+        using difference_type = T;
+        using value_type = T;
+        using pointer = T*;
+        using reference = T&;
+        using iterator_category = random_access_iterator_tag;
+
         T i, step;
         T operator-(const iterator& other) { return i - other.i; };
         bool operator!=(const iterator& other) const { return i != other.i; }
         auto& operator+=(const int& n) { i += step * n; return *this; }
         auto& operator++() { i += step; return *this; }
         auto& operator*() { return i; }
-
-        using difference_type = T;
-        using value_type = T;
-        using pointer = T*;
-        using reference = T&;
-        using iterator_category = random_access_iterator_tag;
     };
     struct iterable_wrapper {
         T start, stop, step;
