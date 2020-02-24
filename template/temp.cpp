@@ -1,6 +1,6 @@
 //{{{
 #pragma comment(linker, "/stack:200000000")
-#pragma GCC optimize("Ofast")
+#pragma GCC optimize("O2")
 #pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native")
 
 #include <bits/stdc++.h>
@@ -89,12 +89,10 @@ auto subarr(const T& t) { return tie(get<Is>(t)...); }
 template<typename T, typename = void> struct is_container : false_type {};
 template<typename T>
 struct is_container<T, conditional_t<false, decltype(begin(declval<T>())), void>> : true_type {};
-
 template<class T> using IsC = typename enable_if<is_container<T>::value and
     not std::is_same<T, string>::value>::type;
 template<class T> using NotC = typename enable_if<not is_container<T>::value or
     std::is_same<T, string>::value>::type;
-
 inline void read() {}
 template<class T, class ...U> inline void read(T& head, U&... tail) { cin >> head; read(tail...); }
 template<class T> inline NotC<T> print_1(const T& x) { cout << x; }
@@ -117,6 +115,7 @@ template<class T, class ...U> inline void print_n(const T& head, const U&... tai
 }
 template<class ...T> inline void print(const T& ...args) { print_n(args...); putchar('\n'); }
 
+mt19937 rnd((random_device())());
 static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); cout.precision(17); return 0; }();
 //}}}
 using PII = pair<int, int>;

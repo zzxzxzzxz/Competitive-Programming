@@ -1,6 +1,6 @@
 //{{{
 #pragma comment(linker, "/stack:200000000")
-#pragma GCC optimize("Ofast")
+#pragma GCC optimize("O2")
 #pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native")
 
 #include <bits/stdc++.h>
@@ -115,6 +115,7 @@ template<class T, class ...U> void print_n(const T& head, const U& ...args) {
 template<class ...T> inline void print(const T& ...args) { print_n(args...); putchar('\n'); }
 template<class ...T> void read(T& ...args) { (cin >> ... >> args); }
 
+mt19937 rnd((random_device())());
 static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); cout.precision(17); return 0; }();
 //}}}
 using PII = pair<int, int>;

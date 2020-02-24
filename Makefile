@@ -1,5 +1,5 @@
 #CMD = gcc -std=c++17 -Ofast -Wall -Wextra -Wno-unused-result -Wno-unused-const-variable -Wno-pragmas -lstdc++ -Wl,-stack_size -Wl,1000000000
-CMD = g++ -std=c++17 -Wall -Wextra -Wno-unused-result -Wno-unused-const-variable -Wno-pragmas
+CMD = g++ -std=c++17 -O2 -Wall -Wextra -Wno-unused-result -Wno-unused-const-variable -Wno-pragmas
 OUTPUT ?= "a.out"
 
 compile:
