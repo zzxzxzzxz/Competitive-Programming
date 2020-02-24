@@ -115,7 +115,7 @@ template<class T, class ...U> inline void print_n(const T& head, const U&... tai
 }
 template<class ...T> inline void print(const T& ...args) { print_n(args...); putchar('\n'); }
 
-mt19937 rnd((random_device())());
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); cout.precision(17); return 0; }();
 //}}}
 using PII = pair<int, int>;

@@ -136,9 +136,8 @@ pair<Node*, Node*> balance_n(Node* node, int n) {
     if(n == 0) {
         return { nullptr, node };
     }
-    auto [right, mid] = balance_n(node, (n - 1) / 2);
-    auto root = mid;
-    auto [left, tail] = balance_n(mid->left, n - 1 - (n - 1) / 2);
+    auto [right, root] = balance_n(node, (n - 1) / 2);
+    auto [left, tail] = balance_n(root->left, n - 1 - (n - 1) / 2);
     root->left = left;
     root->right = right;
     return {root, tail};
