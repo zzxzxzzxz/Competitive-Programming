@@ -186,6 +186,28 @@ void plot(Node* root) {
     }
 }
 
+pair<Node*, Node*> flatten1(Node* node) {
+    if(not node) {
+        return { nullptr, nullptr };
+    }
+    Node* head = node;
+    Node* tail = node;
+    if(node->right) {
+        Node* tmp;
+        tie(head, tmp) = flatten1(node->right);
+        tmp->left = node;
+    }
+    if(node->left) {
+        tie(node->left, tail) = flatten1(node->left);
+    }
+    return { head, tail };
+}
+
+Node* flatten(Node* root) {
+    tie(root, ignore) = flatten1(root);
+    return root;
+}
+
 int main() {
     int n = 31;
     vector<Node*> nodes(n);
@@ -197,7 +219,19 @@ int main() {
     }
     auto root = nodes[n - 1];
 
+    cout << "list ot bst:" << endl;
     root = balance(root);
     plot(root);
+
+    cout << endl << endl;
+
+    cout << "bst ot list:" << endl;
+    root = flatten(root);
+
+    while(root) {
+        cout << root->val << " ";
+        root = root->left;
+    }
+    cout << endl;
     return 0;
 }
