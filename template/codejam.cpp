@@ -84,7 +84,7 @@ constexpr auto printer(T&& iterable) {
 };
 
 template <size_t ...Is, typename T>
-auto subarr(const T& t) { return tie(get<Is>(t)...); }
+auto getis(const T& t) { return tie(get<Is>(t)...); }
 
 template<typename T, typename = void> struct is_container : false_type {};
 template<typename T>
