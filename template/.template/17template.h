@@ -21,15 +21,13 @@ using namespace std;
 #define dbg8(a, b, c, d, e, f, g, h) showvar(a) cout << ", "; dbg7(b, c, d, e, f, g, h);
 #define debug(...) SELECT(__VA_ARGS__, dbg8, dbg7, dbg6, dbg5, dbg4, dbg3, dbg2, dbg1)(__VA_ARGS__)
 
-template<typename T>
-constexpr auto range(T start, T stop, T step) {
+template<typename T> constexpr auto range(T start, T stop, T step) {
     struct iterator {
         using difference_type = T;
         using value_type = T;
         using pointer = T*;
         using reference = T&;
         using iterator_category = random_access_iterator_tag;
-
         T i, step;
         T operator-(const iterator& other) { return i - other.i; };
         bool operator!=(const iterator& other) const { return i != other.i; }
@@ -59,6 +57,7 @@ auto reversed(T&& iterable) {
         T iterable;
         auto begin() const { return std::rbegin(iterable); }
         auto end() const { return std::rend(iterable); }
+        auto size() const { return std::size(iterable); }
     };
     return iterable_wrapper{ forward<T>(iterable) };
 }
@@ -67,7 +66,7 @@ template<typename T, typename Iter = decltype(begin(declval<T>()))>
 constexpr auto printer(T&& iterable) {
     struct iterator {
         Iter iter, ed;
-        auto operator!=(const iterator& other) {
+        auto operator!=(const iterator& other) const {
             auto ret = (iter != other.iter);
             if(not ret) cout << '\n';
             return ret;
@@ -91,7 +90,9 @@ constexpr auto zip(index_sequence<Is...>, T&& iterables, Cs&&...) {
     struct iterator {
         Iter iter;
         unique_ptr<Ref> tref = nullptr;
-        bool operator!=(const iterator& other) { return ((get<Is>(iter) != get<Is>(other.iter)) and ...); }
+        bool operator!=(const iterator& other) const {
+            return ((get<Is>(iter) != get<Is>(other.iter)) and ...);
+        }
         auto& operator++() { ((++get<Is>(iter)), ...); return *this; }
         auto& operator*() { tref.reset(new Ref(tie(*get<Is>(iter)...))); return *tref; }
     };
@@ -113,8 +114,9 @@ constexpr auto enumerate(T&& iterable) {
     return zip(range(std::size(iterable)), forward<T>(iterable));
 }
 
-template <size_t ...Is, typename T>
-auto getis(const T& t) { return tie(get<Is>(t)...); }
+template<size_t ...Is, typename T> auto getis(const T& t) { return tie(get<Is>(t)...); }
+template<class T> void setmax(T& a, const T& b) { a = max(a, b); }
+template<class T> void setmin(T& a, const T& b) { a = min(a, b); }
 
 template<typename T, typename = void> struct is_container : false_type {};
 template<typename T> struct is_container<T, void_t<decltype(begin(declval<T>()))>> : true_type {};
@@ -125,7 +127,6 @@ template<typename T, typename U> struct is_pair<pair<T, U>> : true_type {};
 
 inline void print_n() {}
 template<class T, class ...U> inline void print_n(const T& head, const U& ...args);
-
 template<class T> inline void print_1(const T& x) {
     if constexpr(is_same<T, string>::value) {
         cout << x;

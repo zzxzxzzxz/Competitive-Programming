@@ -21,8 +21,7 @@ using namespace std;
 #define dbg8(a, b, c, d, e, f, g, h) showvar(a) cout << ", "; dbg7(b, c, d, e, f, g, h);
 #define debug(...) SELECT(__VA_ARGS__, dbg8, dbg7, dbg6, dbg5, dbg4, dbg3, dbg2, dbg1)(__VA_ARGS__)
 
-template<typename T>
-constexpr auto range(T start, T stop, T step) {
+template<typename T> constexpr auto range(T start, T stop, T step) {
     struct iterator {
         using difference_type = T;
         using value_type = T;
@@ -31,7 +30,7 @@ constexpr auto range(T start, T stop, T step) {
         using iterator_category = random_access_iterator_tag;
 
         T i, step;
-        T operator-(const iterator& other) { return i - other.i; };
+        T operator-(const iterator& other) const { return i - other.i; };
         bool operator!=(const iterator& other) const { return i != other.i; }
         auto& operator+=(const int& n) { i += step * n; return *this; }
         auto& operator++() { i += step; return *this; }
@@ -59,6 +58,7 @@ auto reversed(T&& iterable) {
         T iterable;
         auto begin() const { return std::rbegin(iterable); }
         auto end() const { return std::rend(iterable); }
+        auto size() const { return iterable.size(); }
     };
     return iterable_wrapper{ forward<T>(iterable) };
 }
@@ -67,7 +67,7 @@ template<typename T, typename Iter = decltype(begin(declval<T>()))>
 constexpr auto printer(T&& iterable) {
     struct iterator {
         Iter iter, ed;
-        auto operator!=(const iterator& other) {
+        auto operator!=(const iterator& other) const {
             auto ret = (iter != other.iter);
             if(not ret) cout << '\n';
             return ret;
@@ -83,6 +83,13 @@ constexpr auto printer(T&& iterable) {
     return iterable_wrapper{ forward<T>(iterable) };
 };
 
+template<class ...T> void absorb(T&& ...) {}
+template<size_t L, size_t I, class T>
+bool zip_it_ne(const T& it1, const T& it2) {
+    if(not (get<I>(it1) != get<I>(it2))) return false;
+    if(I + 1 == L) return true;
+    return zip_it_ne<L, (I + 1) % L, T>(it1, it2);
+}
 template<size_t ...Is, class T, class ...Cs,
     class Iter = tuple<decltype(begin(declval<Cs>()))...>,
     class Ref = tuple<decltype(*begin(declval<Cs>()))&...>
@@ -91,15 +98,17 @@ constexpr auto zip(index_sequence<Is...>, T&& iterables, Cs&&...) {
     struct iterator {
         Iter iter;
         unique_ptr<Ref> tref = nullptr;
-        bool operator!=(const iterator& other) { return ((get<Is>(iter) != get<Is>(other.iter)) and ...); }
-        auto& operator++() { ((++get<Is>(iter)), ...); return *this; }
+        bool operator!=(const iterator& other) const {
+            return zip_it_ne<sizeof...(Is), 0, Iter>(iter, other.iter);
+        }
+        auto& operator++() { absorb(++get<Is>(iter)...); return *this; }
         auto& operator*() { tref.reset(new Ref(tie(*get<Is>(iter)...))); return *tref; }
     };
     struct iterable_wrapper {
         T iterables;
         auto begin() const { return iterator { Iter{ std::begin(get<Is>(iterables))... } }; }
         auto end() const { return iterator { Iter{ std::end(get<Is>(iterables))... } }; }
-        auto size() const { return min({ std::size(get<Is>(iterables))... }); }
+        auto size() const { return min({ get<Is>(iterables).size()... }); }
     };
     return iterable_wrapper{ forward<T>(iterables) };
 }
@@ -110,11 +119,12 @@ constexpr auto zip(Cs&& ...cs) {
 
 template<typename T, typename Iter = decltype(begin(declval<T>()))>
 constexpr auto enumerate(T&& iterable) {
-    return zip(range(std::size(iterable)), forward<T>(iterable));
+    return zip(range(iterable.size()), forward<T>(iterable));
 }
 
-template <size_t ...Is, typename T>
-auto getis(const T& t) { return tie(get<Is>(t)...); }
+template<size_t ...Is, typename T> auto getis(const T& t) { return tie(get<Is>(t)...); }
+template<class T> void setmax(T& a, const T& b) { a = max(a, b); }
+template<class T> void setmin(T& a, const T& b) { a = min(a, b); }
 
 template<typename T, typename = void> struct is_container : false_type {};
 template<typename T>
@@ -123,8 +133,6 @@ template<class T> using IsC = typename enable_if<is_container<T>::value and
     not std::is_same<T, string>::value>::type;
 template<class T> using NotC = typename enable_if<not is_container<T>::value or
     std::is_same<T, string>::value>::type;
-inline void read() {}
-template<class T, class ...U> inline void read(T& head, U&... tail) { cin >> head; read(tail...); }
 template<class T> inline NotC<T> print_1(const T& x) { cout << x; }
 template<class T> inline IsC<T> print_1(const T& v) {
     for(auto it = v.begin(); it != v.end(); ++it) { if(it != v.begin()) putchar(' '); print_1(*it); }
@@ -144,6 +152,8 @@ template<class T, class ...U> inline void print_n(const T& head, const U&... tai
     print_1(head); if(sizeof...(tail)) putchar(' '); print_n(tail...);
 }
 template<class ...T> inline void print(const T& ...args) { print_n(args...); putchar('\n'); }
+inline void read() {}
+template<class T, class ...U> inline void read(T& head, U&... tail) { cin >> head; read(tail...); }
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); cout.precision(17); return 0; }();
