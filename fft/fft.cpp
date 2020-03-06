@@ -19,9 +19,9 @@ namespace FastFourierTransform {
 
     const real PI = acosl(-1);
     int base = 1;
-    vector< C > rts = { {0, 0},
-                        {1, 0} };
-    vector< int > rev = {0, 1};
+    vector<C> rts = {{0, 0},
+                     {1, 0}};
+    vector<int> rev = {0, 1};
 
 
     void ensure_base(int nbase) {

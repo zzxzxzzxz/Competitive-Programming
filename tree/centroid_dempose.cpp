@@ -7,6 +7,7 @@ long long count(int v);
 //}}}
 
 const int MAX_N = 50005;
+const int MAX_K = 505;
 using LL = long long;
 
 struct edge {
@@ -49,38 +50,47 @@ int solve(int v, int total) {
 }
 
 //{{{
-LL count(int v) {
-    unordered_map<int, int> cnt;
-    auto dfs = [&](auto self, int v, int p, int depth) -> void {
-        if(depth <= k) ++cnt[depth];
-        for(auto& e : G[v]) {
-            if(e.to != p and not used[e.to]) {
-                self(self, e.to, v, depth + 1);
+int cnt_all[MAX_K], cnt[MAX_K];
+
+void bfs(int v, int p) {
+    memset(cnt, 0, sizeof(cnt));
+
+    vector<pair<int, int>> stk = {{v, p}}, tmp;
+    int depth = 1;
+    while(depth <= k and not stk.empty()) {
+        cnt[depth++] += stk.size();
+
+        tmp.clear();
+        for(auto [u, pu] : stk) {
+            for(auto& e : G[u]) {
+                if(e.to != pu and not used[e.to]) {
+                    tmp.push_back({e.to, u});
+                }
             }
         }
-    };
+        swap(tmp, stk);
+    }
+}
+
+LL count(int v) {
+    memset(cnt_all, 0, sizeof(cnt_all));
+    cnt_all[0] = 1;
 
     LL ans = 0;
-    unordered_map<int, int> cnt_all = {{0, 1}};
     for(auto& e : G[v]) {
-        if(used[e.to]) continue;
-
-        cnt.clear();
-        dfs(dfs, e.to, v, 1);
-        for(auto [key, val] : cnt) {
-            cnt_all[key] += val;
-            if(cnt.find(k - key) != cnt.end()) {
-                ans -= 1LL * val * cnt[k - key];
+        if(not used[e.to]) {
+            bfs(e.to, v);
+            for(int i = 1; i <= k; ++i) {
+                cnt_all[i] += cnt[i];
+                ans -= 1LL * cnt[i] * cnt[k - i];
             }
         }
     }
 
-    for(auto [key, val] : cnt_all) {
-        if(cnt_all.find(k - key) != cnt_all.end()) {
-            ans += 1LL * val * cnt_all[k - key];
-        }
+    for(int i = 0; i <= k; ++i) {
+        ans += 1LL * cnt_all[i] * cnt_all[k - i];
     }
-    ans >>= 1;
+    ans /= 2;
     return ans;
 }
 //}}}
