@@ -137,7 +137,7 @@ template<class T> inline NotC<T> print_1(const T& x) { cout << x; }
 template<class T> inline IsC<T> print_1(const T& v) {
     for(auto it = v.begin(); it != v.end(); ++it) { if(it != v.begin()) putchar(' '); print_1(*it); }
 }
-inline void print_1(const tuple<>& t) {};
+inline void print_1(const tuple<>&) {};
 template<size_t L, size_t I, class T> void print_tuple(const T& t) {
     if(I != 0) putchar(' '); print_1(get<I>(t));
     if(I + 1 < L) print_tuple<L, (I + 1) % L>(t);
