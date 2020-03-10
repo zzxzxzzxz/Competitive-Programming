@@ -141,12 +141,10 @@ template<class T> inline void print_1(const string& sep, const T& x) {
     }
 }
 template<class T, class ...U> void print_n(const string& sep, const T& head, const U& ...args) {
-    print_1(sep, head); ((cout << sep, print_1(sep, args)), ...);
-}
+    print_1(sep, head); ((cout << sep, print_1(sep, args)), ...); }
 template<class ...T> inline void print_noln(const T& ...args) { print_n(" ", args...); }
 template<class ...T> inline void print_brk(const T& ...args) {
-    putchar('('); print_n(", ", args...); putchar(')');
-}
+    putchar('('); print_n(", ", args...); putchar(')'); }
 template<class ...T> inline void print(const T& ...args) { print_n(" ", args...); putchar('\n'); }
 template<class ...T> void read(T& ...args) { (cin >> ... >> args); }
 

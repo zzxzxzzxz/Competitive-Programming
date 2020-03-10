@@ -133,25 +133,27 @@ template<class T> using IsC = typename enable_if<is_container<T>::value and
     not std::is_same<T, string>::value>::type;
 template<class T> using NotC = typename enable_if<not is_container<T>::value or
     std::is_same<T, string>::value>::type;
-template<class T> inline NotC<T> print_1(const T& x) { cout << x; }
-template<class T> inline IsC<T> print_1(const T& v) {
-    for(auto it = v.begin(); it != v.end(); ++it) { if(it != v.begin()) putchar(' '); print_1(*it); }
+template<class T> inline NotC<T> print_1(const string& sep, const T& x) { cout << x; }
+template<class T> inline IsC<T> print_1(const string& sep, const T& v) {
+    for(auto it = v.begin(); it != v.end(); ++it) { if(it != v.begin()) cout << sep; print_1(sep, *it); }
 }
-inline void print_1(const tuple<>&) {};
-template<size_t L, size_t I, class T> void print_tuple(const T& t) {
-    if(I != 0) putchar(' '); print_1(get<I>(t));
-    if(I + 1 < L) print_tuple<L, (I + 1) % L>(t);
+inline void print_1(const string&, const tuple<>&) {};
+template<size_t L, size_t I, class T> void print_tuple(const string& sep, const T& t) {
+    if(I != 0) cout << sep; print_1(sep, get<I>(t));
+    if(I + 1 < L) print_tuple<L, (I + 1) % L>(sep, t);
 }
-template<class ...T> inline void print_1(const tuple<T...>& x) {
-    print_tuple<sizeof...(T), 0, tuple<T...>>(x);
-}
-inline void print_n() {}
-template<class T, class ...U> inline void print_n(const T& head, const U&... tail);
-template<class T, class U> inline void print_1(const pair<T, U>& p) { print_n(p.first, p.second); }
-template<class T, class ...U> inline void print_n(const T& head, const U&... tail) {
-    print_1(head); if(sizeof...(tail)) putchar(' '); print_n(tail...);
-}
-template<class ...T> inline void print(const T& ...args) { print_n(args...); putchar('\n'); }
+template<class ...T> inline void print_1(const string& sep, const tuple<T...>& x) {
+    print_tuple<sizeof...(T), 0, tuple<T...>>(sep, x); }
+inline void print_n(const string&) {}
+template<class T, class ...U> inline void print_n(const string& sep, const T& head, const U&... tail);
+template<class T, class U> inline void print_1(const string& sep, const pair<T, U>& p) {
+    print_n(sep, p.first, p.second); }
+template<class T, class ...U> inline void print_n(const string& sep, const T& head, const U&... tail) {
+    print_1(sep, head); if(sizeof...(tail)) cout << sep; print_n(sep, tail...); }
+template<class ...T> inline void print_noln(const T& ...args) { print_n(" ", args...); }
+template<class ...T> inline void print_brk(const T& ...args) {
+    putchar('('); print_n(", ", args...); putchar(')'); }
+template<class ...T> inline void print(const T& ...args) { print_n(" ", args...); putchar('\n'); }
 inline void read() {}
 template<class T, class ...U> inline void read(T& head, U&... tail) { cin >> head; read(tail...); }
 
