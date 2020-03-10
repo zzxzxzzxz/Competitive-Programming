@@ -10,7 +10,7 @@ using namespace std;
 #define repeat(x) int _ = 0; _ < (x); ++_
 
 #define SELECT(_1, _2, _3, _4, _5, _6, _7, _8, NAME,...) NAME
-#define showvar(x) print_n(#x, "=", x);
+#define showvar(x) print_n(" ", #x, "=", x);
 #define dbg1(a) showvar(a) cout << endl;
 #define dbg2(a, b) showvar(a) cout << ", "; dbg1(b);
 #define dbg3(a, b, c) showvar(a) cout << ", "; dbg2(b, c);
