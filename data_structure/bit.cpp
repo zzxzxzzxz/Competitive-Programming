@@ -5,8 +5,14 @@ using Data = int;
 Data zero = 0;
 
 vector<Data> dat;
+void _add(Data& a, Data b) {
+    a += b;
+}
+
 
 struct BIT {
+    int lg(int n) { return 31 - __builtin_clz(n); }
+
     int n;
     BIT(int n, Data* ptr = nullptr): n(n) {
         dat.assign(n + 1, 0);
@@ -19,10 +25,6 @@ struct BIT {
                 }
             }
         }
-    }
-
-    void _add(Data& a, Data b) {
-        a += b;
     }
 
     Data sum(int i) {
@@ -40,17 +42,42 @@ struct BIT {
             i += i & -i;
         }
     }
+
+    int lower_bound(int v) {
+        int sum = 0, pos = 0;
+
+        for(int i = lg(n); i >= 0; --i) {
+            if(pos + (1 << i) < n and sum + dat[pos + (1 << i)] < v) {
+                sum += dat[pos + (1 << i)];
+                pos += (1 << i);
+            }
+        }
+        return pos + 1;
+    }
 };
 
 int main()
 {
-    vector<int> v = {1, 2, 3, 4, 5};
+    vector<int> v = {2, 2, 2, 3, 3};
     int n = int(v.size());
     BIT bit(n, &v[0]);
 
-    bit.add(2, 3);
+    for(int i = 1; i <= n; ++i) {
+        cout << v[i - 1] << " \n"[i == n];
+    }
     for(int i = 1; i <= n; ++i) {
         cout << bit.sum(i) << " \n"[i == n];
+    }
+    bit.add(3, 10);
+    cout << "add(3, 10)" << endl;
+    for(int i = 1; i <= n; ++i) {
+        cout << bit.sum(i) << " \n"[i == n];
+    }
+
+    cout << "lower_bound:" << endl;
+    for(int v = 1; v <= 7; ++v) {
+        int idx = bit.lower_bound(v);
+        cout << v << ": " << idx << " (" << bit.sum(idx) << ")" << endl;
     }
     return 0;
 }
