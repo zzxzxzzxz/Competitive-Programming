@@ -1,10 +1,8 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-random_device rd;
-mt19937 mt(rd());
-uniform_int_distribution<size_t> dist(0, SIZE_MAX);
-size_t seed = dist(mt);
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+size_t seed = rng();
 
 struct Node {
     size_t sz;

@@ -1,10 +1,8 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-random_device rd;
-mt19937 mt(rd());
-uniform_int_distribution<size_t> dist(0, SIZE_MAX);
-size_t seed = dist(mt);
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+size_t seed = rng();
 
 template<class T>
 class Treap{
@@ -145,7 +143,7 @@ int main(){
     cout << endl;
 
     for(int i = 0; i < 10; ++i) {
-        int l = dist(mt) % n, r = dist(mt) % n;
+        int l = rng() % n, r = rng() % n;
         if(l > r) swap(l, r);
         if(i % 4) {
             printf("%3d  | ask(%2d, %2d)\n", t.ask(l, r + 1), l, r + 1);
