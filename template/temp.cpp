@@ -133,6 +133,9 @@ template<class T> using IsC = typename enable_if<is_container<T>::value and
     not std::is_same<T, string>::value>::type;
 template<class T> using NotC = typename enable_if<not is_container<T>::value or
     std::is_same<T, string>::value>::type;
+
+template<class T, class U> inline void print_1(const string& sep, const pair<T, U>& p);
+template<class ...T> inline void print_1(const string& sep, const tuple<T...>& x);
 template<class T> inline NotC<T> print_1(const string&, const T& x) { cout << x; }
 template<class T> inline IsC<T> print_1(const string& sep, const T& v) {
     for(auto it = v.begin(); it != v.end(); ++it) { if(it != v.begin()) cout << sep; print_1(sep, *it); }

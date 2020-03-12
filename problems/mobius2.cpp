@@ -28,9 +28,8 @@ template<typename T> constexpr auto range(T start, T stop, T step) {
         using pointer = T*;
         using reference = T&;
         using iterator_category = random_access_iterator_tag;
-
         T i, step;
-        T operator-(const iterator& other) const { return i - other.i; };
+        T operator-(const iterator& other) { return i - other.i; };
         bool operator!=(const iterator& other) const { return i != other.i; }
         auto& operator+=(const int& n) { i += step * n; return *this; }
         auto& operator++() { i += step; return *this; }
@@ -58,7 +57,7 @@ auto reversed(T&& iterable) {
         T iterable;
         auto begin() const { return std::rbegin(iterable); }
         auto end() const { return std::rend(iterable); }
-        auto size() const { return iterable.size(); }
+        auto size() const { return std::size(iterable); }
     };
     return iterable_wrapper{ forward<T>(iterable) };
 }
@@ -83,13 +82,6 @@ constexpr auto printer(T&& iterable) {
     return iterable_wrapper{ forward<T>(iterable) };
 };
 
-template<class ...T> void absorb(T&& ...) {}
-template<size_t L, size_t I, class T>
-bool zip_it_ne(const T& it1, const T& it2) {
-    if(not (get<I>(it1) != get<I>(it2))) return false;
-    if(I + 1 == L) return true;
-    return zip_it_ne<L, (I + 1) % L, T>(it1, it2);
-}
 template<size_t ...Is, class T, class ...Cs,
     class Iter = tuple<decltype(begin(declval<Cs>()))...>,
     class Ref = tuple<decltype(*begin(declval<Cs>()))&...>
@@ -99,16 +91,16 @@ constexpr auto zip(index_sequence<Is...>, T&& iterables, Cs&&...) {
         Iter iter;
         unique_ptr<Ref> tref = nullptr;
         bool operator!=(const iterator& other) const {
-            return zip_it_ne<sizeof...(Is), 0, Iter>(iter, other.iter);
+            return ((get<Is>(iter) != get<Is>(other.iter)) and ...);
         }
-        auto& operator++() { absorb(++get<Is>(iter)...); return *this; }
+        auto& operator++() { ((++get<Is>(iter)), ...); return *this; }
         auto& operator*() { tref.reset(new Ref(tie(*get<Is>(iter)...))); return *tref; }
     };
     struct iterable_wrapper {
         T iterables;
         auto begin() const { return iterator { Iter{ std::begin(get<Is>(iterables))... } }; }
         auto end() const { return iterator { Iter{ std::end(get<Is>(iterables))... } }; }
-        auto size() const { return min({ get<Is>(iterables).size()... }); }
+        auto size() const { return min({ std::size(get<Is>(iterables))... }); }
     };
     return iterable_wrapper{ forward<T>(iterables) };
 }
@@ -119,7 +111,7 @@ constexpr auto zip(Cs&& ...cs) {
 
 template<typename T, typename Iter = decltype(begin(declval<T>()))>
 constexpr auto enumerate(T&& iterable) {
-    return zip(range(iterable.size()), forward<T>(iterable));
+    return zip(range(std::size(iterable)), forward<T>(iterable));
 }
 
 template<size_t ...Is, typename T> auto getis(const T& t) { return tie(get<Is>(t)...); }
@@ -127,38 +119,34 @@ template<class T> void setmax(T& a, const T& b) { a = max(a, b); }
 template<class T> void setmin(T& a, const T& b) { a = min(a, b); }
 
 template<typename T, typename = void> struct is_container : false_type {};
-template<typename T>
-struct is_container<T, conditional_t<false, decltype(begin(declval<T>())), void>> : true_type {};
-template<class T> using IsC = typename enable_if<is_container<T>::value and
-    not std::is_same<T, string>::value>::type;
-template<class T> using NotC = typename enable_if<not is_container<T>::value or
-    std::is_same<T, string>::value>::type;
+template<typename T> struct is_container<T, void_t<decltype(begin(declval<T>()))>> : true_type {};
+template<typename T> struct is_tuple : false_type {};
+template<typename ...T> struct is_tuple<tuple<T...>> : true_type {};
+template<typename T> struct is_pair : false_type {};
+template<typename T, typename U> struct is_pair<pair<T, U>> : true_type {};
 
-template<class T, class U> inline void print_1(const string& sep, const pair<T, U>& p);
-template<class ...T> inline void print_1(const string& sep, const tuple<T...>& x);
-template<class T> inline NotC<T> print_1(const string&, const T& x) { cout << x; }
-template<class T> inline IsC<T> print_1(const string& sep, const T& v) {
-    for(auto it = v.begin(); it != v.end(); ++it) { if(it != v.begin()) cout << sep; print_1(sep, *it); }
-}
-inline void print_1(const string&, const tuple<>&) {};
-template<size_t L, size_t I, class T> void print_tuple(const string& sep, const T& t) {
-    if(I != 0) cout << sep; print_1(sep, get<I>(t));
-    if(I + 1 < L) print_tuple<L, (I + 1) % L>(sep, t);
-}
-template<class ...T> inline void print_1(const string& sep, const tuple<T...>& x) {
-    print_tuple<sizeof...(T), 0, tuple<T...>>(sep, x); }
 inline void print_n(const string&) {}
-template<class T, class ...U> inline void print_n(const string& sep, const T& head, const U&... tail);
-template<class T, class U> inline void print_1(const string& sep, const pair<T, U>& p) {
-    print_n(sep, p.first, p.second); }
-template<class T, class ...U> inline void print_n(const string& sep, const T& head, const U&... tail) {
-    print_1(sep, head); if(sizeof...(tail)) cout << sep; print_n(sep, tail...); }
+template<class T, class ...U> void print_n(const string& sep, const T& head, const U& ...args);
+template<class T> inline void print_1(const string& sep, const T& x) {
+    if constexpr(is_same<T, string>::value) {
+        cout << x;
+    } else if constexpr(is_tuple<T>::value) {
+        apply([sep](const auto& ...ts) { print_n(sep, ts...); }, x);
+    } else if constexpr(is_pair<T>::value) {
+        print_n(sep, x.first, x.second);
+    } else if constexpr(is_container<T>::value) {
+        for(auto it = x.begin(); it != x.end(); ++it) { if(it != x.begin()) cout << sep; print_1(sep, *it); }
+    } else {
+        cout << x;
+    }
+}
+template<class T, class ...U> void print_n(const string& sep, const T& head, const U& ...args) {
+    print_1(sep, head); ((cout << sep, print_1(sep, args)), ...); }
 template<class ...T> inline void print_noln(const T& ...args) { print_n(" ", args...); }
 template<class ...T> inline void print_brk(const T& ...args) {
     putchar('('); print_n(", ", args...); putchar(')'); }
 template<class ...T> inline void print(const T& ...args) { print_n(" ", args...); putchar('\n'); }
-inline void read() {}
-template<class T, class ...U> inline void read(T& head, U&... tail) { cin >> head; read(tail...); }
+template<class ...T> void read(T& ...args) { (cin >> ... >> args); }
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); cout.precision(17); return 0; }();
@@ -169,5 +157,72 @@ using LL = long long;
 const int MOD = 1e9 + 7;
 const int INF = 0x3f3f3f3f;
 const LL LLINF = 0x3f3f3f3f3f3f3f3f;
-const int MAX_N = 300005;
+const int MAX_P = 100005;
 
+bool values[MAX_P];
+int mu[MAX_P], cnt[MAX_P];
+vector<int> d[MAX_P];
+
+int num_coprime(int x) {
+    int sum = 0;
+    for(int i : d[x]) {
+        sum += mu[i] * cnt[i];
+    }
+    return sum;
+}
+
+void update(int x, int val) {
+    for(int i : d[x]) {
+        cnt[i] += val;
+    }
+}
+
+// https://codeforces.com/contest/1285/problem/F
+
+int main() {
+    LL ans = 0;
+
+    int n;
+    read(n);
+    for(repeat(n)) {
+        int a;
+        read(a);
+        values[a] = true;
+    }
+
+    for(int i : range(1, MAX_P)) {
+        for(int j = 1; j * i < MAX_P; ++j) {
+            values[j] |= values[j * i];
+            d[j * i].push_back(i);
+        }
+        if(i == 1) {
+            mu[1] = 1;
+        } else {
+            int p = d[i][1];
+            if((i / p) % p == 0) {
+                mu[i] = 0;
+            } else {
+                mu[i] = -mu[i / p];
+            }
+        }
+    }
+    vector<unsigned> stk;
+    for(unsigned i : range(MAX_P - 1, 0, -1)) {
+        if(not values[i]) continue;
+        ans = max(ans, LL(i));
+
+        int nc = num_coprime(i);
+        while(nc > 0) {
+            if(__gcd(stk.back(), i) == 1) {
+                ans = max(ans, LL(i) * stk.back());
+                --nc;
+            }
+            update(stk.back(), -1);
+            stk.pop_back();
+        }
+        update(i, 1);
+        stk.push_back(i);
+    }
+    print(ans);
+    return 0;
+}
