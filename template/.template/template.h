@@ -118,39 +118,37 @@ template<typename T, typename = void> struct is_container : false_type {};
 template<typename T>
 struct is_container<T, conditional_t<false, decltype(begin(declval<T>())), void>> : true_type {};
 template<class T> using IsC = typename enable_if<is_container<T>::value and
-    not std::is_same<T, string>::value>::type;
+    (not is_same<T, string>::value) and (not is_same<T, string_view>::value)>::type;
 template<class T> using NotC = typename enable_if<not is_container<T>::value or
-    std::is_same<T, string>::value>::type;
-
-template<class T, class U> inline void print_1(const string& sep, const pair<T, U>& p);
-template<class ...T> inline void print_1(const string& sep, const tuple<T...>& x);
-template<class T> inline NotC<T> print_1(const string&, const T& x) { cout << x; }
-template<class T> inline IsC<T> print_1(const string& sep, const T& v) {
-    for(auto it = v.begin(); it != v.end(); ++it) { if(it != v.begin()) cout << sep; print_1(sep, *it); }
+    is_same<T, string>::value or is_same<T, string_view>::value>::type;
+template<class T> inline IsC<T> print_1(const T& v);
+template<class T> inline NotC<T> print_1(const T& x) { cout << x; }
+template<size_t N> void print_1(const array<char, N>& x) { cout << &x[0]; };
+inline void print_1(const tuple<>&) { cout << "()"; };
+template<size_t L, size_t I, class T> void print_tuple(const T& t) {
+    if(I != 0) cout << ", "; print_1(get<I>(t));
+    if(I + 1 < L) print_tuple<L, (I + 1) % L>(t);
 }
-inline void print_1(const string&, const tuple<>&) {};
-template<size_t L, size_t I, class T> void print_tuple(const string& sep, const T& t) {
-    if(I != 0) cout << sep; print_1(sep, get<I>(t));
-    if(I + 1 < L) print_tuple<L, (I + 1) % L>(sep, t);
+template<class ...T> inline void print_1(const tuple<T...>& x) {
+    cout << "("; print_tuple<sizeof...(T), 0, tuple<T...>>(x); cout << ")"; }
+inline void print_n() {}
+template<class T, class ...U> inline void print_n(const T& head, const U&... tail);
+template<class T, class U> inline void print_1(const pair<T, U>& p) {
+    cout << "("; print_1(p.first); cout << ", "; print_1(p.second); cout << ")"; }
+template<class T, class ...U> inline void print_n(const T& head, const U&... tail) {
+    print_1(head); if(sizeof...(tail)) cout << " "; print_n(tail...); }
+template<class T> inline IsC<T> print_1(const T& v) {
+    cout << "[";
+    for(auto it = v.begin(); it != v.end(); ++it) { if(it != v.begin()) cout << ", "; print_1(*it); }
+    cout << "]";
 }
-template<class ...T> inline void print_1(const string& sep, const tuple<T...>& x) {
-    print_tuple<sizeof...(T), 0, tuple<T...>>(sep, x); }
-inline void print_n(const string&) {}
-template<class T, class ...U> inline void print_n(const string& sep, const T& head, const U&... tail);
-template<class T, class U> inline void print_1(const string& sep, const pair<T, U>& p) {
-    print_n(sep, p.first, p.second); }
-template<class T, class ...U> inline void print_n(const string& sep, const T& head, const U&... tail) {
-    print_1(sep, head); if(sizeof...(tail)) cout << sep; print_n(sep, tail...); }
-template<class ...T> inline void print_noln(const T& ...args) { print_n(" ", args...); }
-template<class ...T> inline void print_brk(const T& ...args) {
-    putchar('('); print_n(", ", args...); putchar(')'); }
-template<class ...T> inline void print(const T& ...args) { print_n(" ", args...); putchar('\n'); }
+template<class ...T> inline void print(const T& ...args) { print_n(args...); putchar('\n'); }
 inline void read() {}
 template<class T, class ...U> inline void read(T& head, U&... tail) { cin >> head; read(tail...); }
 
 void _dbg(const char*) { cout << '\n'; }
 template<class T, class ...U> void _dbg(const char* sdbg, const T& head, const U& ...tail) {
-    while(*sdbg and *sdbg != ',') cout << *sdbg++; print_n(" ", " =", head);
+    while(*sdbg and *sdbg != ',') cout << *sdbg++; print_n(" =", head);
     if(sizeof...(U)) { cout << ", "; ++sdbg; } _dbg(sdbg + 1, tail...);
 }
 #define debug(...) _dbg(#__VA_ARGS__, __VA_ARGS__)
