@@ -1,58 +1,68 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-const int MOD = 1000000007;
-#define MAX_N 5000
-#define INF 0x3f3f3f3f
+const int INF = 0x3f3f3f3f;
 
-struct edge {
-    int to, cap, rev;
-};
+struct MaxFlow {
+    struct edge {
+        int to, cap, rev;
+    };
 
-vector<edge> G[MAX_N];
-bool used[MAX_N];
+    vector<vector<edge>> G;
+    vector<char> used;
 
-void add_edge(int from, int to, int cap) {
-    int i = G[from].size();
-    int j = G[to].size();
-    G[from].push_back((edge){to, cap, j});
-    G[to].push_back((edge){from, 0, i});
-}
-
-int dfs(int v, int t, int f) {
-    if(v == t) {
-        return f;
+    MaxFlow(int V) {
+        G.resize(V + 1);
+        used.resize(V + 1);
     }
-    used[v] = true;
-    for(int i = 0; i < int(G[v].size()); i++) {
-        edge &e = G[v][i];
-        if(not used[e.to] and e.cap > 0) {
-            int d = dfs(e.to, t, min(f, e.cap));
-            if(d > 0) {
-                e.cap -= d;
-                G[e.to][e.rev].cap += d;
-                return d;
-            }
+
+    void clear() {
+        for(auto& es : G) {
+            es.clear();
         }
     }
-    return 0;
-}
 
-int max_flow(int s, int t) {
-    int flow = 0;
-
-    int f = dfs(s, t, INF);
-    while(f > 0) {
-        flow += f;
-        memset(used, 0, sizeof(used));
-        f = dfs(s, t, INF);
+    void add(int from, int to, int cap) {
+        int i = G[from].size();
+        int j = G[to].size();
+        G[from].push_back({to, cap, j});
+        G[to].push_back({from, 0, i});
     }
-    return flow;
-}
 
-int main()
-{
-    vector<tuple<int, int, int>> E = {
+    int dfs(int v, int t, int f) {
+        if(v == t) {
+            return f;
+        }
+        used[v] = true;
+        for(auto& e : G[v]) {
+            if(not used[e.to] and e.cap > 0) {
+                int d = dfs(e.to, t, min(f, e.cap));
+                if(d > 0) {
+                    e.cap -= d;
+                    G[e.to][e.rev].cap += d;
+                    return d;
+                }
+            }
+        }
+        return 0;
+    }
+
+    int solve(int s, int t) {
+        int flow = 0;
+        fill(used.begin(), used.end(), false);
+        int f = dfs(s, t, INF);
+        while(f > 0) {
+            flow += f;
+            fill(used.begin(), used.end(), false);
+            f = dfs(s, t, INF);
+        }
+        return flow;
+    }
+};
+
+int main() {
+    int V = 5;
+    vector<tuple<int, int, int>> edges = {
         {0, 1, 10},
         {0, 2, 2},
         {1, 2, 6},
@@ -61,13 +71,14 @@ int main()
         {3, 4, 8},
         {2, 4, 5}
     };
-    int s = 0, t = 4;
-    for(auto& t: E) {
-        int a, b, cap;
-        tie(a, b, cap) = t;
-        add_edge(a, b, cap);
+
+    auto mf = MaxFlow(V);
+
+    for(auto [a, b, cap]: edges) {
+        mf.add(a, b, cap);
     }
-    int ans = max_flow(s, t);
-    printf("%d\n", ans);
+    int s = 0, t = 4;
+    int ans = mf.solve(s, t);
+    cout << ans << endl;
     return 0;
 }

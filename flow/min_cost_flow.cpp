@@ -2,78 +2,81 @@
 using namespace std;
 
 using PII = pair<int, int>;
+const int INF = 0x3f3f3f3f;
 
-#define INF 0x3f3f3f3f
+struct MinCostFlow {
+    struct edge {
+        int to, cap, cost, rev;
+    };
+    vector<vector<edge>> G;
+    vector<int> h, d, prevv, preve;
 
-const int MOD = 1000000007;
-#define MAX_N 5000
+    MinCostFlow(int V) {
+        G.resize(V + 1);
+        h.resize(V + 1);
+        d.resize(V + 1);
+        prevv.resize(V + 1);
+        preve.resize(V + 1);
+    }
 
-struct edge {
-    int to, cap, cost, rev;
-};
+    void add(int from, int to, int cap, int cost) {
+        int i = G[from].size();
+        int j = G[to].size();
+        G[from].push_back({to, cap, cost, j});
+        G[to].push_back({from, 0, -cost, i});
+    }
 
-int V;
-vector<edge> G[MAX_N];
-int h[MAX_N];
-int d[MAX_N];
-int prevv[MAX_N], preve[MAX_N];
-
-void add_edge(int from, int to, int cap, int cost) {
-    int i = G[from].size();
-    int j = G[to].size();
-    G[from].push_back({to, cap, cost, j});
-    G[to].push_back({from, 0, -cost, i});
-}
-
-int min_cost_flow(int s, int t, int f) {
-    int res = 0;
-    memset(h, 0, sizeof(h));
-    while(f > 0){
-        priority_queue<PII, vector<PII>, greater<PII> > que;
-        memset(d, INF, sizeof(d));
-        d[s] = 0;
-        que.push({0, s});
-        while(not que.empty()){
-            auto [dist, v] = que.top();
-            que.pop();
-            if(d[v] < dist) {
-                continue;
-            }
-            for(int i = 0; i < int(G[v].size()); i++){
-                edge& e = G[v][i];
-                if(e.cap > 0 and d[e.to] > d[v] + e.cost + h[v] - h[e.to]){
-                    d[e.to] = d[v] + e.cost + h[v] - h[e.to];
-                    prevv[e.to] = v;
-                    preve[e.to] = i;
-                    que.push({d[e.to], e.to});
+    int solve(int s, int t, int required) {
+        int res = 0;
+        fill(h.begin(), h.end(), 0);
+        while(required > 0) {
+            fill(d.begin(), d.end(), INF);
+            d[s] = 0;
+            priority_queue<PII, vector<PII>, greater<PII>> que;
+            que.push({0, s});
+            while(not que.empty()){
+                auto [dist, v] = que.top();
+                que.pop();
+                if(dist > d[v]) {
+                    continue;
+                }
+                for(int i = 0; i < int(G[v].size()); i++){
+                    edge& e = G[v][i];
+                    if(e.cap > 0 and d[e.to] > d[v] + e.cost + h[v] - h[e.to]){
+                        d[e.to] = d[v] + e.cost + h[v] - h[e.to];
+                        prevv[e.to] = v;
+                        preve[e.to] = i;
+                        que.push({d[e.to], e.to});
+                    }
                 }
             }
-        }
-        if(d[t] == INF) {
-            return -1;
-        }
-        for(int i = 0; i < V; i++) {
-            h[i] += d[i];
-        }
-        int d = f;
-        for(int v = t; v != s; v = prevv[v]) {
-            edge& e = G[prevv[v]][preve[v]];
-            d = min(d, e.cap);
-        }
-        f -= d;
-        res += d * h[t];
-        for(int v = t; v != s; v = prevv[v]) {
-            edge& e = G[prevv[v]][preve[v]];
-            e.cap -= d;
-            G[v][e.rev].cap += d;
-        }
-    }
-    return res;
-}
+            if(d[t] == INF) {
+                return -1;
+            }
+            for(int i = 0; i < int(h.size()); i++) {
+                h[i] += d[i];
+            }
+            int flow = required;
+            for(int v = t; v != s; v = prevv[v]) {
+                edge& e = G[prevv[v]][preve[v]];
+                flow = min(flow, e.cap);
+            }
+            required -= flow;
+            res += flow * h[t];
 
-int main()
-{
-    vector<tuple<int, int, int, int>> E = {
+            for(int v = t; v != s; v = prevv[v]) {
+                edge& e = G[prevv[v]][preve[v]];
+                e.cap -= flow;
+                G[v][e.rev].cap += flow;
+            }
+        }
+        return res;
+    }
+};
+
+int main() {
+    int V = 5;
+    vector<tuple<int, int, int, int>> edges = {
         {0, 1, 10, 2},
         {0, 2, 2, 4},
         {1, 2, 6, 6},
@@ -82,13 +85,14 @@ int main()
         {3, 4, 8, 6},
         {2, 4, 5, 2}
     };
-    V = 5;
+
+    auto mcf = MinCostFlow(V);
+
     int s = 0, t = 4, f = 9;
-    for(auto& e: E) {
-        auto [a, b, cap, cost] = e;
-        add_edge(a, b, cap, cost);
+    for(auto [a, b, cap, cost]: edges) {
+        mcf.add(a, b, cap, cost);
     }
-    int ans = min_cost_flow(s, t, f);
-    printf("%d\n", ans);
+    int ans = mcf.solve(s, t, f);
+    cout << ans << endl;
     return 0;
 }
