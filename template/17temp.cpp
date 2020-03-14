@@ -9,6 +9,18 @@ using namespace std;
 #define putchar(x) cout << (x)
 #define repeat(x) int _ = 0; _ < (x); ++_
 
+#define SELECT(_1, _2, _3, _4, _5, _6, _7, _8, NAME,...) NAME
+#define showvar(x) print_n(" ", #x, "=", x);
+#define dbg1(a) showvar(a) cout << endl;
+#define dbg2(a, b) showvar(a) cout << ", "; dbg1(b);
+#define dbg3(a, b, c) showvar(a) cout << ", "; dbg2(b, c);
+#define dbg4(a, b, c, d) showvar(a) cout << ", "; dbg3(b, c, d);
+#define dbg5(a, b, c, d, e) showvar(a) cout << ", "; dbg4(b, c, d, e);
+#define dbg6(a, b, c, d, e, f) showvar(a) cout << ", "; dbg5(b, c, d, e, f);
+#define dbg7(a, b, c, d, e, f, g) showvar(a) cout << ", "; dbg6(b, c, d, e, f, g);
+#define dbg8(a, b, c, d, e, f, g, h) showvar(a) cout << ", "; dbg7(b, c, d, e, f, g, h);
+#define debug(...) SELECT(__VA_ARGS__, dbg8, dbg7, dbg6, dbg5, dbg4, dbg3, dbg2, dbg1)(__VA_ARGS__)
+
 template<typename T> constexpr auto range(T start, T stop, T step) {
     struct iterator {
         using difference_type = T;
@@ -141,13 +153,6 @@ template<class T, class ...U> void print_n(const T& head, const U& ...args) {
     print_1(head); ((cout << " ", print_1(args)), ...); }
 template<class ...T> inline void print(const T& ...args) { print_n(args...); putchar('\n'); }
 template<class ...T> void read(T& ...args) { (cin >> ... >> args); }
-
-void _dbg(const char*) { cout << '\n'; }
-template<class T, class ...U> void _dbg(const char* sdbg, const T& head, const U& ...tail) {
-    while(*sdbg and *sdbg != ',') cout << *sdbg++; print_n(" =", head);
-    if(sizeof...(U)) { cout << ", "; ++sdbg; } _dbg(sdbg + 1, tail...);
-}
-#define debug(...) _dbg(#__VA_ARGS__, __VA_ARGS__)
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); cout.precision(17); return 0; }();
