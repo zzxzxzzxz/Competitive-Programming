@@ -9,18 +9,6 @@ using namespace std;
 #define putchar(x) cout << (x)
 #define repeat(x) int _ = 0; _ < (x); ++_
 
-#define SELECT(_1, _2, _3, _4, _5, _6, _7, _8, NAME,...) NAME
-#define showvar(x) print_n(" ", #x, "=", x);
-#define dbg1(a) showvar(a) cout << endl;
-#define dbg2(a, b) showvar(a) cout << ", "; dbg1(b);
-#define dbg3(a, b, c) showvar(a) cout << ", "; dbg2(b, c);
-#define dbg4(a, b, c, d) showvar(a) cout << ", "; dbg3(b, c, d);
-#define dbg5(a, b, c, d, e) showvar(a) cout << ", "; dbg4(b, c, d, e);
-#define dbg6(a, b, c, d, e, f) showvar(a) cout << ", "; dbg5(b, c, d, e, f);
-#define dbg7(a, b, c, d, e, f, g) showvar(a) cout << ", "; dbg6(b, c, d, e, f, g);
-#define dbg8(a, b, c, d, e, f, g, h) showvar(a) cout << ", "; dbg7(b, c, d, e, f, g, h);
-#define debug(...) SELECT(__VA_ARGS__, dbg8, dbg7, dbg6, dbg5, dbg4, dbg3, dbg2, dbg1)(__VA_ARGS__)
-
 template<typename T> constexpr auto range(T start, T stop, T step) {
     struct iterator {
         using difference_type = T;
@@ -126,6 +114,8 @@ template<typename T> struct is_pair : false_type {};
 template<typename T, typename U> struct is_pair<pair<T, U>> : true_type {};
 template<typename T> struct is_str_arr : false_type {};
 template<size_t N> struct is_str_arr<array<char, N>> : true_type {};
+template<typename T> struct is_const_char_arr_ref : false_type {};
+template<size_t N> struct is_const_char_arr_ref<char const (&)[N]> : true_type {};
 
 template<class T> inline void print_1(const T& x) {
     if constexpr(is_same<T, string>::value or is_same<T, string_view>::value) {
@@ -156,6 +146,19 @@ template<class ...T> void read(T& ...args) { (cin >> ... >> args); }
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); cout.precision(17); return 0; }();
+
+template<class T> void print_dbg(string_view s, T&& x) {
+    if(is_const_char_arr_ref<T>::value) { print_n(x); } else { print_n(s, "=", x); } }
+#define SELECT(_1, _2, _3, _4, _5, _6, _7, _8, NAME,...) NAME
+#define dbg1(a) print_dbg(#a, a); cout << endl;
+#define dbg2(a, b) print_dbg(#a, a); cout << ", "; dbg1(b);
+#define dbg3(a, b, c) print_dbg(#a, a); cout << ", "; dbg2(b, c);
+#define dbg4(a, b, c, d) print_dbg(#a, a); cout << ", "; dbg3(b, c, d);
+#define dbg5(a, b, c, d, e) print_dbg(#a, a); cout << ", "; dbg4(b, c, d, e);
+#define dbg6(a, b, c, d, e, f) print_dbg(#a, a); cout << ", "; dbg5(b, c, d, e, f);
+#define dbg7(a, b, c, d, e, f, g) print_dbg(#a, a); cout << ", "; dbg6(b, c, d, e, f, g);
+#define dbg8(a, b, c, d, e, f, g, h) print_dbg(#a, a); cout << ", "; dbg7(b, c, d, e, f, g, h);
+#define debug(...) SELECT(__VA_ARGS__, dbg8, dbg7, dbg6, dbg5, dbg4, dbg3, dbg2, dbg1)(__VA_ARGS__)
 //}}}
 using PII = pair<int, int>;
 using LL = long long;
