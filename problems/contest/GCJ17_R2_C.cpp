@@ -1,236 +1,363 @@
+//{{{
 #pragma comment(linker, "/stack:200000000")
-#pragma GCC optimize("Ofast")
+#pragma GCC optimize("O2")
 #pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native")
 
 #include <bits/stdc++.h>
 using namespace std;
 
-#define GET_MACRO(_1,_2,_3,_4,NAME,...) NAME
-#define REP2(i,n) for(int i=0;i<(int)(n);i++)
-#define REP3(i,m,n) for(int i=m;i<(int)(n);i++)
-#define REP4(i,m,n,s) for(int i=m;(s>0 and i<(int)(n)) or (s<0 and i>(int)(n));i+=s)
-#define REP(...) GET_MACRO(__VA_ARGS__, REP4, REP3, REP2)(__VA_ARGS__)
-#define REPIT(i,c) for(__typeof((c).begin()) i=(c).begin();i!=(c).end();i++)
-#define PIS(x) printf("%d ",x)
-#define PN() putchar('\n')
-#define MP make_pair
-#define PB push_back
-#define EB emplace_back
-#define MT make_tuple
+#define putchar(x) cout << (x)
+#define repeat(x) int _ = 0; _ < (x); ++_
 
+#define SELECT(_1, _2, _3, _4, _5, _6, _7, _8, NAME,...) NAME
+#define showvar(x) print_n(" ", #x, "=", x);
+#define dbg1(a) showvar(a) cout << endl;
+#define dbg2(a, b) showvar(a) cout << ", "; dbg1(b);
+#define dbg3(a, b, c) showvar(a) cout << ", "; dbg2(b, c);
+#define dbg4(a, b, c, d) showvar(a) cout << ", "; dbg3(b, c, d);
+#define dbg5(a, b, c, d, e) showvar(a) cout << ", "; dbg4(b, c, d, e);
+#define dbg6(a, b, c, d, e, f) showvar(a) cout << ", "; dbg5(b, c, d, e, f);
+#define dbg7(a, b, c, d, e, f, g) showvar(a) cout << ", "; dbg6(b, c, d, e, f, g);
+#define dbg8(a, b, c, d, e, f, g, h) showvar(a) cout << ", "; dbg7(b, c, d, e, f, g, h);
+#define debug(...) SELECT(__VA_ARGS__, dbg8, dbg7, dbg6, dbg5, dbg4, dbg3, dbg2, dbg1)(__VA_ARGS__)
+
+template<typename T> constexpr auto range(T start, T stop, T step) {
+    struct iterator {
+        using difference_type = T;
+        using value_type = T;
+        using pointer = T*;
+        using reference = T&;
+        using iterator_category = random_access_iterator_tag;
+
+        T i, step;
+        T operator-(const iterator& other) const { return i - other.i; };
+        bool operator!=(const iterator& other) const { return i != other.i; }
+        auto& operator+=(const int& n) { i += step * n; return *this; }
+        auto& operator++() { i += step; return *this; }
+        auto& operator*() { return i; }
+    };
+    struct iterable_wrapper {
+        T start, stop, step;
+        auto begin() const { return iterator{ start, step }; }
+        auto end() const { return iterator{ stop, step }; }
+        size_t size() const { return (stop - start) / step; }
+
+        iterable_wrapper(T start_, T stop_, T step_): start(start_), stop(stop_), step(step_) {
+            stop = step > 0 ? max(start, stop) : min(start, stop);
+            stop += (step - (stop - start) % step) % step;
+        }
+    };
+    return iterable_wrapper(start, stop, step);
+};
+template<typename T> constexpr auto range(T start, T stop) { return range(start, stop, T(1)); }
+template<typename T> constexpr auto range(T stop) { return range(T(0), stop, T(1)); }
+
+template<typename T, typename Iter = decltype(rbegin(declval<T>()))>
+auto reversed(T&& iterable) {
+    struct iterable_wrapper {
+        T iterable;
+        auto begin() const { return std::rbegin(iterable); }
+        auto end() const { return std::rend(iterable); }
+        auto size() const { return iterable.size(); }
+    };
+    return iterable_wrapper{ forward<T>(iterable) };
+}
+
+template<typename T, typename Iter = decltype(begin(declval<T>()))>
+constexpr auto printer(T&& iterable) {
+    struct iterator {
+        Iter iter, ed;
+        auto operator!=(const iterator& other) const {
+            auto ret = (iter != other.iter);
+            if(not ret) cout << '\n';
+            return ret;
+        }
+        auto& operator++() { ++iter; if(iter != ed) cout << ' '; return *this; }
+        auto& operator*() { return *iter; }
+    };
+    struct iterable_wrapper {
+        T iterable;
+        auto begin() const { return iterator{ std::begin(iterable), std::end(iterable) }; }
+        auto end() const { return iterator{ std::end(iterable), std::end(iterable) }; }
+    };
+    return iterable_wrapper{ forward<T>(iterable) };
+};
+
+template<class ...T> void absorb(T&& ...) {}
+template<size_t L, size_t I, class T>
+bool zip_it_ne(const T& it1, const T& it2) {
+    if(not (get<I>(it1) != get<I>(it2))) return false;
+    if(I + 1 == L) return true;
+    return zip_it_ne<L, (I + 1) % L, T>(it1, it2);
+}
+template<size_t ...Is, class T, class ...Cs,
+    class Iter = tuple<decltype(begin(declval<Cs>()))...>,
+    class Ref = tuple<decltype(*begin(declval<Cs>()))&...>
+    >
+constexpr auto zip(index_sequence<Is...>, T&& iterables, Cs&&...) {
+    struct iterator {
+        Iter iter;
+        unique_ptr<Ref> tref = nullptr;
+        bool operator!=(const iterator& other) const {
+            return zip_it_ne<sizeof...(Is), 0, Iter>(iter, other.iter);
+        }
+        auto& operator++() { absorb(++get<Is>(iter)...); return *this; }
+        auto& operator*() { tref.reset(new Ref(tie(*get<Is>(iter)...))); return *tref; }
+    };
+    struct iterable_wrapper {
+        T iterables;
+        auto begin() const { return iterator { Iter{ std::begin(get<Is>(iterables))... } }; }
+        auto end() const { return iterator { Iter{ std::end(get<Is>(iterables))... } }; }
+        auto size() const { return min({ get<Is>(iterables).size()... }); }
+    };
+    return iterable_wrapper{ forward<T>(iterables) };
+}
+template<class ...Cs, class = tuple<decltype(begin(declval<Cs>()))...>>
+constexpr auto zip(Cs&& ...cs) {
+    return zip(index_sequence_for<Cs...>{}, tuple<Cs...>(forward<Cs>(cs)...), forward<Cs>(cs)...);
+}
+
+template<typename T, typename Iter = decltype(begin(declval<T>()))>
+constexpr auto enumerate(T&& iterable) {
+    return zip(range(iterable.size()), forward<T>(iterable));
+}
+
+template<size_t ...Is, typename T> auto getis(const T& t) { return tie(get<Is>(t)...); }
+template<class T> void setmax(T& a, const T& b) { a = max(a, b); }
+template<class T> void setmin(T& a, const T& b) { a = min(a, b); }
+
+template<typename T, typename = void> struct is_container : false_type {};
+template<typename T>
+struct is_container<T, conditional_t<false, decltype(begin(declval<T>())), void>> : true_type {};
+template<class T> using IsC = typename enable_if<is_container<T>::value and
+    (not is_same<T, string>::value) and (not is_same<T, string_view>::value)>::type;
+template<class T> using NotC = typename enable_if<not is_container<T>::value or
+    is_same<T, string>::value or is_same<T, string_view>::value>::type;
+template<class T> inline IsC<T> print_1(const T& v);
+template<class T> inline NotC<T> print_1(const T& x) { cout << x; }
+template<size_t N> void print_1(const array<char, N>& x) { cout << &x[0]; };
+inline void print_1(const tuple<>&) { cout << "()"; };
+template<size_t L, size_t I, class T> void print_tuple(const T& t) {
+    if(I != 0) cout << ", "; print_1(get<I>(t));
+    if(I + 1 < L) print_tuple<L, (I + 1) % L>(t);
+}
+template<class ...T> inline void print_1(const tuple<T...>& x) {
+    cout << "("; print_tuple<sizeof...(T), 0, tuple<T...>>(x); cout << ")"; }
+inline void print_n() {}
+template<class T, class ...U> inline void print_n(const T& head, const U&... tail);
+template<class T, class U> inline void print_1(const pair<T, U>& p) {
+    cout << "("; print_1(p.first); cout << ", "; print_1(p.second); cout << ")"; }
+template<class T, class ...U> inline void print_n(const T& head, const U&... tail) {
+    print_1(head); if(sizeof...(tail)) cout << " "; print_n(tail...); }
+template<class T> inline IsC<T> print_1(const T& v) {
+    cout << "[";
+    for(auto it = v.begin(); it != v.end(); ++it) { if(it != v.begin()) cout << ", "; print_1(*it); }
+    cout << "]";
+}
+template<class ...T> inline void print(const T& ...args) { print_n(args...); putchar('\n'); }
+inline void read() {}
+template<class T, class ...U> inline void read(T& head, U&... tail) { cin >> head; read(tail...); }
+
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); cout.precision(17); return 0; }();
+//}}}
 using PII = pair<int, int>;
-using TI3 = tuple<int, int, int>;
 using LL = long long;
-using ULL =  unsigned long long;
-using MAT = array<array<LL, 2>, 2>;
 
-template<class T> void _read( T &x ) { cin>>x; }
-void _read(int &x) { scanf("%d", &x); }
-void _read(LL &x) { scanf("%lld", &x); }
-void _read(double &x) { scanf("%lf", &x); }
-void _read(char &x) { scanf(" %c", &x); }
-void _read(char *x) { scanf("%s", x); }
-void read() {}
-template<class T, class... U>
-void read( T& head, U&... tail ) {
-    _read(head);
-    read(tail...);
-}
+const int MOD = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const LL LLINF = 0x3f3f3f3f3f3f3f3f;
 
-template<class T> void _print( const T &x ) { cout << x; }
-void _print( const int &x ) { printf("%d", x); }
-void _print( const LL &x ) { printf("%lld", x); }
-void _print( const double &x ) { printf("%.16lf",x); }
-void _print( const char &x ) { putchar(x); }
-void _print( const char *x ) { printf("%s",x); }
-template<class T> void _print( const vector<T> &x ) { for (auto i = x.begin(); i != x.end(); _print(*i++)) if (i != x.cbegin()) putchar(' '); }
-void print() {}
-template<class T, class... U> void print( const T& head, const U&... tail ) {
-    _print(head);
-    putchar(sizeof...(tail) ? ' ' : '\n');
-    print(tail...);
-}
+struct SAT {
+    vector<vector<int>> G;
+    vector<int> vs;
+    vector<char> color, visited;
+    int V;
+    SAT(int V): V(V) {
+        G.resize((V + 1) * 2);
+        color.resize((V + 1) * 2);
+        visited.resize((V + 1) * 2);
+    }
 
-const int MOD = 1000000007;
-#define MAX_N 55
-#define MAX_V (MAX_N * MAX_N * 2 + 10)
-vector<int> G[MAX_V];
-vector<int> rG[MAX_V];
-vector<int> vs;
-bool used[MAX_V];
-int cmp[MAX_V];
-int offset = MAX_N * MAX_N;
-
-void add_edge(int from, int to) {
-    G[from].push_back(to);
-    rG[to].push_back(from);
-}
-
-void dfs(int v) {
-    used[v] = true;
-    REPIT(ii, G[v]) {
-        if(not used[*ii]) {
-            dfs(*ii);
+    void clear() {
+        for(auto& es : G) {
+            es.clear();
         }
     }
-    vs.push_back(v);
-}
 
-void rdfs(int v, int k) {
-    used[v] = true;
-    cmp[v] = k;
-    REPIT(ii, rG[v]) {
-        if(not used[*ii]) {
-            rdfs(*ii, k);
-        }
+    void add(int i, bool b) {
+        int v = i * 2 + b;
+        G[v ^ 1].push_back(v);
     }
-}
 
-void ssc() {
-    memset(used, 0, sizeof(used));
-    vs.clear();
-    REP(i, MAX_V) {
-        if(not used[i]) {
-            dfs(i);
-        }
+    void add(int i1, bool b1, int i2, bool b2) {
+        int v1 = i1 * 2 + b1, v2 = i2 * 2 + b2;
+        G[v1 ^ 1].push_back(v2);
+        G[v2 ^ 1].push_back(v1);
     }
-    memset(used, 0, sizeof(used));
-    int k = 0;
-    REP(i, MAX_V-1, -1, -1) {
-        if(not used[vs[i]]) {
-            rdfs(vs[i], k++);
-        }
-    }
-}
 
-PII cond[MAX_N * MAX_N][4];
-char room[MAX_N][MAX_N];
+    void dfs(int v) {
+        visited[v] = true;
+        for(int u: G[v]) {
+            if(not visited[u]) {
+                dfs(u);
+            }
+        }
+        vs.push_back(v);
+    }
+
+    bool assign(int v) {
+        if(visited[v]) return color[v];
+        visited[v] = true;
+        color[v] = true;
+
+        for(int u: G[v]) {
+            if(not assign(u)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    vector<char> solve() {
+        vs.clear();
+        fill(visited.begin(), visited.end(), false);
+        for(int i = 0; i < int(G.size()); ++i) {
+            if(not visited[i]) {
+                dfs(i);
+            }
+        }
+        reverse(vs.begin(), vs.end());
+
+        fill(visited.begin(), visited.end(), false);
+        for(auto i : vs) {
+            if(not visited[i]) {
+                visited[i] = true;
+                color[i] = false;
+                if(not assign(i ^ 1)) {
+                    return {};
+                }
+            }
+        }
+        vector<char> res;
+        for(int v = 0; v < V; ++v) {
+            res.push_back(color[v * 2 + 1]);
+        }
+        return res;
+    }
+};
+
+const int MAX_R = 55, MAX_C = 55;
+auto sat = SAT(MAX_R * MAX_C);
+
 int R, C;
+char room[MAX_R][MAX_C];
 
-bool OK(int r, int c) {
-    if(r < 0 or c < 0 or r >= R or c >= C or room[r][c] == '#') {
-        return false;
+bool go(int r, int c, array<int, 2> d, vector<array<int, 2>>& epts) {
+    r += d[0];
+    c += d[1];
+    while(r >= 0 and r < R and c >= 0 and c < C and room[r][c] != '#') {
+        if(room[r][c] == '.') {
+            epts.push_back({r, c});
+        } else if(room[r][c] == '|' or room[r][c] == '-') {
+            return false;
+        } else if(room[r][c] == '/') {
+            swap(d[0], d[1]);
+            d[0] = -d[0];
+            d[1] = -d[1];
+        } else if(room[r][c] == '\\') {
+            swap(d[0], d[1]);
+        }
+        r += d[0];
+        c += d[1];
     }
     return true;
 }
 
-PII turn(int r, int c, int dr, int dc) {
-    if(room[r][c] == '/') {
-        swap(dr, dc);
-        dr *= -1;
-        dc *= -1;
-    } else if(room[r][c] == '\\') {
-        swap(dr, dc);
-    }
-    return {dr, dc};
-}
+using VCondArr = array<array<vector<pair<int, bool>>, MAX_C>, MAX_R>;
 
-void go(int r, int c, int dr, int dc, int mode) {
-    int r0 = r, c0 = c;
-    while(OK(r + dr, c + dc)) {
-        r += dr;
-        c += dc;
-
-        int k = (dr == 0)? max(dc, 0) : 2 + max(dr, 0);
-        if(room[r][c] == '|' or room[r][c] == '-') {
-            cond[r*C + c][k] = {1 + r0*C + c0, mode};
-            break;
-        } else if(room[r][c] == '.') {
-            assert(cond[r*C + c][k].first == 0);
-            if(cond[r*C + c][k^1].first > 0) {
-                cond[r*C + c][k^1] = {0, 0};
-            } else {
-                cond[r*C + c][k] = {1 + r0*C + c0, mode};
-            }
+void explore(int r, int c, VCondArr& conds) {
+    vector<array<int, 2>> epts;
+    auto ok1 = go(r, c, {0, 1}, epts) and go(r, c, {0, -1}, epts);
+    if(not ok1) {
+        sat.add((r * C + c), false);
+    } else {
+        for(auto [r1, c1] : epts) {
+            conds[r1][c1].emplace_back(r * C + c, true);
         }
-        tie(dr, dc) = turn(r, c, dr, dc);
+    }
+
+    epts.clear();
+    auto ok2 = go(r, c, {1, 0}, epts) and go(r, c, {-1, 0}, epts);
+    if(not ok2) {
+        sat.add((r * C + c), true);
+    } else {
+        for(auto [r1, c1] : epts) {
+            conds[r1][c1].emplace_back(r * C + c, false);
+        }
     }
 }
 
 void solve() {
-    REP(i, MAX_V) {
-        G[i].clear();
-        rG[i].clear();
-    }
-    memset(cond, 0, sizeof(cond));
+    sat.clear();
     read(R, C);
-    REP(r, R) {
-        read(room[r]);
+    VCondArr conds;
+
+    for(int i : range(R)) {
+        read(room[i]);
     }
 
-    REP(r, R) {
-        REP(c, C) {
-            if(room[r][c] == '-' or room[r][c] == '|') {
-                go(r, c, 0, 1, 0);
-                go(r, c, 0, -1, 0);
-                go(r, c, 1, 0, 1);
-                go(r, c, -1, 0, 1);
-            }
-        }
-    }
-
-    REP(r, R) {
-        REP(c, C) {
-            vector<PII> conds;
-            REP(k, 4) {
-                if(cond[r*C + c][k].first > 0) {
-                    conds.push_back(cond[r*C + c][k]);
-                }
-            }
+    for(int r : range(R)) {
+        for(int c : range(C)) {
             if(room[r][c] == '|' or room[r][c] == '-') {
-                REPIT(ii, conds) {
-                    int v = ii->first;
-                    int mode = ii->second;
-                    add_edge(v + offset * mode, v + offset * (1-mode));
-                }
-            } else if(room[r][c] == '.') {
-                if(conds.size() == 1) {
-                    int v = conds[0].first;
-                    int mode = conds[0].second;
-                    add_edge(v + offset * (1-mode), v + offset * mode);
-                } else if(conds.size() == 2) {
-                    int v = conds[0].first, u = conds[1].first;
-                    int modev = conds[0].second, modeu = conds[1].second;
-                    add_edge(v + offset * (1-modev), u + offset * modeu);
-                    add_edge(u + offset * (1-modeu), v + offset * modev);
-                } else {
-                    print("IMPOSSIBLE");
-                    return;
-                }
+                explore(r, c, conds);
             }
         }
     }
-    ssc();
 
-    REP(i, 1, R * C + 1) {
-        int r = (i - 1) / C;
-        int c = (i - 1) % C;
-        if(cmp[i] == cmp[i + offset]) {
-            print("IMPOSSIBLE");
-            return;
-        }
-        if(room[r][c] == '|' or room[r][c] == '-') {
-            if(cmp[i] > cmp[i + offset]) {
-                room[r][c] = '-';
+    for(int r : range(R)) {
+        for(int c : range(C)) {
+            if(room[r][c] != '.') {
+                continue;
+            }
+            if(conds[r][c].size() == 0 or conds[r][c].size() >= 3) {
+                print("IMPOSSIBLE");
+                return;
+            }
+            if(conds[r][c].size() == 1) {
+                auto [i0, b0] = conds[r][c][0];
+                sat.add(i0, b0);
             } else {
-                room[r][c] = '|';
+                auto [i0, b0] = conds[r][c][0];
+                auto [i1, b1] = conds[r][c][1];
+                sat.add(i0, b0, i1, b1);
+            }
+        }
+    }
+    auto res = sat.solve();
+    if(res.empty()) {
+        print("IMPOSSIBLE");
+        return;
+    }
+    for(int r : range(R)) {
+        for(int c : range(C)) {
+            if(room[r][c] == '|' or room[r][c] == '-') {
+                room[r][c] = res[r * C + c] ? '-' : '|';
             }
         }
     }
     print("POSSIBLE");
-    REP(r, R) {
-        print(room[r]);
+    for(int i : range(R)) {
+        print(room[i]);
     }
 }
 
-int main()
-{
+int main() {
     int T;
-    scanf("%d", &T);
-    for(int i = 0; i < T; i++) {
-        printf("Case #%d: ", i+1);
+    cin >> T;
+    for(int i = 1; i <= T; ++i) {
+        cout << "Case #" << i << ": ";
         solve();
     }
-
     return 0;
 }
