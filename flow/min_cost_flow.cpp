@@ -19,6 +19,12 @@ struct MinCostFlow {
         preve.resize(V + 1);
     }
 
+    void clear() {
+        for(auto& es : G) {
+            es.clear();
+        }
+    }
+
     void add(int from, int to, int cap, int cost) {
         int i = G[from].size();
         int j = G[to].size();
