@@ -1,12 +1,14 @@
-void solve() {
-}
+struct Solution {
+    Solution(int) {
+    }
+};
 
 int main() {
     int T;
     cin >> T;
     for(int i = 1; i <= T; ++i) {
         cout << "Case #" << i << ": ";
-        solve();
+        ignore = Solution(i);
     }
     return 0;
 }

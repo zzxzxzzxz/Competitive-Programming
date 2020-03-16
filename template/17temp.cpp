@@ -168,15 +168,16 @@ const int INF = 0x3f3f3f3f;
 const LL LLINF = 0x3f3f3f3f3f3f3f3f;
 const int MAX_N = 300005;
 
-
-void solve() {
-}
+struct Solution {
+    Solution(int) {
+    }
+};
 
 int main() {
-    int t = 1;
-    //cin >> t;
-    for(int i = 0; i < t; ++i) {
-        solve();
+    int T = 1;
+    //cin >> T;
+    for(int i = 1; i <= T; ++i) {
+        ignore = Solution(i);
     }
     return 0;
 }
