@@ -32,7 +32,7 @@ class Treap {//{{{
             return node ? node->sz : 0;
         }
 
-        array<NodePtr, 2> split(NodePtr& root, const int val) {
+        pair<NodePtr, NodePtr> split(NodePtr& root, const int val) {
             if(not root) {
                 return {nullptr, nullptr};
             }

@@ -48,7 +48,7 @@ class Treap {
             return node ? node->sz : 0;
         }
 
-        array<NodePtr, 2> split(NodePtr& root, size_t k) {
+        pair<NodePtr, NodePtr> split(NodePtr& root, size_t k) {
             if(not root) {
                 return {nullptr, nullptr};
             }
