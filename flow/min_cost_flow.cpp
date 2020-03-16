@@ -38,11 +38,11 @@ struct MinCostFlow {
         while(required > 0) {
             fill(d.begin(), d.end(), INF);
             d[s] = 0;
-            priority_queue<PII, vector<PII>, greater<PII>> que;
-            que.push({0, s});
-            while(not que.empty()){
-                auto [dist, v] = que.top();
-                que.pop();
+            priority_queue<PII, vector<PII>, greater<PII>> pq;
+            pq.push({0, s});
+            while(not pq.empty()){
+                auto [dist, v] = pq.top();
+                pq.pop();
                 if(dist > d[v]) {
                     continue;
                 }
@@ -52,7 +52,7 @@ struct MinCostFlow {
                         d[e.to] = d[v] + e.cost + h[v] - h[e.to];
                         prevv[e.to] = v;
                         preve[e.to] = i;
-                        que.push({d[e.to], e.to});
+                        pq.push({d[e.to], e.to});
                     }
                 }
             }
