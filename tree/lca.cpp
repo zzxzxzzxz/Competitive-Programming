@@ -62,8 +62,7 @@ struct LCA {
     }
 };
 
-int main()
-{
+int main() {
     cout << "          1" << endl;
     cout << "         / \\" << endl;
     cout << "        2   4" << endl;

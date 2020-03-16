@@ -16,7 +16,7 @@ Data combine(const Data& val1, const Data& val2) {
     return val1 + val2;
 }
 
-struct SegTree {
+struct SegTree {//{{{
     int N;
     SegTree(int n_, Data *a = NULL) {
         N = 1;
@@ -72,10 +72,9 @@ struct SegTree {
         Data ret = modify(combine(vl, vr), lazy[k], min(r, b) - max(l, a));
         return ret;
     }
-};
+};//}}}
 
-int main()
-{
+int main() {
     vector<int> v = {11, 15, 12, 13, 5, 6, 2, 8};
     int n = v.size();
     SegTree t(n, &v[0]);

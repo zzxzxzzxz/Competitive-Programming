@@ -19,7 +19,7 @@ Data combine(const Data& val1, const Data& val2) {
     return min(val1, val2);
 }
 
-struct SegTree {
+struct SegTree {//{{{
     int N;
     SegTree(int n_, Data *a = NULL) {
         N = 1;
@@ -109,10 +109,9 @@ struct SegTree {
         Data vr = query(a, b, mid, r, k << 1 | 1);
         return combine(vl, vr);
     }
-};
+};//}}}
 
-int main()
-{
+int main() {
     vector<int> v = {11, 15, 12, 13, 5, 6, 2, 8};
     int n = v.size();
     SegTree t(n, &v[0]);

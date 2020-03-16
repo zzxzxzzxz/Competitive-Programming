@@ -31,8 +31,7 @@ vector<int> getpdiv(int x) {
     return ps;
 }
 
-int main()
-{
+int main() {
     Sieve();
     int x = 734132;
     cout << x << " : ";

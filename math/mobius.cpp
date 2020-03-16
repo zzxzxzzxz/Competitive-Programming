@@ -26,8 +26,7 @@ void Sieve() {
     }
 }
 
-int main()
-{
+int main() {
     Sieve();
     for(int i = 1; i <= 30; ++i) {
         printf("%2d ", i);

@@ -38,8 +38,7 @@ void mget( int src, T &head, U&... tail ) {
     mget(src,tail...);
 }
 
-int main()
-{
+int main() {
     int id = MyNodeId();
     int nnodes = NumberOfNodes();
     LL n = GetN();

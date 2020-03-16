@@ -48,8 +48,7 @@ vector<int> build_lcp(const string& s, const vector<int>& sa) {
 }
 
 
-int main()
-{
+int main() {
     string s = "abracadabra";
     int n = s.size();
     auto sa = build_sa(s);

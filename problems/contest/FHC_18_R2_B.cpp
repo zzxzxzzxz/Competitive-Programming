@@ -193,8 +193,7 @@ void solve() {
     print(ans);
 }
 
-int main()
-{
+int main() {
     int T;
     scanf("%d", &T);
     for(int i = 0; i < T; i++) {

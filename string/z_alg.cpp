@@ -47,8 +47,7 @@ size_t z_alg(string& s, string& p) {
     return string::npos;
 }
 
-int main()
-{
+int main() {
     string s = "abaabaabcaabxaaazaaz";
     string p = "aabcaabxaaaz";
     build_Z(p);

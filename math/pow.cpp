@@ -21,8 +21,7 @@ LL inv(LL x) {
     return mypow(x, MOD - 2);
 }
 
-int main()
-{
+int main() {
     int a;
     a = 5231423;
     printf("%lld\n", a * inv(a) % MOD);

@@ -9,8 +9,7 @@ void _add(Data& a, Data b) {
     a += b;
 }
 
-
-struct BIT {
+struct BIT {//{{{
     int lg(int n) { return 31 - __builtin_clz(n); }
 
     int n;
@@ -54,10 +53,9 @@ struct BIT {
         }
         return pos + 1;
     }
-};
+};//}}}
 
-int main()
-{
+int main() {
     vector<int> v = {2, 2, 2, 3, 3};
     int n = int(v.size());
     BIT bit(n, &v[0]);

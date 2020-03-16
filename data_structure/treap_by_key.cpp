@@ -4,7 +4,7 @@ using namespace std;
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 size_t seed = rng();
 
-struct Node {
+struct Node {//{{{
     size_t sz;
     int val;
     unique_ptr<Node> left, right;
@@ -17,10 +17,9 @@ struct Node {
     void push() {
     };
 };
-
 using NodePtr = unique_ptr<Node>;
-
-class Treap{
+//}}}
+class Treap {//{{{
     private:
         NodePtr root;
         bool prior(NodePtr& node1, NodePtr& node2) {
@@ -132,7 +131,7 @@ class Treap{
         void dfs(const F& f) {
             dfs(root, f);
         }
-};
+};//}}}
 
 int main(){
     vector<int> v1 = {15, 3, 16, 4, 10, 7, 19, 1, 8, 12};

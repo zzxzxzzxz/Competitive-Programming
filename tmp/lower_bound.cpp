@@ -86,8 +86,7 @@ void test_r(int k, set<int>& S) {
     print("upper", k, (it == S.end())? -1: *it);
 }
 
-int main()
-{
+int main() {
     set<int> S = {1, 3, 5, 7, 9};
     REPP(ii, S) {
         _print(*ii);

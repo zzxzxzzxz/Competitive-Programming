@@ -33,8 +33,7 @@ void QuickSelect(Iter start, Iter kth, Iter stop, Cmp cmp = Cmp()) {
     QuickSelectExcute(start, kth, stop, cmp);
 }
 
-int main()
-{
+int main() {
     //vector<int> v = {20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
     //vector<int> v = {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1};
     vector<int> v = {3, 6, 2, 2, 1, 3, 5, 4, 5};

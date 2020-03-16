@@ -3,7 +3,7 @@ using namespace std;
 
 const int INF = 0x3f3f3f3f;
 
-struct MaxMatch {
+struct MaxMatch {//{{{
     vector<vector<int>> G;
     vector<int> match;
     vector<char> used;
@@ -51,7 +51,7 @@ struct MaxMatch {
         }
         return res;
     }
-};
+};//}}}
 
 int main() {
     vector<pair<int, int>> edges = {

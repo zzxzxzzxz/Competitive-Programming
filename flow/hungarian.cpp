@@ -129,8 +129,7 @@ int hungarian() {
     return ans;
 }
 
-int main()
-{
+int main() {
     vector<vector<int>> g = {
         {1, 5, 6}, {2, 5, 8},
         {2, 6, 6}, {3, 4, 4}

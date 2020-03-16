@@ -19,8 +19,7 @@ void min_nnzx(int a, int& x, int b, int& y, int d) {
     y += a / d * m;
 }
 
-int main()
-{
+int main() {
     int n = 100, a = 13, b = 11;
     int x, y;
     int d = extgcd(a, b, x, y);

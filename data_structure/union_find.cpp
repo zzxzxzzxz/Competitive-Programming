@@ -1,9 +1,9 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-vector<int> parent, rnk;
+struct DSU {//{{{
+    vector<int> parent, rnk;
 
-struct DSU {
     DSU(int n) {
         rnk.assign(n, 0);
         parent.resize(n);
@@ -34,10 +34,9 @@ struct DSU {
             }
         }
     }
-};
+};//}}}
 
-int main()
-{
+int main() {
     int n = 10;
     auto dsu = DSU(n + 1);
     dsu.unite(1, 2);

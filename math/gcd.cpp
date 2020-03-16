@@ -12,8 +12,7 @@ int gcd(int a, int b) {
     return a;
 }
 
-int main()
-{
+int main() {
     int a, b;
     scanf("%d%d", &a, &b);
     printf("%d\n", gcd(a, b));

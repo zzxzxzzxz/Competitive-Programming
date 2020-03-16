@@ -4,7 +4,7 @@ using namespace std;
 using PII = pair<int, int>;
 const int INF = 0x3f3f3f3f;
 
-struct MinCostFlow {
+struct MinCostFlow {//{{{
     struct edge {
         int to, cap, cost, rev;
     };
@@ -78,7 +78,7 @@ struct MinCostFlow {
         }
         return res;
     }
-};
+};//}}}
 
 int main() {
     int V = 5;

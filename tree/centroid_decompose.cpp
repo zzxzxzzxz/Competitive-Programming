@@ -97,8 +97,7 @@ LL count(int v) {
 
 // https://codeforces.com/contest/161/problem/D
 
-int main()
-{
+int main() {
     k = 2;
     int n = 5;
     vector<array<int, 2>> graph = {

@@ -54,8 +54,7 @@ class Zp {
 };
 
 
-int main()
-{
+int main() {
     Zp<107> x = 100;
     cout << x + 10 << endl;
     x *= 100;

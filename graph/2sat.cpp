@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-struct SAT {
+struct SAT {//{{{
     vector<vector<int>> G;
     vector<int> vs;
     vector<char> color, visited;
@@ -78,8 +78,7 @@ struct SAT {
         }
         return res;
     }
-};
-
+};//}}}
 
 int main() {
     auto show = [](vector<char>& res) {

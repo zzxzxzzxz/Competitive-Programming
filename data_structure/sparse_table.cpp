@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-struct SparseTable {
+struct SparseTable {//{{{
     vector<vector<int>> st;
     int __lg(int n) { return 31 - __builtin_clz(n); }
 
@@ -27,7 +27,7 @@ struct SparseTable {
         int k = __lg(r - l);
         return max(st[k][l], st[k][r - (1 << k)]);
     }
-};
+};//}}}
 
 int main() {
     vector<int> a = {3, 7, 4, 5, 6, 2, 9, 8, 1};

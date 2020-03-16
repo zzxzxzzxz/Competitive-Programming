@@ -2,9 +2,7 @@
 
 using namespace std;
 
-
-int main()
-{
+int main() {
     auto f = []() {
         int x = 0;
         return [x]() mutable {return x++;};

@@ -145,8 +145,7 @@ int test2(int k) {
     return l;
 }
 
-int main()
-{
+int main() {
     print("boundary: -1, 13");
     for(int i = -2; i <= n + 1; ++i) {
         test(i);

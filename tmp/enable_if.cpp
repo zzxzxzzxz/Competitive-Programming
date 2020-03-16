@@ -17,8 +17,7 @@ NotFd<T> test(const T&) {
     cout << 2 << endl;;
 }
 
-int main()
-{
+int main() {
     int n = 1;
     vector<int> v;
     test(1);

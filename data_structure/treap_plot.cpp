@@ -37,7 +37,7 @@ struct Node {
 
 using NodePtr = unique_ptr<Node>;
 
-class Treap{
+class Treap {
     private:
         NodePtr root;
         bool prior(NodePtr& node1, NodePtr& node2) {
@@ -193,7 +193,7 @@ class Treap{
         }
 };
 
-int main(){
+int main() {
     vector<int> v = {1, 3, 2, 0, 2, 1, 2, 1, 1, 2};
     int n = v.size();
 

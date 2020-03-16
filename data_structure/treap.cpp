@@ -4,8 +4,7 @@ using namespace std;
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 size_t seed = rng();
 
-template<class T>
-class Treap{
+template<class T> class Treap {//{{{
     private:
         struct Node {
             size_t sz;
@@ -125,7 +124,7 @@ class Treap{
             };
             traverse(traverse, root, f);
         }
-};
+};//}}}
 
 int main(){
     vector<int> v = {5, 3, 6, 4, 0, 7, 9, 1, 8, 2};

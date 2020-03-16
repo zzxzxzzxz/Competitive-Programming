@@ -3,7 +3,7 @@ using namespace std;
 
 const int INF = 0x3f3f3f3f;
 
-struct MaxFlow {
+struct MaxFlow {//{{{
     struct edge {
         int to, cap, rev;
     };
@@ -58,7 +58,7 @@ struct MaxFlow {
         }
         return flow;
     }
-};
+};//}}}
 
 int main() {
     int V = 5;
