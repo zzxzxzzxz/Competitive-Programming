@@ -75,14 +75,16 @@ class Treap {//{{{
             }
 
             if(prior(a, b)) {
-                auto [bl, br] = split(b, a->val);
+                NodePtr bl, br;
+                tie(bl, br) = split(b, a->val);
                 a->push();
                 a->left = unite(a->left, bl);
                 a->right = unite(a->right, br);
                 a->pull();
                 return move(a);
             } else {
-                auto [al, ar] = split(a, b->val);
+                NodePtr al, ar;
+                tie(al, ar) = split(a, b->val);
                 b->push();
                 b->left = unite(b->left, al);
                 b->right = unite(b->right, ar);
@@ -114,7 +116,8 @@ class Treap {//{{{
 
         void insert(const int val) {
             auto node = make_unique<Node>(val);
-            auto [a, b] = split(root, val);
+            NodePtr a, b;
+            tie(a, b) = split(root, val);
             a = merge(a, node);
             root = merge(a, b);
         }

@@ -41,7 +41,8 @@ struct MinCostFlow {//{{{
             priority_queue<PII, vector<PII>, greater<PII>> pq;
             pq.push({0, s});
             while(not pq.empty()){
-                auto [dist, v] = pq.top();
+                int dist, v;
+                tie(dist, v) = pq.top();
                 pq.pop();
                 if(dist > d[v]) {
                     continue;

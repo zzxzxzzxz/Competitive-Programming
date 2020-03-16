@@ -86,7 +86,8 @@ template<class T> class Treap {//{{{
 
         void insert(const T& val, const size_t k) {
             auto node = make_unique<Node>(val);
-            auto [a, b] = split(root, k);
+            NodePtr a, b;
+            tie(a, b) = split(root, k);
             a = merge(a, node);
             root = merge(a, b);
         }

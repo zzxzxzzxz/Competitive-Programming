@@ -1,13 +1,13 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-struct Node {
+struct Node {//{{{
     int id = -1;
     Node* fail = nullptr;
     array<Node*, 26> nxt = {};
-};
+};//}}}
 
-struct ACA {
+struct ACA {//{{{
     Node *root;
     ACA(): root(new Node()) {}
 
@@ -80,7 +80,7 @@ struct ACA {
         }
         return res;
     }
-};
+};//}}}
 
 int main() {
     ACA t;

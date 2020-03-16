@@ -18,7 +18,9 @@ int main() {
     };
     vector<vector<int>> G(n + 1), rG(n + 1);
     vector<int> cpn(n + 1);
-    for(auto& [u, v]: edges) {
+    for(auto& e: edges) {
+        int u, v;
+        tie(u, v) = e;
         G[u].push_back(v);
         rG[v].push_back(u);
     }
