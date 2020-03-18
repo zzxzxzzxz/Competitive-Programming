@@ -7,7 +7,6 @@ struct Node {//{{{
     Node* link = nullptr;
     array<Node*, 26> nxt = {};
 };//}}}
-
 struct ACA {//{{{
     Node *root;
     ACA(): root(new Node()) {}
@@ -28,8 +27,8 @@ struct ACA {//{{{
         deque<Node*> que;
         for(int i = 0; i < 26; ++i) {
             if(root->nxt[i]) {
-                (root->nxt[i])->fail = root;
-                (root->nxt[i])->link = root;
+                root->nxt[i]->fail = root;
+                root->nxt[i]->link = (root->id != -1) ? root : nullptr;
                 que.push_back(root->nxt[i]);
             }
         }
@@ -47,11 +46,7 @@ struct ACA {//{{{
                 }
                 if(fl->nxt[i]) {
                     ptr->nxt[i]->fail = fl->nxt[i];
-                    if(fl->nxt[i]->id != -1) {
-                        ptr->nxt[i]->link = fl->nxt[i];
-                    } else {
-                        ptr->nxt[i]->link = fl->nxt[i]->link;
-                    }
+                    ptr->nxt[i]->link = (fl->nxt[i]->id != -1) ? fl->nxt[i] : fl->nxt[i]->link;
                     //ptr->nxt[i]->cnt += fail->nxt[i]->cnt;
                 } else {
                     ptr->nxt[i]->fail = root;
@@ -61,25 +56,22 @@ struct ACA {//{{{
         }
     }
 
-    auto search(const string& s) {
-        vector<pair<int, int>> res;
+    auto search(const string& s, int n) {
+        vector<vector<int>> res(n, vector<int>{});
         Node *p = root;
         for(int j = 0; j < int(s.size()); ++j) {
             int i = s[j] - 'a';
             while(p != root and not p->nxt[i]) {
                 p = p->fail;
             }
-            if(p->nxt[i]) {
-                p = p->nxt[i];
-            } else {
-                p = root;
-            }
+            p = p->nxt[i] ? p->nxt[i] : root;
+
             if(p->id > -1) {
-                res.push_back({p->id, j});
+                res[p->id].push_back(j);
             }
             auto q = p->link;
-            while(q != root) {
-                res.push_back({q->id, j});
+            while(q != nullptr) {
+                res[q->id].push_back(j);
                 q = q->link;
             }
         }
@@ -102,13 +94,14 @@ int main() {
     string s("aaaaaaa");
     cout << s << endl;
 
-    auto res = t.search(s);
+    auto res = t.search(s, words.size());
 
-    for(auto it = res.begin(); it != res.end(); ++it) {
-        auto [id, idx] = *it;
-        int l = int(words[id].size());
-        for(int i = 0; i < idx - l + 1; ++i) cout << " ";
-        cout << words[id] << endl;
+    for(int id = 0; id < int(words.size()); ++id) {
+        for(int idx : res[id]) {
+            int l = int(words[id].size());
+            for(int i = 0; i < idx - l + 1; ++i) cout << " ";
+            cout << words[id] << endl;
+        }
     }
     return 0;
 }
