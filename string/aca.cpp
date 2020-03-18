@@ -4,6 +4,7 @@ using namespace std;
 struct Node {//{{{
     int id = -1;
     Node* fail = nullptr;
+    Node* link = nullptr;
     array<Node*, 26> nxt = {};
 };//}}}
 
@@ -28,6 +29,7 @@ struct ACA {//{{{
         for(int i = 0; i < 26; ++i) {
             if(root->nxt[i]) {
                 (root->nxt[i])->fail = root;
+                (root->nxt[i])->link = root;
                 que.push_back(root->nxt[i]);
             }
         }
@@ -45,6 +47,11 @@ struct ACA {//{{{
                 }
                 if(fl->nxt[i]) {
                     ptr->nxt[i]->fail = fl->nxt[i];
+                    if(fl->nxt[i]->id != -1) {
+                        ptr->nxt[i]->link = fl->nxt[i];
+                    } else {
+                        ptr->nxt[i]->link = fl->nxt[i]->link;
+                    }
                     //ptr->nxt[i]->cnt += fail->nxt[i]->cnt;
                 } else {
                     ptr->nxt[i]->fail = root;
@@ -70,12 +77,10 @@ struct ACA {//{{{
             if(p->id > -1) {
                 res.push_back({p->id, j});
             }
-            auto q = p->fail;
-            while(q != NULL) {
-                if(q->id > -1) {
-                    res.push_back({q->id, j});
-                }
-                q = q->fail;
+            auto q = p->link;
+            while(q != root) {
+                res.push_back({q->id, j});
+                q = q->link;
             }
         }
         return res;
@@ -84,7 +89,7 @@ struct ACA {//{{{
 
 int main() {
     ACA t;
-    vector<string> words = {"aa", "aaaa"};
+    vector<string> words = {"a", "aa", "aaaa"};
     cout << "{";
     for(int i = 0; i < int(words.size()); ++i) {
         t.insert(words[i], i);
