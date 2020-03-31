@@ -83,7 +83,7 @@ using namespace itertools;
 #define repeat(x) int _ = 0; _ < (x); ++_
 //}}}
 namespace parser {//{{{
-    template<class...>struct types{using type=types;};
+    template<class...>struct types{ using type = types; };
     template<class Sig> struct args;
     template<class R, class...Args>
         struct args<R(Args...)>:types<Args...>{};
@@ -92,7 +92,7 @@ namespace parser {//{{{
     template<typename T> struct is_vector : false_type {};
     template<typename T> struct is_vector<vector<T>> : true_type {};
 
-    template<class T> auto read(istringstream&& iss) {
+    template<class T> auto read(istringstream& iss) {
         if constexpr(is_same_v<T, string>) {
             char c;
             string res;
@@ -106,7 +106,7 @@ namespace parser {//{{{
             T res;
             char c; iss >> c;
             while(c != ']') {
-                auto tmp = read<typename T::value_type>(static_cast<istringstream&&>(iss));
+                auto tmp = read<typename T::value_type>(iss);
                 res.push_back(tmp);
                 iss >> c;
             }
@@ -115,9 +115,21 @@ namespace parser {//{{{
             T res; iss >> res; return res;
         }
     }
-    string readline() { string s; getline(cin, s); return s; }
-    template <class ...Ts> auto parse_input(types<Ts...>) {
-        return make_tuple(read<remove_reference_t<Ts>>(istringstream(readline()))...);
+
+    optional<tuple<>> read1() { return {{}}; }
+    template<class T, class ...U> optional<tuple<T, U...>> read1(T, U ...tail) {
+        string s;
+        getline(cin, s);
+        if(cin.eof()) return {};
+        auto iss = istringstream(s);
+        auto t1 = make_tuple(read<T>(iss));
+        auto t2 = read1(tail...);
+        return { tuple_cat(t1, t2.value()) };
+    }
+
+    template<class ...Ts, class T = tuple<remove_reference_t<Ts>...>>
+    optional<T> parse_input(types<Ts...>) {
+        return read1<remove_reference_t<Ts>...>( remove_reference_t<Ts>()... );
     }
 };
 using namespace parser;
@@ -128,14 +140,14 @@ using LL = long long;
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 
-
-
-
 #define METHOD //FIXME
 
 int main() {
-    auto input = parse_input(args_t<decltype(METHOD)>{});
-    auto sol = Solution();
-    apply([&sol](auto ...args) { print(sol.METHOD(args...)); }, input);
+    while(true) {
+        auto input = parse_input(args_t<decltype(METHOD)>{});
+        if(input == nullopt) break;
+        auto sol = Solution();
+        apply([&sol](auto ...args) { print(sol.METHOD(args...)); }, input.value());
+    }
     return 0;
 }
