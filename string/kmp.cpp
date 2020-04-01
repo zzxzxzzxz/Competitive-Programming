@@ -4,39 +4,39 @@ using namespace std;
 const int MOD = 1000000007;
 #define MAX_N 300005
 
-int F[MAX_N];
+size_t F[MAX_N];
 
 void build_failure_function(string& p) {
-    int m = p.size();
-    F[0] = -1;
-    for(int i = 1; i < m; i++) {
-        int k = F[i - 1];
-        while(k != -1 and p[k + 1] != p[i]) {
-            k = F[k];
+    size_t m = p.size();
+    F[0] = 0;
+    for(size_t i = 1; i < m; i++) {
+        size_t k = F[i - 1];
+        while(k != 0 and p[k] != p[i]) {
+            k = F[k - 1];
         }
-        if(p[k + 1] == p[i]) {
+        if(p[k] == p[i]) {
             F[i] = k + 1;
         } else {
-            F[i] = -1;
+            F[i] = 0;
         }
     }
 }
 
 size_t kmp(string& s, string& p) {
-    int n = s.size(), m = p.size();
-    int k = -1;
-    for(int i = 0; i < n; i++) {
-        while(k != -1 and p[k + 1] != s[i]) {
-            k = F[k];
+    size_t n = s.size(), m = p.size();
+    size_t k = 0;
+    for(size_t i = 0; i < n; i++) {
+        while(k != 0 and p[k] != s[i]) {
+            k = F[k - 1];
         }
-        if(p[k + 1] == s[i]) {
+        if(p[k] == s[i]) {
             k = k + 1;
         } else {
-            k = -1;
+            k = 0;
         }
-        if(k == m - 1) {
+        if(k == m) {
             return i - m + 1;
-            // k = F[k]
+            // k = F[k - 1]
         }
     }
     return string::npos;
