@@ -128,11 +128,10 @@ using namespace itertools;
 #define repeat(x) int _ = 0; _ < (x); ++_
 //}}}
 namespace parser {//{{{
-    template<class...>struct types{ using type = types; };
+    template<class...> struct types { using type = types; };
     template<class Sig> struct args;
-    template<class R, class...Args>
-        struct args<R(Args...)>:types<Args...>{};
-    template<class Sig> using args_t=typename args<Sig>::type;
+    template<class R, class... Args> struct args<R(Args...)> : types<Args...> {};
+    template<class Sig> using args_t = typename args<Sig>::type;
 
     template<typename T> struct is_vector : false_type {};
     template<typename T> struct is_vector<vector<T>> : true_type {};
@@ -172,9 +171,9 @@ namespace parser {//{{{
         return { tuple_cat(t1, t2.value()) };
     }
 
-    template<class ...Ts, class T = tuple<remove_reference_t<Ts>...>>
-        optional<T> parse_input(types<Ts...>) {
-            return read1<remove_reference_t<Ts>...>( remove_reference_t<Ts>()... );
+    template<class ...T, class U = tuple<remove_reference_t<T>...>>
+        optional<U> parse_input(types<T...>) {
+            return read1<remove_reference_t<T>...>( remove_reference_t<T>()... );
         }
 };
 using namespace parser;
