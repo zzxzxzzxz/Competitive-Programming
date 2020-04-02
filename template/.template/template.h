@@ -41,7 +41,7 @@ template<typename T> constexpr auto range(T start, T stop) { return range(start,
 template<typename T> constexpr auto range(T stop) { return range(T(0), stop, T(1)); }
 
 template<typename T, typename Iter = decltype(rbegin(declval<T>()))>
-auto reversed(T&& iterable) {
+constexpr auto reversed(T&& iterable) {
     struct iterable_wrapper {
         T iterable;
         auto begin() const { return std::rbegin(iterable); }
