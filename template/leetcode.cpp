@@ -16,6 +16,8 @@ namespace pyprint {//{{{
     template<class T> inline void print_1(const T& x) {
         if constexpr(is_same<T, string>::value or is_same<T, string_view>::value) {
             cout << x;
+        } else if constexpr(is_same<T, bool>::value) {
+            cout << (x ? "true" : "false");
         } else if constexpr(is_str_arr<T>::value) {
             cout << &x[0];
         } else if constexpr(is_tuple<T>::value) {
@@ -78,6 +80,49 @@ namespace itertools {//{{{
     };
     template<typename T> constexpr auto range(T start, T stop) { return range(start, stop, T(1)); }
     template<typename T> constexpr auto range(T stop) { return range(T(0), stop, T(1)); }
+
+    template<typename T, typename Iter = decltype(rbegin(declval<T>()))>
+        constexpr auto reversed(T&& iterable) {
+            struct iterable_wrapper {
+                T iterable;
+                auto begin() const { return std::rbegin(iterable); }
+                auto end() const { return std::rend(iterable); }
+                auto size() const { return std::size(iterable); }
+            };
+            return iterable_wrapper{ forward<T>(iterable) };
+        }
+
+    template<size_t ...Is, class T, class ...Cs,
+        class Iter = tuple<decltype(begin(declval<Cs>()))...>,
+        class Ref = tuple<decltype(*begin(declval<Cs>()))&...>
+            >
+            constexpr auto zip(index_sequence<Is...>, T&& iterables, Cs&&...) {
+                struct iterator {
+                    Iter iter;
+                    unique_ptr<Ref> tref = nullptr;
+                    bool operator!=(const iterator& other) const {
+                        return ((get<Is>(iter) != get<Is>(other.iter)) and ...);
+                    }
+                    auto& operator++() { ((++get<Is>(iter)), ...); return *this; }
+                    auto& operator*() { tref.reset(new Ref(tie(*get<Is>(iter)...))); return *tref; }
+                };
+                struct iterable_wrapper {
+                    T iterables;
+                    auto begin() const { return iterator { Iter{ std::begin(get<Is>(iterables))... } }; }
+                    auto end() const { return iterator { Iter{ std::end(get<Is>(iterables))... } }; }
+                    auto size() const { return min({ std::size(get<Is>(iterables))... }); }
+                };
+                return iterable_wrapper{ forward<T>(iterables) };
+            }
+    template<class ...Cs, class = tuple<decltype(begin(declval<Cs>()))...>>
+        constexpr auto zip(Cs&& ...cs) {
+            return zip(index_sequence_for<Cs...>{}, tuple<Cs...>(forward<Cs>(cs)...), forward<Cs>(cs)...);
+        }
+
+    template<typename T, typename Iter = decltype(begin(declval<T>()))>
+        constexpr auto enumerate(T&& iterable) {
+            return zip(range(std::size(iterable)), forward<T>(iterable));
+        }
 };
 using namespace itertools;
 #define repeat(x) int _ = 0; _ < (x); ++_
@@ -128,9 +173,9 @@ namespace parser {//{{{
     }
 
     template<class ...Ts, class T = tuple<remove_reference_t<Ts>...>>
-    optional<T> parse_input(types<Ts...>) {
-        return read1<remove_reference_t<Ts>...>( remove_reference_t<Ts>()... );
-    }
+        optional<T> parse_input(types<Ts...>) {
+            return read1<remove_reference_t<Ts>...>( remove_reference_t<Ts>()... );
+        }
 };
 using namespace parser;
 //}}}
