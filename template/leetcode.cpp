@@ -138,13 +138,9 @@ namespace parser {//{{{
 
     template<class T> auto read(istringstream& iss) {
         if constexpr(is_same_v<T, string>) {
-            char c;
+            char c; iss >> c;
             string res;
-            iss >> c >> c;
-            while(c != '"') {
-                res.push_back(c);
-                iss >> c;
-            }
+            getline(iss, res, '"');
             return res;
         } else if constexpr(is_vector<T>::value) {
             T res;
@@ -178,7 +174,6 @@ namespace parser {//{{{
 };
 using namespace parser;
 //}}}
-
 using PII = pair<int, int>;
 using LL = long long;
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
