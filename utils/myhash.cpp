@@ -9,8 +9,8 @@ struct Hash {
         hash<int> h;
         auto hval = seed;
         auto [fi, se] = p;
-        hval = h(fi) + 0x9e3779b9 + (hval << 6) + (hval >> 2);
-        hval = h(se) + 0x9e3779b9 + (hval << 6) + (hval >> 2);
+        hval ^= h(fi) + 0x9e3779b9 + (hval << 6) + (hval >> 2);
+        hval ^= h(se) + 0x9e3779b9 + (hval << 6) + (hval >> 2);
         return hval;
     }
 };
