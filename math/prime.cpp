@@ -37,6 +37,14 @@ int main() {
     cout << x << " : ";
     auto ps = getpdiv(x);
     for(auto v: ps) cout << v << " ";
-    cout << endl;
+    cout << endl << endl;
+
+    long long p = 1;
+    int i = 0;
+    const long long mx = 1e12;
+    while(p < mx) {
+        p *= primes[i++];
+        cout << i << " " << p << endl;
+    }
     return 0;
 }

@@ -1,16 +1,7 @@
-//{{{
-#pragma comment(linker, "/stack:200000000")
-#pragma GCC optimize("Ofast")
-#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native")
-
 #include <bits/stdc++.h>
 using namespace std;
 
-#define putchar(x) cout << (x)
-#define repeat(x) [[maybe_unused]] auto _: range(x)
-
-template<typename T>
-struct range {
+template<typename T> constexpr auto range(T start, T stop, T step) {
     struct iterator {
         using difference_type = T;
         using value_type = T;
@@ -19,139 +10,111 @@ struct range {
         using iterator_category = random_access_iterator_tag;
 
         T i, step;
+        T operator-(const iterator& other) const { return i - other.i; };
         bool operator!=(const iterator& other) const { return i != other.i; }
-        T operator-(const iterator& other) { return i - other.i; };
-        auto& operator++() { i += step; return *this; }
         auto& operator+=(const int& n) { i += step * n; return *this; }
+        auto& operator++() { i += step; return *this; }
         auto& operator*() { return i; }
     };
-    T start, stop, step;
-    auto begin() const { return iterator{start, step}; }
-    auto end() const { return iterator{stop, step}; }
-    size_t size() const { return (stop - start) / step; }
-    range(T start_, T stop_, T step_): start(start_), stop(stop_), step(step_) {
-        stop = step > 0 ? max(start, stop) : min(start, stop);
-        stop += (step - (stop - start) % step) % step;
-    }
-    range(T start_, T stop_): range(start_, stop_, T(1)) {}
-    range(T stop_): range(T(0), stop_, T(1)) {}
-};
-// for c++14 (no template constructor deduction)
-#define GET_MACRO(_1,_2,_3,NAME,...) NAME
-#define range3(x,y,z) range<decltype(x)>(x,y,z)
-#define range2(x,y) range<decltype(x)>(x,y)
-#define range1(x) range<decltype(x)>(x)
-#define range(...) GET_MACRO(__VA_ARGS__, range3, range2, range1)(__VA_ARGS__)
-
-template<typename T, size_t L, size_t I>
-bool zip_it_ne(const T& t1, const T& t2) {
-    if(not (get<I>(t1) != get<I>(t2))) return false;
-    if(I + 1 == L) return true;
-    const size_t I1 = I + 1 < L ? I + 1 : I;
-    return zip_it_ne<T, L, I1>(t1, t2);
-}
-
-template<class T, class TIter, size_t ...Is>
-auto zip(T&& t, TIter, index_sequence<Is...>) {
-    struct iterator {
-        TIter iter;
-        bool operator!=(const iterator& other) {
-            const size_t L = sizeof...(Is);
-            return zip_it_ne<TIter, L, 0>(iter, other.iter);
-        }
-        iterator& operator++() { iter = tie(++get<Is>(iter)...); return *this; }
-        auto operator*() { return tie(*get<Is>(iter)...); }
-    };
     struct iterable_wrapper {
-        T t;
-        auto begin() const { return iterator{ TIter{std::begin(get<Is>(t))...} }; }
-        auto end() const { return iterator{ TIter{std::end(get<Is>(t))...} }; }
+        T start, stop, step;
+        auto begin() const { return iterator{ start, step }; }
+        auto end() const { return iterator{ stop, step }; }
+        size_t size() const { return (stop - start) / step; }
+
+        iterable_wrapper(T start_, T stop_, T step_): start(start_), stop(stop_), step(step_) {
+            stop = step > 0 ? max(start, stop) : min(start, stop);
+            stop += (step - (stop - start) % step) % step;
+        }
     };
-    return iterable_wrapper{ forward<T>(t) };
+    return iterable_wrapper(start, stop, step);
+};
+template<typename T> constexpr auto range(T start, T stop) { return range(start, stop, T(1)); }
+template<typename T> constexpr auto range(T stop) { return range(T(0), stop, T(1)); }
+
+template<typename T, typename Iter = decltype(rbegin(declval<T>()))>
+constexpr auto reversed(T&& iterable) {
+    struct iterable_wrapper {
+        T iterable;
+        auto begin() const { return std::rbegin(iterable); }
+        auto end() const { return std::rend(iterable); }
+        auto size() const { return iterable.size(); }
+    };
+    return iterable_wrapper{ forward<T>(iterable) };
 }
 
-template<class ...Cs>
-auto zip(Cs&& ...cs) {
-    return zip(
-            tuple<Cs...>{ forward<Cs>(cs)... },
-            tuple<decltype(begin(declval<Cs>()))...>{ begin(cs)... },
-            index_sequence_for<Cs...>{}
-        );
-}
-
-template<typename T>
-auto enumerate(T&& iterable) {
-    return zip(range(iterable.size()), forward<T>(iterable));
-}
-
-template<typename T, typename TIter = decltype(begin(declval<T>())),
-    typename = decltype(end(declval<T>()))>
+template<typename T, typename Iter = decltype(begin(declval<T>()))>
 constexpr auto printer(T&& iterable) {
     struct iterator {
-        size_t i;
-        TIter iter, ed;
-        bool operator!=(const iterator& other) { return iter != other.iter; }
-        auto& operator++() { ++i; ++iter; putchar(iter != ed ? ' ' : '\n'); return *this; }
-        auto operator*() { return *iter; }
+        Iter iter, ed;
+        auto operator!=(const iterator& other) const {
+            auto ret = (iter != other.iter);
+            if(not ret) cout << '\n';
+            return ret;
+        }
+        auto& operator++() { ++iter; if(iter != ed) cout << ' '; return *this; }
+        auto& operator*() { return *iter; }
     };
     struct iterable_wrapper {
         T iterable;
-        auto begin() const { return iterator{ 0, iterable.begin(), iterable.end() }; }
-        auto end() const { return iterator{ 0, iterable.end(), iterable.end() }; }
+        auto begin() const { return iterator{ std::begin(iterable), std::end(iterable) }; }
+        auto end() const { return iterator{ std::end(iterable), std::end(iterable) }; }
     };
     return iterable_wrapper{ forward<T>(iterable) };
 };
 
-template <size_t ... Is, typename T>
-auto tuple_slice(const T& t) { return tie(get<Is>(t)...); }
-
-inline void read() {}
-template<class T, class ...U> inline void read(T& head, U&... tail) {
-    cin >> head; read(tail...);
+template<class ...T> void absorb(T&& ...) {}
+template<size_t L, size_t I, class T>
+bool zip_it_ne(const T& it1, const T& it2) {
+    if(not (get<I>(it1) != get<I>(it2))) return false;
+    if(I + 1 == L) return true;
+    return zip_it_ne<L, (I + 1) % L, T>(it1, it2);
 }
-template<class T> inline void print_1(const T& x) { cout << x; }
-template<class T> inline void print_1(const vector<T>& v) {
-    for(auto it = v.begin(); it != v.end(); ++it) {
-        if(it != v.begin()) putchar(' '); print_1(*it);
-    }
+template<size_t ...Is, class T, class ...Cs,
+    class Iter = tuple<decltype(begin(declval<Cs>()))...>,
+    class Ref = tuple<decltype(*begin(declval<Cs>()))&...>
+    >
+constexpr auto zip(index_sequence<Is...>, T&& iterables, Cs&&...) {
+    struct iterator {
+        Iter iter;
+        unique_ptr<Ref> tref = nullptr;
+        bool operator!=(const iterator& other) const {
+            return zip_it_ne<sizeof...(Is), 0, Iter>(iter, other.iter);
+        }
+        auto& operator++() { absorb(++get<Is>(iter)...); return *this; }
+        auto& operator*() { tref.reset(new Ref(tie(*get<Is>(iter)...))); return *tref; }
+    };
+    struct iterable_wrapper {
+        T iterables;
+        auto begin() const { return iterator { Iter{ std::begin(get<Is>(iterables))... } }; }
+        auto end() const { return iterator { Iter{ std::end(get<Is>(iterables))... } }; }
+        auto size() const { return min({ get<Is>(iterables).size()... }); }
+    };
+    return iterable_wrapper{ forward<T>(iterables) };
 }
-inline void print_n() {}
-template<class T, class ...U> inline void print_n(const T& head, const U&... tail) {
-    print_1(head); if(sizeof...(tail)) putchar(' '); print_n(tail...);
+template<class ...Cs, class = tuple<decltype(begin(declval<Cs>()))...>>
+constexpr auto zip(Cs&& ...cs) {
+    return zip(index_sequence_for<Cs...>{}, tuple<Cs...>(forward<Cs>(cs)...), forward<Cs>(cs)...);
 }
-template<class ...T> inline void print(const T& ...args) { print_n(args...); putchar('\n'); }
 
-static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); return 0; }();
-//}}}
-using PII = pair<int, int>;
-using LL = long long;
-
-const int MOD = 1e9 + 7;
-const int INF = 1e9 + 10;
-const LL LLINF = 1e18 + 10;
-const int MAX_N = 300005;
-
+template<typename T, typename Iter = decltype(begin(declval<T>()))>
+constexpr auto enumerate(T&& iterable) {
+    return zip(range(iterable.size()), forward<T>(iterable));
+}
 
 int main() {
-    vector<int> v1 = {1, 2, 3};
-    vector<int> v2 = {4, 5, 6};
-    vector<int> v3 = {11, 12, 13, 14};
-    for(const auto& t : zip(v1, v2, v3)) {
-        int k1, k2, k3;
-        tie(k1, k2, k3) = t;
-        print(k1, k2, k3);
+    vector<int> v = {11, 22, 33, 44, 55, 66};
+
+    for(const auto& i : printer(enumerate(zip(reversed(v), range(5, 20, 4))))) {
+        int idx, a, b;
+        pair<int, int> p;
+        tie(idx, p) = i;
+        tie(a, b) = p;
+        cout << "(" << idx << ", " << a << ", " << b << ")";
     }
-    for(const auto& p : enumerate(v2)) {
-        int i, k;
-        tie(i, k) = p;
-        print(i, k);
-    }
-    for(const auto& p : printer(enumerate(range(5, 20, 4)))) {
-        int i, k;
-        tie(i, k) = p;
-        print_n(i, ",", k, "|");
-    }
+
     auto r = range(5, 50, 7);
-    print(*lower_bound(r.begin(), r.end(), 20));
+    auto x = *lower_bound(r.begin(), r.end(), 20);
+    cout << x << endl;
     return 0;
 }
