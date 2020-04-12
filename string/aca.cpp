@@ -10,6 +10,7 @@ struct Node {//{{{
     array<Node*, SZ> nxt = {};
 };//}}}
 struct ACA {//{{{
+    int max_id = -1;
     Node *root;
     ACA(): root(new Node()) {}
 
@@ -23,6 +24,7 @@ struct ACA {//{{{
             ptr = ptr->nxt[i];
         }
         ptr->id = id;
+        max_id = max(max_id, id);
     }
 
     void build_failure() {
@@ -58,8 +60,8 @@ struct ACA {//{{{
         }
     }
 
-    auto search(const string& s, int n) {
-        vector<vector<int>> res(n, vector<int>{});
+    auto search(const string& s) {
+        vector<vector<int>> res(max_id + 1, vector<int>{});
         Node *p = root;
         for(int j = 0; j < int(s.size()); ++j) {
             int i = s[j] - MINCHAR;
@@ -96,7 +98,7 @@ int main() {
     string s("aaaaaaa");
     cout << s << endl;
 
-    auto res = t.search(s, words.size());
+    auto res = t.search(s);
 
     for(int id = 0; id < int(words.size()); ++id) {
         for(int idx : res[id]) {
