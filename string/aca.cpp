@@ -1,11 +1,13 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+const int SZ = 26;
+const int MINCHAR = 'a';
 struct Node {//{{{
     int id = -1;
     Node* fail = nullptr;
     Node* link = nullptr;
-    array<Node*, 26> nxt = {};
+    array<Node*, SZ> nxt = {};
 };//}}}
 struct ACA {//{{{
     Node *root;
@@ -14,7 +16,7 @@ struct ACA {//{{{
     void insert(const string& s, int id) {
         Node* ptr = root;
         for(auto c : s) {
-            int i = c - 'a';
+            int i = c - MINCHAR;
             if(not ptr->nxt[i]) {
                 ptr->nxt[i] = new Node();
             }
@@ -25,7 +27,7 @@ struct ACA {//{{{
 
     void build_failure() {
         deque<Node*> que;
-        for(int i = 0; i < 26; ++i) {
+        for(int i = 0; i < SZ; ++i) {
             if(root->nxt[i]) {
                 root->nxt[i]->fail = root;
                 root->nxt[i]->link = (root->id != -1) ? root : nullptr;
@@ -36,7 +38,7 @@ struct ACA {//{{{
             Node* ptr = que.front();
             que.pop_front();
 
-            for(int i = 0; i < 26; ++i) {
+            for(int i = 0; i < SZ; ++i) {
                 if(not ptr->nxt[i]) {
                     continue;
                 }
@@ -60,7 +62,7 @@ struct ACA {//{{{
         vector<vector<int>> res(n, vector<int>{});
         Node *p = root;
         for(int j = 0; j < int(s.size()); ++j) {
-            int i = s[j] - 'a';
+            int i = s[j] - MINCHAR;
             while(p != root and not p->nxt[i]) {
                 p = p->fail;
             }
