@@ -118,24 +118,34 @@ struct MaxFlowLB {/*{{{*/
 };/*}}}*/
 
 int main() {
-    cout << "           1  ---  3           " << endl;
-    cout << " [1, 1]  /   \\   /   \\  [2, 0] " << endl;
-    cout << "        0      X      5        " << endl;
-    cout << " [1, 1]  \\   /   \\   /  [2, 2] " << endl;
-    cout << "           2  ---  4           " << endl;
+    vector<int> M = {0, 1, 1, 2, 2};
+    vector<int> m = {0, 0, 0, 0, 2};
+    vector<string> r = {"",
+        "[" + to_string(M[1]) + ", " + to_string(m[1]) + "]",
+        "[" + to_string(M[2]) + ", " + to_string(m[2]) + "]",
+        "[" + to_string(M[3]) + ", " + to_string(m[3]) + "]",
+        "[" + to_string(M[4]) + ", " + to_string(m[4]) + "]",
+    };
+
+    cout << "          1  ---  3           "  << endl;
+    cout <<r[1]<< "  /   \\   /   \\  " <<r[3]<< endl;
+    cout << "       0      X      5        "  << endl;
+    cout <<r[2]<< "  \\   /   \\   /  " <<r[4]<< endl;
+    cout << "          2  ---  4           "  << endl;
+    cout << endl;
 
     int V = 6;
     vector<tuple<int, int, int, int>> edges = {
-        {0, 1, 1, 1},
-        {0, 2, 1, 1},
+        {0, 1, M[1], m[1]},
+        {0, 2, M[2], m[2]},
 
         {1, 3, 1, 0},
         {1, 4, 1, 0},
         {2, 3, 1, 0},
         {2, 4, 1, 0},
 
-        {3, 5, 2, 0},
-        {4, 5, 2, 2},
+        {3, 5, M[3], m[3]},
+        {4, 5, M[4], m[4]},
     };
 
     auto mflb = MaxFlowLB(V);
