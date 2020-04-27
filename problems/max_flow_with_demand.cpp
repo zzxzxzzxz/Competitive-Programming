@@ -108,16 +108,219 @@ template<class T> void print_dbg(const string& s, T&& x) {
 //}}}
 using PII = pair<int, int>;
 using LL = long long;
+using ULL = unsigned long long;
 
-const int MOD = 1e9 + 7;
 const int INF = 0x3f3f3f3f;
-const LL LLINF = 0x3f3f3f3f3f3f3f3f;
-const int MAX_N = 300005;
+struct MaxFlow {/*{{{*/
+    struct edge {
+        int to, cap, rev;
+    };
+    vector<vector<edge>> G;
+    vector<int> level, iter;
+
+    MaxFlow(int V) {
+        G.resize(V + 1);
+        level.resize(V + 1);
+        iter.resize(V + 1);
+    }
+
+    void clear() {
+        for(auto& es : G) {
+            es.clear();
+        }
+    }
+
+    void add(int from, int to, int cap) {
+        int i = G[from].size();
+        int j = G[to].size();
+        G[from].push_back({to, cap, j});
+        G[to].push_back({from, 0, i});
+    }
+
+    void bfs(int s) {
+        fill(level.begin(), level.end(), -1);
+        level[s] = 0;
+        deque<int> que = {s};
+        while(not que.empty()) {
+            int v = que.front();
+            que.pop_front();
+            for(auto& e : G[v]) {
+                if(e.cap > 0 and level[e.to] < 0) {
+                    level[e.to] = level[v] + 1;
+                    que.emplace_back(e.to);
+                }
+            }
+        }
+    }
+
+    int dfs(int v, int t, int f) {
+        if(v == t) {
+            return f;
+        }
+        for(int& i = iter[v]; i < int(G[v].size()); i++) {
+            auto& e = G[v][i];
+            if(e.cap > 0 and level[v] < level[e.to]) {
+                int d = dfs(e.to, t, min(f, e.cap));
+                if(d > 0) {
+                    e.cap -= d;
+                    G[e.to][e.rev].cap += d;
+                    return d;
+                }
+            }
+        }
+        return 0;
+    }
+
+    int solve(int s, int t) {
+        int flow = 0;
+        bfs(s);
+        while(level[t] != -1) {
+            fill(iter.begin(), iter.end(), 0);
+            int f = dfs(s, t, INF);
+            while(f > 0) {
+                flow += f;
+                f = dfs(s, t, INF);
+            }
+            bfs(s);
+        }
+        return flow;
+    }
+};/*}}}*/
+struct MaxFlowLB {/*{{{*/
+    int s1, t1;
+    MaxFlow mf;
+    vector<int> din, dout;
+    MaxFlowLB(int V):
+        s1(V + 1), t1(V + 2), mf(MaxFlow(V + 2)), din(V + 1, 0), dout(V + 1, 0) {}
+
+    void clear() {
+        mf.clear();
+        fill(din.begin(), din.end(), 0);
+        fill(dout.begin(), dout.end(), 0);
+    }
+
+    void add(int from, int to, int cap, int demand) {
+        mf.add(from, to, cap - demand);
+        dout[from] += demand;
+        din[to] += demand;
+    }
+
+    bool solve(int s, int t) {
+        for(int v = 0; v < int(din.size()); ++v) {
+            if(din[v] > 0) {
+                mf.add(s1, v, din[v]);
+            }
+            if(dout[v] > 0) {
+                mf.add(v, t1, dout[v]);
+            }
+        }
+        mf.add(t, s, INF);
+
+        mf.solve(s1, t1);
+        for(auto& e : mf.G[s1]) {
+            if(e.to < int(din.size()) and e.cap != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+};/*}}}*/
+
+const int MAX_N = 505;
+ULL S[MAX_N], T[MAX_N], U[MAX_N], V[MAX_N];
+ULL ans[MAX_N][MAX_N];
+
+auto mflb = MaxFlowLB(MAX_N * 2);
 
 struct Solution {
+    int N;
+    bool solve(int k) {
+        mflb.clear();
+        int s = N * 2, t = N * 2 + 1;
+
+        for(int i : range(N)) {
+            for(int j : range(N)) {
+                mflb.add(i, j + N, 1, 0);
+            }
+        }
+
+        for(int i : range(N)) {
+            /*
+             * 0: one 0
+             * 1: all 1
+             * 2: all 0
+             * 3: one 1
+             */
+            int row = S[i] * 2 + ((U[i] >> k) & 1);
+            int col = T[i] * 2 + ((V[i] >> k) & 1);
+
+            if(row == 0) {
+                mflb.add(s, i, N - 1, 0);
+            } else if(row == 1) {
+                mflb.add(s, i, N, N);
+            } else if(row == 2) {
+                mflb.add(s, i, 0, 0);
+            } else {
+                mflb.add(s, i, N, 1);
+            }
+
+            if(col == 0) {
+                mflb.add(i + N, t, N - 1, 0);
+            } else if(col == 1) {
+                mflb.add(i + N, t, N, N);
+            } else if(col == 2) {
+                mflb.add(i + N, t, 0, 0);
+            } else {
+                mflb.add(i + N, t, N, 1);
+            }
+        }
+
+        if(not mflb.solve(s, t)) {
+            return false;
+        }
+
+        for(int i : range(N)) {
+            for(auto& e : mflb.mf.G[i]) {
+                if(e.to <= N * 2 and e.cap == 0) {
+                    int j = e.to - N;
+                    ans[i][j] |= (1ULL << k);
+                }
+            }
+        }
+        return true;
+    }
+
     Solution(int) {
+        read(N);
+        for(int i : range(N)) {
+            read(S[i]);
+        }
+        for(int i : range(N)) {
+            read(T[i]);
+        }
+        for(int i : range(N)) {
+            read(U[i]);
+        }
+        for(int i : range(N)) {
+            read(V[i]);
+        }
+
+        for(int i = 0; i < 64; ++i) {
+            if(not solve(i)) {
+                print(-1);
+                return;
+            }
+        }
+
+        for(int i : range(N)) {
+            for(int j : printer(range(N))) {
+                print_1(ans[i][j]);
+            }
+        }
     }
 };
+
+// https://atcoder.jp/contests/abc164/tasks/abc164_f
 
 int main() {
     int T = 1;
