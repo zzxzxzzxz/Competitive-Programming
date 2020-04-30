@@ -167,7 +167,7 @@ int main() {
     for(int i : left) {
         for(auto& e : mflb.mf.G[i]) {
             if(right.count(e.to) and e.cap == 0) {
-                ans[i - 1][e.to - 3] |= 1;
+                ans[i - 1][e.to - 3] = 1;
             }
         }
     }
