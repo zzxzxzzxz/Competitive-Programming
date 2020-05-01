@@ -115,6 +115,10 @@ template<class T> void print_dbg(string_view s, T&& x) {
 const int INF = 0x3f3f3f3f;
 const int MAX_N = 500005;
 
+int default_value(int idx) {
+    return idx;
+}
+
 struct PersistentArray {/*{{{*/
     int version;
     vector<vector<pair<int, int>>> values;
@@ -128,12 +132,13 @@ struct PersistentArray {/*{{{*/
         unordered_map<int, int>& tmp;
 
         int operator[](int idx) {
+            //if(ver == version and tmp.find(idx) != tmp.end()) {
             if(tmp.find(idx) != tmp.end()) {
                 return tmp[idx];
             }
             auto it = upper_bound(values[idx].begin(), values[idx].end(), make_pair(ver, INF));
             if(it == values[idx].begin()) {
-                return idx;
+                return default_value(idx);
             }
             return prev(it)->second;
         }
