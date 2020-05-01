@@ -32,16 +32,25 @@ template<typename T> constexpr auto range(T start, T stop, T step) {
 template<typename T> constexpr auto range(T start, T stop) { return range(start, stop, T(1)); }
 template<typename T> constexpr auto range(T stop) { return range(T(0), stop, T(1)); }
 
-template<typename T, typename Iter = decltype(rbegin(declval<T>()))>
-constexpr auto reversed(T&& iterable) {
+template<typename T, typename Iter = decltype(begin(declval<T>()))>
+constexpr auto printer(T&& iterable) {
+    struct iterator {
+        Iter iter, ed;
+        auto operator!=(const iterator& other) const {
+            auto ret = (iter != other.iter);
+            if(not ret) cout << '\n';
+            return ret;
+        }
+        auto& operator++() { ++iter; if(iter != ed) cout << ' '; return *this; }
+        auto& operator*() { return *iter; }
+    };
     struct iterable_wrapper {
         T iterable;
-        auto begin() const { return std::rbegin(iterable); }
-        auto end() const { return std::rend(iterable); }
-        auto size() const { return std::size(iterable); }
+        auto begin() const { return iterator{ std::begin(iterable), std::end(iterable) }; }
+        auto end() const { return iterator{ std::end(iterable), std::end(iterable) }; }
     };
     return iterable_wrapper{ forward<T>(iterable) };
-}
+};
 
 template<size_t ...Is, typename T> auto getis(const T& t) { return tie(get<Is>(t)...); }
 template<class T> void setmax(T& a, const T& b) { a = max(a, b); }
@@ -108,76 +117,78 @@ const int MAX_N = 500005;
 
 struct PersistentArray {/*{{{*/
     int version;
-    vector<int> cur;
     vector<vector<pair<int, int>>> values;
-    vector<pair<int, int>> changes;
-    PersistentArray(int n): version(1), cur(n, -1), values(n) {}
+    unordered_map<int, int> tmp;
 
-    int get(int idx, int ver) {
-        if(cur[idx] != -1) {
-            return cur[idx];
+    PersistentArray(int n): version(1), values(n) {}
+
+    struct wrapper {
+        int ver;
+        vector<vector<pair<int, int>>>& values;
+        unordered_map<int, int>& tmp;
+
+        int operator[](int idx) {
+            if(tmp.find(idx) != tmp.end()) {
+                return tmp[idx];
+            }
+            auto it = upper_bound(values[idx].begin(), values[idx].end(), make_pair(ver, INF));
+            if(it == values[idx].begin()) {
+                return idx;
+            }
+            return prev(it)->second;
         }
-        auto it = upper_bound(values[idx].begin(), values[idx].end(), make_pair(ver, INF));
-        if(it == values[idx].begin()) {
-            return idx;
+    };
+
+    auto operator()(int ver) {
+        if(ver == -1) {
+            ver = version;
         }
-        return prev(it)->second;
+        return wrapper{ ver, values, tmp };
     }
 
-    void set(int idx, int value) {
-        cur[idx] = value;
-        changes.emplace_back(idx, value);
+    auto& operator[](int idx) {
+        return tmp[idx];
     }
 
     int commit() {
-        for(auto& [idx, value] : reversed(changes)) {
-            if(cur[idx] != -1) {
-                values[idx].emplace_back(version, value);
-                cur[idx] = -1;
-            }
+        for(auto [idx, value] : tmp) {
+            values[idx].emplace_back(version, value);
         }
-        changes.clear();
+        tmp.clear();
         return version++;
     }
 
     void rollback() {
-        for(auto& p : changes) {
-            cur[p.first] = -1;
-        }
-        changes.clear();
+        tmp.clear();
     }
 };/*}}}*/
 struct DSU {/*{{{*/
     PersistentArray parent, rnk;
     DSU(int n): parent(n), rnk(n) {}
 
-    int find(int x, int ver) {
-        if(parent.get(x, ver) == x) {
-            return x;
+    int find(int idx, int ver = -1) {
+        if(parent(ver)[idx] == idx) {
+            return idx;
         }
-        return find(parent.get(x, ver), ver);
+        return find(parent(ver)[idx], ver);
     }
 
-    void unite(int x, int y, int ver) {
-        int px = find(x, ver);
-        int py = find(y, ver);
-        if(px == py) {
-            return;
-        }
-
-        if(rnk.get(px, ver) < rnk.get(py, ver)) {
-            parent.set(px, py);
+    void unite(int x, int y, int ver = -1) {
+        auto px = find(x, ver);
+        auto py = find(y, ver);
+        if(px == py) return;
+        if(rnk(ver)[px] < rnk(ver)[py]) {
+            parent[px] = py;
         } else {
-            parent.set(py, px);
-            if(rnk.get(px, ver) == rnk.get(py, ver)) {
-                rnk.set(px, rnk.get(px, ver) + 1);
+            parent[py] = px;
+            if(rnk(ver)[px] == rnk(ver)[py]) {
+                ++rnk[px];
             }
         }
     }
 
     int commit() {
-        parent.commit();
-        return rnk.commit();
+        return parent.commit(), rnk.commit();
     }
 
     void rollback() {
@@ -204,16 +215,15 @@ struct Solution {
         auto dsu = DSU(n + 1);
 
         array<int, MAX_N> cost2ver = {};
-        int i = 1, ver = 0;
+        int i = 1;
         while(i <= m) {
             int j = idx[i];
             while(i <= m and cost[idx[i]] == cost[j]) {
                 auto [u, v] = E[idx[i]];
-                dsu.unite(u, v, ver + 1);
+                dsu.unite(u, v);
                 ++i;
             }
-            cost2ver[cost[j]] = ver;
-            ver = dsu.commit();
+            cost2ver[cost[j]] = dsu.commit();
         }
 
         int q;
@@ -232,7 +242,7 @@ struct Solution {
             auto ok = true;
             while(i < es.size()) {
                 size_t j = i;
-                int ver = cost2ver[cost[es[j]]];
+                int ver = cost2ver[cost[es[j]]] - 1;
                 while(i < es.size() and cost[es[i]] == cost[es[j]]) {
                     auto [u, v] = E[es[i]];
                     if(dsu.find(u, ver) == dsu.find(v, ver)) {
@@ -256,8 +266,6 @@ struct Solution {
         }
     }
 };
-
-// https://codeforces.com/contest/891/problem/C
 
 int main() {
     int T = 1;
