@@ -3,37 +3,30 @@ using namespace std;
 
 using DataType = int;
 
-//const DataType zero_m = INT_MIN, zero_c = 0;
-//const DataType zero_m = 0, zero_c = 0;
-const DataType zero_m = 0, zero_c = INT_MAX;
+//const DataType zero_m = 0, zero_c = INT_MAX;
+const DataType zero_m = 0, zero_c = 0;
+
 DataType modify(const DataType& val1, const DataType& val2, int width = 1) {
-    //ignore = val1; return val2 * width;
-    //return val1 + val2 * width;
-    ignore = width; return val1 + val2;
+    //ignore = width; return val1 + val2;
+    return val1 + val2 * width;
 }
 DataType combine(const DataType& val1, const DataType& val2) {
-    //return val1 + val2;
-    //return val1 + val2;
-    return min(val1, val2);
+    //return min(val1, val2);
+    return val1 + val2;
 }
 struct Node {/*{{{*/
     DataType val, lazy;
-    void add(DataType& x) {
-        val = modify(val, x);
+    void add(DataType& x, int width) {
+        val = modify(val, x, width);
         lazy = modify(lazy, x);
     }
-    void pull(Node& a, Node& b) {
-        val = combine(a.val, b.val);
-    }
-    void push(Node& a, Node& b) {
-        if(lazy != zero_m) {
-            a.add(lazy);
-            b.add(lazy);
-        }
-        lazy = zero_m;
+    void pull(Node& a, Node& b, int width) {
+        val = modify(combine(a.val, b.val), lazy, width);
     }
 };/*}}}*/
 struct SegTree {/*{{{*/
+    int lg(int n) { return 31 - __builtin_clz(n); }
+
     int base;
     vector<Node> dat;
 
@@ -44,7 +37,7 @@ struct SegTree {/*{{{*/
         if(ptr != NULL) {
             for(int i = 0; i < n; i++) dat[i + base].val = ptr[i];
             for(int k = base - 1; k > 0; k--) {
-                dat[k].pull(dat[k * 2], dat[k * 2 + 1]);
+                dat[k].pull(dat[k * 2], dat[k * 2 + 1], 1 << (lg(base) - lg(k)));
             }
         }
     }
@@ -57,16 +50,18 @@ struct SegTree {/*{{{*/
             if(qtype == QUERY) {
                 val = combine(val, dat[k].val);
             } else {
-                dat[k].add(val);
+                dat[k].add(val, r - l);
             }
             return;
         }
-
-        dat[k].push(dat[k << 1], dat[k << 1 | 1]);
         int mid = l + (r - l) / 2;
         rec(a, b, val, qtype, l, mid, k << 1);
         rec(a, b, val, qtype, mid, r, k << 1 | 1);
-        dat[k].pull(dat[k << 1], dat[k << 1 | 1]);
+
+        if(qtype == QUERY) {
+            val = modify(val, dat[k].lazy, min(r, b) - max(l, a));
+        }
+        dat[k].pull(dat[k << 1], dat[k << 1 | 1], r - l);
     }
 
     void update(int a, DataType val) {
@@ -82,7 +77,6 @@ struct SegTree {/*{{{*/
         return val;
     }
 };/*}}}*/
-
 
 int main() {
     vector<int> v = {11, 15, 12, 13, 5, 6, 2, 8};
@@ -107,13 +101,6 @@ int main() {
 
     cout << "(4, 8): " << t.query(4, 8) << endl;
     cout << "(3, 6): " << t.query(3, 6) << endl;
-    cout << "(0, 4): " << t.query(0, 4) << endl;
-
-    cout << "\nadd 10 to idx=0" << endl;
-    t.update(0, 10);
-    v[0] = modify(v[0], 10);
-    for(auto i: v) printf("%2d ", i); printf("\n\n");
-
     cout << "(0, 4): " << t.query(0, 4) << endl;
     return 0;
 }
