@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+mt19937 rng(123123123);
 size_t seed = rng();
 
 template<class T> class Treap {//{{{
@@ -11,22 +11,28 @@ template<class T> class Treap {//{{{
             T val, maxv, lazy;
             unique_ptr<Node> left, right;
             Node(const T& v): sz(1), val(v), maxv(INT_MIN), lazy(0) {}
+
+            void add(T x) {
+                val += x;
+                lazy += x;
+            }
+
             void pull() {
                 sz = 1;
                 maxv = val;
                 if(left) {
                     sz += left->sz;
-                    maxv = max(maxv, left->maxv + left->lazy);
+                    maxv = max(maxv, left->maxv);
                 }
                 if(right) {
                     sz += right->sz;
-                    maxv = max(maxv, right->maxv + right->lazy);
+                    maxv = max(maxv, right->maxv);
                 }
             };
+
             void push() {
-                val += lazy;
-                if(left) left->lazy += lazy;
-                if(right) right->lazy += lazy;
+                if(left) left->add(lazy);
+                if(right) right->add(lazy);
                 lazy = 0;
             };
         };
@@ -97,11 +103,8 @@ template<class T> class Treap {//{{{
             tie(a, b) = split(root, l);
             tie(b, c) = split(b, r - l);
 
-            int ans = INT_MIN;
-            if(b) {
-                b->push();
-                ans = b->maxv;
-            }
+            int ans = b ? b->maxv : INT_MIN;
+
             b = merge(b, c);
             root = merge(a, b);
             return ans;
@@ -111,7 +114,7 @@ template<class T> class Treap {//{{{
             NodePtr a, b, c;
             tie(a, b) = split(root, l);
             tie(b, c) = split(b, r - l);
-            b->lazy += v;
+            b->add(v);
             b = merge(b, c);
             root = merge(a, b);
         }
