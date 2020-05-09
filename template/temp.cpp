@@ -12,10 +12,10 @@ template<class T> rge<T> range(T i, T j) { return rge<T>{i, j}; }
 template<class T> auto dud(T* x) -> decltype(cerr << *x, 0);
 template<class T> char dud(...);
 
-template<class ...T> void fold(T&& ...) {}
+template<class ...T> void absorb(T&& ...) {}
 template<class OUT, size_t ...Is, class T>
 void debug_tuple(OUT& out, index_sequence<Is...>, const T& t) {
-    fold((out << (Is != 0 ? ", " : "") << get<Is>(t))...);
+    absorb((out << (Is != 0 ? ", " : "") << get<Is>(t))...);
 }
 
 struct debug {

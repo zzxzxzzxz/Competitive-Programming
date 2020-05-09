@@ -5,7 +5,7 @@ VER ?= 14
 LOCAL = -DLOCAL
 
 CMD = g++ -std=c++${VER} -Wshadow -Wall -Wno-unused-const-variable \
-	  -fsanitize=address -fsanitize=undefined -D_GLIBCXX_DEBUG -g ${LOCAL}
+	  -fsanitize=address -fsanitize=undefined -D_GLIBCXX_DEBUG ${LOCAL}
 
 compile:
 	${CMD} ${s} -o ${OUTPUT}
