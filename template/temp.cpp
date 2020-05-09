@@ -50,7 +50,7 @@ struct debug {
     debug& operator<<(ostream&(*pf)(std::ostream&)) { return *this; }
 #endif
 };
-#define imie(...) " [" << #__VA_ARGS__ ": " << (__VA_ARGS__) << "] "
+#define imie(x) " [" << #x ": " << (x) << "] "
 /*}}}*/
 using PII = pair<int, int>;
 using LL = long long;
