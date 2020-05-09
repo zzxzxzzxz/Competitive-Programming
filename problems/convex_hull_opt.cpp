@@ -116,16 +116,17 @@ const int MAX_N = 300005;
 
 struct Line {
     LL m, c;
-    LL eval(LL x) {
+    auto eval(LL x) {
         return m * x + c;
     }
-    double intersect_x(Line& other) {
-        return double(c - other.c) / (other.m - m);
-    }
-    friend ostream& operator<<(ostream& out, const Line& l) {
-        return out << "(" << l.m << ", " << l.c << ")";
+    auto intersect_x(Line& other) {
+        return (c - other.c) / (other.m - m);
     }
 };
+
+ostream& operator<<(ostream& out, const Line& l) {
+    return out << "(" << l.m << ", " << l.c << ")";
+}
 
 struct Solution {
     Solution(int) {
@@ -150,8 +151,6 @@ struct Solution {
             int j = *lower_bound(idx.begin(), idx.begin() + stk.size() - 1, h[i], cmp);
 
             best = stk[j].eval(h[i]) + h[i] * h[i] + C;
-
-            //debug(i, h[i], stk[j].m, stk[j].c, stk[j].eval(h[i]), best);
 
             Line cur = {-2LL * h[i], best + h[i] * h[i]};
             int m = stk.size();
