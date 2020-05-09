@@ -2,7 +2,7 @@
 #include "bits/stdc++.h"
 using namespace std;
 
-#define all(x) (x).begin(), (x).end()
+#define all(x) begin(x), end(x)
 #define putchar(x) cout << (x)
 static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); cout.precision(17); return 0; }();
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
@@ -20,28 +20,26 @@ void debug_tuple(OUT& out, index_sequence<Is...>, const T& t) {
 
 struct debug {
 #ifdef LOCAL
-	template<class T> typename enable_if<sizeof dud<T>(0) != 1, debug&>::type operator<<(T i) {
-		cerr << boolalpha << i; return * this;
-	}
-	template<class T> typename enable_if<sizeof dud<T>(0) == 1, debug&>::type operator<<(T i) {
-		return *this << range(begin(i), end(i));
-	}
-	template<class T, class U> debug& operator<<(pair<T, U> d) {
-		return *this << "(" << d.first << ", " << d.second << ")";
-	}
-	template<class ...T> debug& operator<<(tuple<T...> d) {
+    template<class T> typename enable_if<sizeof dud<T>(0) != 1, debug&>::type operator<<(T i) {
+        cerr << boolalpha << i; return * this;
+    }
+    template<class T> typename enable_if<sizeof dud<T>(0) == 1, debug&>::type operator<<(T i) {
+        return *this << range(begin(i), end(i));
+    }
+    template<class T, class U> debug& operator<<(pair<T, U> d) {
+        return *this << "(" << d.first << ", " << d.second << ")";
+    }
+    template<class ...T> debug& operator<<(tuple<T...> d) {
         *this << "(";
         debug_tuple(*this, index_sequence_for<T...>{}, d);
         return *this << ")";
-	}
-    debug& operator<<(const tuple<>&) { return *this; }
-	template<class T> debug & operator <<(rge<T> d) {
-		*this << "[";
-		for(auto it = d.b; it != d.e; ++it) {
-            if(it != d.b) *this << ", "; *this << *it;
-        }
-		return * this << "]";
-	}
+    }
+    template<class T> debug & operator <<(rge<T> d) {
+        *this << "[";
+        for(auto it = d.b; it != d.e; ++it)
+            *this << (it != d.b ?  ", " : "") << *it;
+        return * this << "]";
+    }
     debug& operator<<(ostream&(*pf)(std::ostream&)) {
         cerr << pf; return *this;
     }
