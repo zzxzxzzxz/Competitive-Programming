@@ -4,7 +4,7 @@ OUTPUT ?= "a.out"
 VER ?= 14
 LOCAL = -DLOCAL
 
-CMD = g++ -std=c++${VER} -Wshadow -Wall -Wno-unused-const-variable \
+CMD = g++ -O2 -std=c++${VER} -Wshadow -Wall -Wno-unused-const-variable \
 	  -fsanitize=address -fsanitize=undefined -D_GLIBCXX_DEBUG ${LOCAL}
 
 compile:
