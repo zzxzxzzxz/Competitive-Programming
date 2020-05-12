@@ -7,7 +7,7 @@ using namespace std;
 static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); cout.precision(17); return 0; }();
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
-template<class T> struct rge { T b, e; };
+template<class T> struct rge { T b, e; auto begin() const { return b; } auto end() const { return e; } };
 template<class T> rge<T> range(T i, T j) { return rge<T>{i, j}; }
 template<class T> auto dud(T* x) -> decltype(cerr << *x, 0);
 template<class T> char dud(...);
