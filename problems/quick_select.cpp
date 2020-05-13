@@ -1,36 +1,34 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-random_device rd;
-mt19937 g(rd());
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
-template<class Iter, class Cmp>
-void QuickSelectExcute(Iter start, Iter kth, Iter stop, Cmp cmp) {
-    Iter it = next(start);
-    Iter lt = it, eq = it;
+template<class Iter, class Cmp = less<decltype(*declval<Iter>())>>
+void quick_select(Iter b, Iter kth, Iter e, Cmp cmp = Cmp()) {
+    shuffle(b, e, rng);
 
-    while(it != stop) {
-        if(cmp(*it, *start)) {
-            swap(*it, *eq);
-            swap(*(eq++), *(lt++));
-        } else if(not cmp(*start, *it)) {
-            swap(*it, *(eq++));
+    while(b != e) {
+        auto it = next(b), lt = it, eq = it;
+
+        while(it != e) {
+            if(cmp(*it, *b)) {
+                swap(*it, *eq);
+                swap(*(eq++), *(lt++));
+            } else if(not cmp(*b, *it)) {
+                swap(*it, *(eq++));
+            }
+            ++it;
         }
-        ++it;
-    }
-    swap(*start, *(--lt));
+        swap(*b, *(--lt));
 
-    if(kth < lt) {
-        QuickSelectExcute(start, kth, lt, cmp);
-    } else if(eq <= kth) {
-        QuickSelectExcute(eq, kth, stop, cmp);
+        if(kth < lt) {
+            e = lt;
+        } else if(eq <= kth) {
+            b = eq;
+        } else {
+            break;
+        }
     }
-}
-
-template<class Iter, class Cmp = less<>>
-void QuickSelect(Iter start, Iter kth, Iter stop, Cmp cmp = Cmp()) {
-    shuffle(start, stop, g);
-    QuickSelectExcute(start, kth, stop, cmp);
 }
 
 int main() {
@@ -41,9 +39,9 @@ int main() {
     for(int i = 0; i < int(v.size()); ++i) cout << v[i] << " ";
     cout << endl;
 
-    //QuickSelect(v.begin(), v.begin() + 7, v.end(), greater<int>());
-    //QuickSelect(v.begin(), v.begin(), v.end());
-    QuickSelect(v.begin(), v.begin() + 3, v.end(), greater<int>());
+    //quick_select(v.begin(), v.begin() + 7, v.end(), greater<int>());
+    //quick_select(v.begin(), v.begin(), v.end());
+    quick_select(v.begin(), v.begin() + 3, v.end(), greater<int>());
 
     for(int i = 0; i < int(v.size()); ++i) cout << v[i] << " ";
     cout << endl;

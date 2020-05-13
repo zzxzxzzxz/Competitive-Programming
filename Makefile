@@ -1,10 +1,11 @@
-#CMD = gcc -std=c++17 -Ofast -Wshadow -Wall -lstdc++ -Wl,-stack_size -Wl,1000000000
+#CMD = gcc -std=c++17 -Ofast -Wshadow -Wall -Wno-unused-const-variable -Wno-string-plus-int \
+	  -lstdc++ -Wl,-stack_size -Wl,1000000000
 
 OUTPUT ?= "a.out"
 VER ?= 14
 LOCAL = -DLOCAL
 
-CMD = g++ -O2 -std=c++${VER} -Wshadow -Wall -Wno-unused-const-variable \
+CMD = g++ -O2 -std=c++${VER} -Wshadow -Wall -Wno-unused-const-variable -Wno-string-plus-int \
 	  -fsanitize=address -fsanitize=undefined -D_GLIBCXX_DEBUG ${LOCAL}
 
 compile:

@@ -1,25 +1,25 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-random_device rd;
-mt19937 g(rd());
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
-template<class Iter, class Cmp>
-void QuickSelectExcute(Iter start, Iter kth, Iter stop, Cmp cmp) {
-    auto pivot = *start;
-    Iter le = partition(start, stop, [&](auto& val){return not cmp(pivot, val);});
-    Iter lt = partition(start, le, [&](auto& val){return cmp(val, pivot);});
-    if(kth < lt) {
-        QuickSelectExcute(start, kth, lt, cmp);
-    } else if(le <= kth) {
-        QuickSelectExcute(le, kth, stop, cmp);
+template<class Iter, class Cmp = less<decltype(*declval<Iter>())>>
+void quick_select(Iter b, Iter kth, Iter e, Cmp cmp = Cmp()) {
+    shuffle(b, e, rng);
+
+    while(b != e) {
+        auto pivot = *b;
+        Iter le = partition(b, e, [&](auto& val) { return not cmp(pivot, val); });
+        Iter lt = partition(b, le, [&](auto& val) { return cmp(val, pivot); });
+
+        if(kth < lt) {
+            e = lt;
+        } else if(le <= kth) {
+            b = le;
+        } else {
+            break;
+        }
     }
-}
-
-template<class Iter, class Cmp = less<>>
-void QuickSelect(Iter start, Iter kth, Iter stop, Cmp cmp = Cmp()) {
-    shuffle(start, stop, g);
-    QuickSelectExcute(start, kth, stop, cmp);
 }
 
 int main() {
@@ -30,9 +30,9 @@ int main() {
     for(int i = 0; i < int(v.size()); ++i) cout << v[i] << " ";
     cout << endl;
 
-    //QuickSelect(v.begin(), v.begin() + 7, v.end(), greater<int>());
-    //QuickSelect(v.begin(), v.begin(), v.end());
-    QuickSelect(v.begin(), v.begin() + 3, v.end(), greater<int>());
+    //quick_select(v.begin(), v.begin() + 7, v.end(), greater<int>());
+    //quick_select(v.begin(), v.begin(), v.end());
+    quick_select(v.begin(), v.begin() + 3, v.end(), greater<int>());
 
     for(int i = 0; i < int(v.size()); ++i) cout << v[i] << " ";
     cout << endl;
