@@ -62,7 +62,7 @@ struct ACA {//{{{
 
     auto search(const string& s) {
         vector<vector<int>> res(max_id + 1, vector<int>{});
-        Node *p = root;
+        Node* p = root;
         for(int j = 0; j < int(s.size()); ++j) {
             int i = s[j] - MINCHAR;
             while(p != root and not p->nxt[i]) {

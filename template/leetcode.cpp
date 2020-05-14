@@ -34,6 +34,7 @@ struct debug {
         absorb((*this << (Is != 0 ? ", " : "") << get<Is>(t))...);
     }
 };
+#define imie(...) " [" << #__VA_ARGS__ << ": " << (__VA_ARGS__) << "] "
 
 template<class...> struct types { using type = types; };
 template<class Sig> struct args;
