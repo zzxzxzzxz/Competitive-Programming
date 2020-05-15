@@ -58,26 +58,59 @@ const int INF = 0x3f3f3f3f;
 const LL LLINF = 0x3f3f3f3f3f3f3f3f;
 const int MAX_N = 200005;
 
+template<class T> struct IterMask {/*{{{*/
+    int n;
+    vector<T> ds;
+    T mx;
+    IterMask(vector<T>& v): n(v.size()), ds({1}), mx(0) {
+        for(int i = 0; i < n; ++i) {
+            ds.push_back(ds.back() * (1 + v[i]));
+        }
+        mx = ds.back();
+    }
+
+    auto and_mask(T i, T m) {
+        for(int l = 0; l < int(ds.size()) - 1; ++l) {
+            auto j = i % ds[l + 1] / ds[l];
+            auto k = m % ds[l + 1] / ds[l];
+            if(j > k) i -=  (j - k) * ds[l];
+        }
+        return i;
+    }
+
+    auto decode(T m) {
+        struct iterator {
+            const T m;
+            const vector<T>& ds;
+            int i;
+            auto operator!=(const iterator& other) const { return i != other.i; }
+            auto& operator++() { ++i; return *this; }
+            auto operator*() { return m % ds[i + 1] / ds[i]; }
+        };
+        struct iterable_wrapper {
+            const T m;
+            const vector<T>& ds;
+            auto begin() const { return iterator{ m, ds, 0 }; }
+            auto end() const { return iterator{ m, ds, int(ds.size()) - 1 }; }
+        };
+        return iterable_wrapper{ m, ds };
+    };
+};/*}}}*/
+
 void solve(int) {
     int N;
     cin >> N;
-    vector<vector<int>> G(N * 2);
     vector<string> can(N);
-    int cnt = 0;
     for(int i = 0; i < N; ++i) {
         cin >> can[i];
     }
 
-    auto count = [](auto s, auto val) {
-        return s + (val - '0');
-    };
-    for(int i = 0; i < N; ++i) {
-        cnt += accumulate(all(can[i]), 0, count);
-    }
-
+    int cnt = 0;
+    vector<vector<int>> G(N * 2);
     for(int i = 0; i < N; ++i) {
         for(int j = 0; j < N; ++j) {
             if(can[i][j] == '1') {
+                ++cnt;
                 G[i].push_back(j + N);
                 G[j + N].push_back(i);
             }
@@ -85,7 +118,6 @@ void solve(int) {
     }
 
     vector<bool> visited(N * 2, false);
-
     auto dfs = [&visited, &G, &N](auto self, int v) -> array<int, 2> {
         visited[v] = true;
         array<int, 2> res = {};
@@ -107,81 +139,36 @@ void solve(int) {
             dict[dfs(dfs, i)] += 1;
         }
     }
-    debug() << imie(dict) << endl;
 
-    vector<pair<array<int, 2>, int>> groups(dict.begin(), dict.end());
-    int m = groups.size();
-
-    vector<int> mx, ds(m);
-    for(auto& g : groups) {
-        mx.push_back(g.second);
+    vector<array<int, 2>> groups;
+    vector<int> nums;
+    for(auto& p : dict) {
+        groups.push_back(p.first);
+        nums.push_back(p.second);
     }
-    ds[0] = 1;
-    for(int i = 1; i < m; ++i) {
-        ds[i] = ds[i - 1] * (mx[i - 1] + 1);
-    }
-    debug() << imie(ds) << endl;
 
-    auto encode = [&ds, m](vector<int>& v) {
-        int res = 0;
-        for(int i = 0; i < m; ++i) {
-            res += v[i] * ds[i];
-        }
-        return res;
-    };
-    auto decode = [&ds, m](int u) {
-        vector<int> v(m);
-        for(int i = 0; i < m - 1; ++i) {
-            v[i] = (u % ds[i + 1]) / ds[i];
-        }
-        v[m - 1] = u / ds[m - 1];
-        return v;
-    };
+    auto im = IterMask<int>(nums);
 
-    vector<int> dp(encode(mx) + 1, -1);
-    dp[0] = 0;
+    vector<int> dp(im.mx);
+    for(auto mask = 0; mask < im.mx; ++mask) {
 
-    auto solve = [&](auto self, int u) -> int {
-        if(dp[u] != -1) {
-            return dp[u];
-        }
-
-        auto v = decode(u);
-        int l = 0, r = 0;
-        for(int i = 0; i < m; ++i) {
-            l += groups[i].first[0] * v[i];
-            r += groups[i].first[1] * v[i];
+        int l = 0, r = 0, j = 0;
+        for(auto i : im.decode(mask)) {
+            l += groups[j][0] * i;
+            r += groups[j][1] * i;
+            ++j;
         }
         if(l != r) {
-            dp[u] = INF;
-            return INF;
+            dp[mask] = INF;
+            continue;
         }
 
-        int best = l * r;
-        vector<int> state(m, 0);
-
-        while(true) {
-            int i = 0;
-            state[0] += 1;
-            while(i < m - 1 and state[i] == v[i] + 1) {
-                state[i] = 0;
-                state[++i] += 1;
-            }
-
-            int code = encode(state);
-            if(code == u) {
-                break;
-            }
-            int code1 = u - code;
-            auto res = self(self, code) + self(self, code1);
-            best = min(best, res);
+        dp[mask] = l * l;
+        for(auto subm = mask; subm > 0; subm = im.and_mask(subm - 1, mask)) {
+            dp[mask] = min(dp[mask], dp[subm] + dp[mask - subm]);
         }
-        dp[u] = best;
-        return best;
-    };
-
-    auto res = solve(solve, encode(mx));
-    cout << res - cnt << endl;
+    }
+    cout << dp[im.mx - 1] - cnt << endl;
 }
 
 int main() {
