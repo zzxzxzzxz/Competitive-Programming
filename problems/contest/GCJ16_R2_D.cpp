@@ -62,38 +62,31 @@ template<class T> struct IterMask {/*{{{*/
     int n;
     vector<T> ds;
     T mx;
-    IterMask(vector<T>& v): n(v.size()), ds({1}), mx(0) {
+    IterMask(vector<T>& v): n(v.size()), ds({1}), mx(1) {
         for(int i = 0; i < n; ++i) {
-            ds.push_back(ds.back() * (1 + v[i]));
+            ds.emplace_back(ds.back() * (1 + v[i]));
         }
         mx = ds.back();
     }
 
-    auto and_mask(T i, T m) {
-        for(int l = 0; l < int(ds.size()) - 1; ++l) {
-            auto j = i % ds[l + 1] / ds[l];
-            auto k = m % ds[l + 1] / ds[l];
-            if(j > k) i -=  (j - k) * ds[l];
+    auto and_(T i, T m) {
+        auto res = i;
+        for(int l = n - 1; l >= 0; --l) {
+            auto i2 = i % ds[l], m2 = m % ds[l];
+            auto diff = i - i2 - m + m2;
+            if(diff > 0) res -= diff;
+            i = i2, m = m2;
         }
-        return i;
+        return res;
     }
 
     auto decode(T m) {
-        struct iterator {
-            const T m;
-            const vector<T>& ds;
-            int i;
-            auto operator!=(const iterator& other) const { return i != other.i; }
-            auto& operator++() { ++i; return *this; }
-            auto operator*() { return m % ds[i + 1] / ds[i]; }
-        };
-        struct iterable_wrapper {
-            const T m;
-            const vector<T>& ds;
-            auto begin() const { return iterator{ m, ds, 0 }; }
-            auto end() const { return iterator{ m, ds, int(ds.size()) - 1 }; }
-        };
-        return iterable_wrapper{ m, ds };
+        vector<T> res(n);
+        for(int l = n - 1; l >= 0; --l) {
+            res[l] = m / ds[l];
+            m %= ds[l];
+        }
+        return res;
     };
 };/*}}}*/
 
@@ -147,6 +140,9 @@ void solve(int) {
         nums.push_back(p.second);
     }
 
+    debug() << imie(groups) << endl;
+    debug() << imie(nums) << endl;
+
     auto im = IterMask<int>(nums);
 
     vector<int> dp(im.mx);
@@ -164,8 +160,8 @@ void solve(int) {
         }
 
         dp[mask] = l * l;
-        for(auto subm = mask; subm > 0; subm = im.and_mask(subm - 1, mask)) {
-            dp[mask] = min(dp[mask], dp[subm] + dp[mask - subm]);
+        for(auto s = mask; s > 0; s = im.and_(s - 1, mask)) {
+            dp[mask] = min(dp[mask], dp[s] + dp[mask - s]);
         }
     }
     cout << dp[im.mx - 1] - cnt << endl;
@@ -180,3 +176,58 @@ int main() {
     }
     return 0;
 }
+
+/* input
+6
+2
+11
+10
+2
+10
+00
+3
+000
+000
+000
+1
+1
+3
+000
+110
+000
+25
+0000000000000000000000100
+0000000000000000000000100
+0000000000000000000000000
+0000100000000000000000000
+0000000000000000100000000
+0000000000000000000111000
+0000000000000000000000000
+0000000000000000000011000
+0000000000000000000000000
+0000000100000010000000000
+0000000000000000000000000
+0000000000000000000000000
+0011000010000000000000000
+0000000000000000000000000
+0000000000000000000000000
+0000000000000000100000100
+0000011000000000000000000
+0000000000000000001000000
+0000000000000000001000000
+0000000000000000001000000
+0000001000000000000000000
+0000000000000100000000000
+1100000000000000000000001
+0000000000000000000000001
+0000100000000000000000000
+ */
+
+/* output
+Case #1: 1
+Case #2: 1
+Case #3: 3
+Case #4: 0
+Case #5: 3
+Case #6: 39
+ */
