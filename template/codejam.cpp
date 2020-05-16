@@ -10,6 +10,13 @@ static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); cout.pre
 #define all(x) begin(x), end(x)
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
+template<typename ...T> string format(const string& fmt, T&&... args) {
+    size_t sz = snprintf(nullptr, 0, fmt.c_str(), args...) + 1;
+    unique_ptr<char[]> buf(new char[sz]);
+    snprintf(buf.get(), sz, fmt.c_str(), args...);
+    return string(buf.get(), buf.get() + sz - 1);
+}
+
 template<class T> struct rge { T b, e; auto begin() const { return b; } auto end() const { return e; } };
 template<class T> rge<T> range(T i, T j) { return rge<T>{i, j}; }
 template<class T> auto dud(T* x) -> decltype(cerr << *x, 0);
