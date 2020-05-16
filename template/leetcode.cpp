@@ -27,6 +27,9 @@ struct debug {
             *this << (it != d.b ?  ", " : "") << *it;
         return * this << "]";
     }
+    debug& operator<<(string d) {
+        cerr << '"' << d << '"'; return *this;
+    }
     debug& operator<<(ostream&(*pf)(std::ostream&)) {
         cerr << pf; return *this;
     }
