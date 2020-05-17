@@ -46,55 +46,65 @@ template<class Sig> using args_t = typename args<Sig>::type;
 
 template<typename T> struct is_vector : false_type {};
 template<typename T> struct is_vector<vector<T>> : true_type {};
+template<class T> using IsV = typename enable_if<is_vector<T>::value>::type;
+template<class T> using NotV = typename enable_if<!is_vector<T>::value>::type;
 
-template<class T> auto read(istringstream& iss) {
-    if constexpr(is_same_v<T, string>) {
-        char c; iss >> c;
-        string res;
-        getline(iss, res, '"');
-        return res;
-    } else if constexpr(is_vector<T>::value) {
-        T res;
-        char c; iss >> c;
-        while(c != ']') {
-            auto tmp = read<typename T::value_type>(iss);
-            res.push_back(tmp);
-            iss >> c;
-        }
-        return res;
-    } else {
-        T res; iss >> res; return res;
-    }
+auto read(istringstream& iss, string&&) {
+    char c; iss >> c;
+    string res;
+    getline(iss, res, '"');
+    return res;
 }
 
-optional<tuple<>> read1() { return {{}}; }
-template<class T, class ...U> optional<tuple<T, U...>> read1(T, U ...tail) {
+template<class T, class = NotV<T>>
+auto read(istringstream& iss, T&&) {
+    T res; iss >> res;
+    return res;
+}
+
+template<class T, class = IsV<T>, class VT = typename T::value_type>
+auto read(istringstream& iss, T&&) {
+    T res;
+    char c; iss >> c;
+    while(c != ']') {
+        auto tmp = read<VT>(iss, VT());
+        res.push_back(tmp);
+        iss >> c;
+    }
+    return res;
+}
+
+unique_ptr<tuple<>> read1() { return make_unique<tuple<>>(tuple<>{}); }
+template<class T, class ...U> unique_ptr<tuple<T, U...>> read1(T, U ...tail) {
     string s;
     getline(cin, s);
-    if(cin.eof()) return {};
+    if(cin.eof()) return nullptr;
     auto iss = istringstream(s);
-    auto t1 = make_tuple(read<T>(iss));
-    auto t2 = read1(tail...);
-    return { tuple_cat(t1, t2.value()) };
+    auto t1 = make_tuple(read<T>(iss, T()));
+    auto t2_ptr = read1(tail...);
+    return make_unique<tuple<T, U...>>(tuple_cat(t1, *t2_ptr));
 }
 
 template<class ...T, class U = tuple<remove_reference_t<T>...>>
-optional<U> parse_input(types<T...>) {
+unique_ptr<U> parse_input(types<T...>) {
     return read1<remove_reference_t<T>...>( remove_reference_t<T>()... );
-}/*}}}*/
+}
+
+template<size_t ...Is, class F, class T> void apply(index_sequence<Is...>, F f, T&& t) { f(get<Is>(t)...); }
+template<class F, class ...T> void apply(F f, tuple<T...> t) { apply(index_sequence_for<T...>{}, f, t); }
+/*}}}*/
 using PII = pair<int, int>;
 using LL = long long;
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
-
-#define METHOD //FIXME
+#define METHOD //
 
 int main() {
     while(true) {
         auto input = parse_input(args_t<decltype(METHOD)>{});
-        if(input == nullopt) break;
+        if(input == nullptr) break;
         auto sol = Solution();
-        apply([&sol](auto ...args) { debug() << sol.METHOD(args...) << endl; }, input.value());
+        apply([&sol](auto ...args) { debug() << sol.METHOD(args...) << endl; }, *input);
     }
     return 0;
 }
