@@ -20,17 +20,17 @@ DataType combine(const DataType& val1, const DataType& val2) {
 }
 struct Node {/*{{{*/
     DataType val, lazy;
-    void add(DataType& x) {
-        val = modify(val, x);
+    void add(DataType& x, int width) {
+        val = modify(val, x, width);
         lazy = modify(lazy, x);
     }
     void pull(Node& a, Node& b) {
         val = combine(a.val, b.val);
     }
-    void push(Node& a, Node& b) {
+    void push(Node& a, Node& b, int width) {
         if(lazy != zero_m) {
-            a.add(lazy);
-            b.add(lazy);
+            a.add(lazy, width / 2);
+            b.add(lazy, width / 2);
         }
         lazy = zero_m;
     }
@@ -59,12 +59,12 @@ struct SegTree {/*{{{*/
             if(qtype == QUERY) {
                 val = combine(val, dat[k].val);
             } else {
-                dat[k].add(val);
+                dat[k].add(val, r - l);
             }
             return;
         }
 
-        dat[k].push(dat[k << 1], dat[k << 1 | 1]);
+        dat[k].push(dat[k << 1], dat[k << 1 | 1], r - l);
         int mid = l + (r - l) / 2;
         rec(a, b, val, qtype, l, mid, k << 1);
         rec(a, b, val, qtype, mid, r, k << 1 | 1);
