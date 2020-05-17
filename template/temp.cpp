@@ -2,12 +2,9 @@
 #include "bits/stdc++.h"
 using namespace std;
 
-#ifndef LOCAL
+#define all(x) begin(x), end(x)
 #define putchar(x) cout << (x)
 static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); cout.precision(17); return 0; }();
-#endif
-
-#define all(x) begin(x), end(x)
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 template<typename ...T> string format(const string& fmt, T&&... args) {
