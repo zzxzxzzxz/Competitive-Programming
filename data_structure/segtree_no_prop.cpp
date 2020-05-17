@@ -7,12 +7,14 @@ using DataType = int;
 const DataType zero_m = 0, zero_c = 0;
 
 DataType modify(const DataType& val1, const DataType& val2, int width = 1) {
-    //ignore = width; return val1 + val2;
-    return val1 + val2 * width;
+    //DataType res = val1 + val2; ignore = width;
+    DataType res = val1 + val2 * width;
+    return res;
 }
 DataType combine(const DataType& val1, const DataType& val2) {
-    //return min(val1, val2);
-    return val1 + val2;
+    //DataType res = min(val1, val2);
+    DataType res = val1 + val2;
+    return res;
 }
 struct Node {/*{{{*/
     DataType val, lazy;
