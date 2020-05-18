@@ -19,12 +19,6 @@ template<class T> rge<T> range(T i, T j) { return rge<T>{i, j}; }
 template<class T> auto dud(T* x) -> decltype(cerr << *x, 0);
 template<class T> char dud(...);
 
-template<class ...T> void absorb(T&& ...) {}
-template<class OUT, size_t ...Is, class T>
-void debug_tuple(OUT& out, index_sequence<Is...>, const T& t) {
-    absorb((out << (Is != 0 ? ", " : "") << get<Is>(t))...);
-}
-
 struct debug {
 #ifdef LOCAL
     template<class T> typename enable_if<sizeof dud<T>(0) != 1, debug&>::type operator<<(T i) {
@@ -36,19 +30,20 @@ struct debug {
     template<class T, class U> debug& operator<<(pair<T, U> d) {
         return *this << "(" << d.first << ", " << d.second << ")";
     }
+    debug& operator<<(tuple<>&) { return *this << "()"; };
     template<class ...T> debug& operator<<(tuple<T...> d) {
-        *this << "(";
-        debug_tuple(*this, index_sequence_for<T...>{}, d);
+        *this << "("; debug_tuple<sizeof...(T), 0>(d);
         return *this << ")";
+    }
+    template<size_t L, size_t I, class T> void debug_tuple(const T& t) {
+        *this << (I == 0 ? "" : ", ") << get<I>(t);
+        if(I + 1 < L) debug_tuple<L, (I + 1) % L>(t);
     }
     template<class T> debug & operator <<(rge<T> d) {
         *this << "[";
         for(auto it = d.b; it != d.e; ++it)
             *this << (it != d.b ?  ", " : "") << *it;
-        return * this << "]";
-    }
-    debug& operator<<(string d) {
-        *this << '"'; cerr << d; return *this << '"';
+        return *this << "]";
     }
     debug& operator<<(ostream&(*pf)(std::ostream&)) {
         cerr << pf; return *this;
