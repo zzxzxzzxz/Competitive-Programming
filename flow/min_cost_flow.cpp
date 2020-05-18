@@ -61,7 +61,11 @@ struct MinCostFlow {//{{{
                 return -1;
             }
             for(int i = 0; i < int(h.size()); i++) {
-                h[i] += d[i];
+                if(d[i] == INF) {
+                    h[i] = INF;
+                } else {
+                    h[i] += d[i];
+                }
             }
             int flow = required;
             for(int v = t; v != s; v = prevv[v]) {
