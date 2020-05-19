@@ -55,7 +55,6 @@ struct debug {
 };
 #define imie(...) " [" << #__VA_ARGS__ << ": " << (__VA_ARGS__) << "] "
 /*}}}*/
-using PII = pair<int, int>;
 using LL = long long;
 
 const int MOD = 1e9 + 7;
