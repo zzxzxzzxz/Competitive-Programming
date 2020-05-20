@@ -68,8 +68,9 @@ template<class T> class Treap {//{{{
         struct Node {
             size_t sz;
             T val;
-            unique_ptr<Node> left, right;
-            Node(const T& v): sz(1), val(v) {}
+            Node* left;
+            Node* right;
+            Node(const T& v): sz(1), val(v), left(nullptr), right(nullptr) {}
             void pull() {
                 sz = 1 + (left ? left->sz : 0) + (right ? right->sz : 0);
             };
@@ -77,12 +78,12 @@ template<class T> class Treap {//{{{
             };
         };
 
-        using NodePtr = unique_ptr<Node>;
+        using NodePtr = Node*;
         NodePtr root;
         bool prior(NodePtr& node1, NodePtr& node2) {
             seed = 0xdefaced * seed + 1;
-            size_t r = seed % (node1->sz + node2->sz);
-            return r < node1->sz;
+            size_t r = seed % (size(node1) + size(node2));
+            return r < size(node1);
         }
 
         size_t size(NodePtr& node) {
@@ -91,7 +92,7 @@ template<class T> class Treap {//{{{
 
         pair<NodePtr, NodePtr> split(NodePtr& node, const T& val) {
             if(not node) {
-                return {nullptr, nullptr};
+                return { nullptr, nullptr };
             }
             NodePtr a, b;
             if(val <= node->val) {
@@ -130,7 +131,7 @@ template<class T> class Treap {//{{{
         Treap(): root(nullptr) {}
 
         void insert(const T& val) {
-            auto node = make_unique<Node>(val);
+            auto node = new Node(val);
             NodePtr a, b;
             tie(a, b) = split(root, val);
             a = merge(a, node);
@@ -140,9 +141,22 @@ template<class T> class Treap {//{{{
         int count_ge(const T& val) {
             NodePtr a, b;
             tie(a, b) = split(root, val);
-            int ans = b ? b->sz : 0;
+            int ans = size(b);
             root = merge(a, b);
             return ans;
+        }
+
+        void free() {
+            auto f = [](auto self, const auto& node) {
+                if(not node) {
+                    return;
+                }
+                self(self, node->left);
+                self(self, node->right);
+                delete node;
+            };
+            f(f, root);
+            root = nullptr;
         }
 };//}}}
 
@@ -206,6 +220,7 @@ void solve(int) {
         }
     }
     cout << ans << endl;
+    treap.free();
 }
 
 int main() {

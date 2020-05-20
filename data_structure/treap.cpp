@@ -1,44 +1,37 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-mt19937 rng(123123123);
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 size_t seed = rng();
-
 template<class T> class Treap {//{{{
     private:
         struct Node {
             size_t sz;
             T val, maxv, lazy;
-            unique_ptr<Node> left, right;
-            Node(const T& v): sz(1), val(v), maxv(INT_MIN), lazy(0) {}
-
+            Node* left;
+            Node* right;
+            Node(const T& v): sz(1), val(v), maxv(INT_MIN),
+                              lazy(0), left(nullptr), right(nullptr) {}
             void add(T x) {
                 val += x;
+                maxv += x;
                 lazy += x;
             }
-
             void pull() {
-                sz = 1;
-                maxv = val;
-                if(left) {
-                    sz += left->sz;
-                    maxv = max(maxv, left->maxv);
-                }
-                if(right) {
-                    sz += right->sz;
-                    maxv = max(maxv, right->maxv);
-                }
+                sz = 1 + (left? left->sz : 0) + (right? right->sz : 0);
+                maxv = max(
+                    { val, left? left->maxv : INT_MIN, right? right->maxv : INT_MIN }
+                );
             };
-
             void push() {
                 if(left) left->add(lazy);
                 if(right) right->add(lazy);
                 lazy = 0;
             };
         };
-
-        using NodePtr = unique_ptr<Node>;
+        using NodePtr = Node*;
         NodePtr root;
+
         bool prior(NodePtr& node1, NodePtr& node2) {
             seed = 0xdefaced * seed + 1;
             size_t r = seed % (node1->sz + node2->sz);
@@ -91,7 +84,7 @@ template<class T> class Treap {//{{{
         Treap(): root(nullptr) {}
 
         void insert(const T& val, const size_t k) {
-            auto node = make_unique<Node>(val);
+            auto node = new Node(val);
             NodePtr a, b;
             tie(a, b) = split(root, k);
             a = merge(a, node);
@@ -128,6 +121,33 @@ template<class T> class Treap {//{{{
             };
             traverse(traverse, root, f);
         }
+
+        void free() {
+            auto f = [](auto self, const auto& node) {
+                if(not node) {
+                    return;
+                }
+                self(self, node->left);
+                self(self, node->right);
+                delete node;
+            };
+            f(f, root);
+            root = nullptr;
+        }
+
+        void gg() {
+            auto f = [](auto self, const auto& node) {
+                if(not node) {
+                    return;
+                }
+                if(node->lazy != 0) {
+                    cout << "(" << node->val << ", " << node->lazy << ")" << endl;
+                }
+                self(self, node->left);
+                self(self, node->right);
+            };
+            f(f, root);
+        }
 };//}}}
 
 int main(){
@@ -139,26 +159,17 @@ int main(){
         t.insert(v[i], i);
     }
 
-    auto f = [](const auto& node) {
-        cout << node->val << " ";
-    };
-    t.dfs(f);
-    cout << endl;
+    for(int j = 0; j < n; ++j) printf("%2d ", j); cout << endl;
+    for(int j = 0; j < n; ++j) printf("%2d ", v[j]); cout << endl;
 
-    for(int i = 0; i < 10; ++i) {
-        int l = rng() % n, r = rng() % n;
-        if(l > r) swap(l, r);
-        if(i % 4) {
-            printf("%3d  | ask(%2d, %2d)\n", t.ask(l, r + 1), l, r + 1);
-        } else {
-            printf("     | add(%2d, %2d, %2d)\n", l, r + 1, 5);
-            t.add(l, r + 1, 5);
-            for(int j = l; j <= r; ++j) v[j] += 5;
-        }
-        for(int j = 0; j < n; ++j) printf("%2d ", j); cout << endl;
-        for(int j = 0; j < n; ++j) printf("%2d ", v[j]); cout << endl;
-        cout << endl;
-    }
+    cout << "add(0, 5, 5)" << endl;
+    t.add(0, 5, 5);
+    for(int j = 0; j < 5; ++j) v[j] += 5;
 
+    for(int j = 0; j < n; ++j) printf("%2d ", j); cout << endl;
+    for(int j = 0; j < n; ++j) printf("%2d ", v[j]); cout << endl;
+
+    cout << "ask(1, 5): " << t.ask(1, 5) << endl;
+    t.free();
     return 0;
 }
