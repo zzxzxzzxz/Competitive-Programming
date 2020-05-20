@@ -1,19 +1,19 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-using Data = int;
-Data zero = 0;
+using DataType = int;
+DataType zero = 0;
 
-vector<Data> dat;
-void _add(Data& a, Data b) {
+vector<DataType> dat;
+void _add(DataType& a, DataType b) {
     a += b;
 }
 
 struct BIT {//{{{
-    int lg(int n) { return 31 - __builtin_clz(n); }
+    int lg(int x) { return 31 - __builtin_clz(x); }
 
     int n;
-    BIT(int n, Data* ptr = nullptr): n(n) {
+    BIT(int n, DataType* ptr = nullptr): n(n) {
         dat.assign(n + 1, 0);
         if(ptr) {
             for(int i = 1; i <= n; ++i) {
@@ -26,8 +26,8 @@ struct BIT {//{{{
         }
     }
 
-    Data sum(int i) {
-        Data s = zero;
+    DataType sum(int i) {
+        DataType s = zero;
         while (i > 0) {
             _add(s, dat[i]);
             i -= i & -i;
@@ -35,7 +35,7 @@ struct BIT {//{{{
         return s;
     }
 
-    void add(int i, Data&& x) {
+    void add(int i, DataType&& x) {
         while (i <= n) {
             _add(dat[i], x);
             i += i & -i;
@@ -73,9 +73,9 @@ int main() {
     }
 
     cout << "lower_bound:" << endl;
-    for(int v = 1; v <= 7; ++v) {
-        int idx = bit.lower_bound(v);
-        cout << v << ": " << idx << " (" << bit.sum(idx) << ")" << endl;
+    for(int val = 1; val <= 7; ++val) {
+        int idx = bit.lower_bound(val);
+        cout << val << ": " << idx << " (" << bit.sum(idx) << ")" << endl;
     }
     return 0;
 }

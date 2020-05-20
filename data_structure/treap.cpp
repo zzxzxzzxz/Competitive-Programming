@@ -49,19 +49,19 @@ template<class T> class Treap {//{{{
             return node ? node->sz : 0;
         }
 
-        pair<NodePtr, NodePtr> split(NodePtr& root, size_t k) {
-            if(not root) {
+        pair<NodePtr, NodePtr> split(NodePtr& node, size_t k) {
+            if(not node) {
                 return {nullptr, nullptr};
             }
             NodePtr a, b;
-            if(k <= size(root->left)) {
-                b = move(root);
+            if(k <= size(node->left)) {
+                b = move(node);
                 b->push();
                 tie(a, b->left) = split(b->left, k);
                 b->pull();
             } else {
-                size_t left_sz = size(root->left) + 1;
-                a = move(root);
+                size_t left_sz = size(node->left) + 1;
+                a = move(node);
                 a->push();
                 tie(a->right, b) = split(a->right, k - left_sz);
                 a->pull();
