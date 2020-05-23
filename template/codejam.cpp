@@ -22,7 +22,7 @@ template<class T> char dud(...);
 struct debug {
 #ifdef LOCAL
     debug(int line) {
-        if(line) cerr << "LINE(" << line << ") ->";
+        if(line) cerr << "LINE(" << line << ") -> ";
     }
     template<class T> typename enable_if<sizeof dud<T>(0) != 1, debug&>::type operator<<(T i) {
         cerr << boolalpha << i; return * this;
