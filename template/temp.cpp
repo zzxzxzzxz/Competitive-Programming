@@ -21,6 +21,9 @@ template<class T> char dud(...);
 
 struct debug {
 #ifdef LOCAL
+    debug(int line) {
+        if(line) cerr << "LINE(" << line << ") ->";
+    }
     template<class T> typename enable_if<sizeof dud<T>(0) != 1, debug&>::type operator<<(T i) {
         cerr << boolalpha << i; return * this;
     }
@@ -49,11 +52,17 @@ struct debug {
         cerr << pf; return *this;
     }
 #else
+    debug(int) {}
     template<class T> debug& operator<<(T&&) { return *this; }
     debug& operator<<(ostream&(*pf)(std::ostream&)) { return *this; }
 #endif
 };
 #define imie(...) " [" << #__VA_ARGS__ << ": " << (__VA_ARGS__) << "] "
+
+#define debug0()  debug(__LINE__)
+#define debug1(x) debug(0)
+#define GET_MACRO(_0, _1, NAME, ...) NAME
+#define debug(...) GET_MACRO(_0, ##__VA_ARGS__, debug1, debug0)(__VA_ARGS__)
 /*}}}*/
 using LL = long long;
 
