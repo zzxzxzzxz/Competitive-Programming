@@ -93,8 +93,9 @@ unique_ptr<U> parse_input(types<T...>) {
 template<size_t ...Is, class F, class T> void apply(index_sequence<Is...>, F f, T&& t) { f(get<Is>(t)...); }
 template<class F, class ...T> void apply(F f, tuple<T...> t) { apply(index_sequence_for<T...>{}, f, t); }
 /*}}}*/
-using LL = long long;
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+#define all(x) begin(x), end(x)
+using LL = long long;
 
 #define METHOD //
 

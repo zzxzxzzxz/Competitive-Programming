@@ -32,8 +32,11 @@ pF:
 pG:
 	${CMD} G.cpp -o G
 
+pH:
+	${CMD} H.cpp -o H
+
 clean:
-	@rm -f in*.txt a.out A B C D E F G *.tu* *.in *.out *input* *output*
+	@rm -f in*.txt a.out A B C D E F G H *.tu* *.in *.out *input* *output*
 
 clean_tu:
 	find . -name '*.tu*' -delete
