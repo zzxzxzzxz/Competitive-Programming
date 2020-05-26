@@ -1,14 +1,23 @@
-#CXXFLAGS = -Ofast -std=c++17 -Wshadow -Wall -Wno-unused-const-variable -Wno-string-plus-int \
-	  -lstdc++ -Wl,-stack_size -Wl,1000000000
-
+LOCAL ?= 1
+DEBUG ?= 1
 VER ?= 14
-LOCAL = -DLOCAL
 
-CXXFLAGS = -O3 -std=c++${VER} -Wshadow -Wall -Wno-unused-const-variable -Wno-string-plus-int \
-	  -fsanitize=address -fsanitize=undefined -D_GLIBCXX_DEBUG ${LOCAL}
+ifeq (${LOCAL}, 1)
+	F_LOCAL = -DLOCAL
+else
+	F_LOCAL =
+endif
+
+ifeq (${DEBUG}, 1)
+	CXX = g++ -O3 -std=c++${VER} -Wshadow -Wall -Wno-unused-const-variable -Wno-string-plus-int \
+		  -fsanitize=address -fsanitize=undefined -D_GLIBCXX_DEBUG ${F_LOCAL}
+else
+	CXX = g++ -Ofast -std=c++17 -Wshadow -Wall -Wno-unused-const-variable -Wno-string-plus-int \
+		  -lstdc++ -Wl,-stack_size -Wl,1000000000
+endif
 
 %:
-	g++ ${CXXFLAGS} $@.cpp -o $(shell basename $@)
+	${CXX} $@.cpp -o $(shell basename $@)
 
 clean: clean_tu
 	@find . -type f -perm +111 -and -not -name "*.py" -delete
