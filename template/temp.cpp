@@ -54,7 +54,7 @@ struct debug {
 #else
     debug(int) {}
     template<class T> debug& operator<<(T&&) { return *this; }
-    debug& operator<<(ostream&(*pf)(std::ostream&)) { return *this; }
+    debug& operator<<(ostream&(*)(std::ostream&)) { return *this; }
 #endif
 };
 #define imie(...) " [" << #__VA_ARGS__ << ": " << (__VA_ARGS__) << "] "
