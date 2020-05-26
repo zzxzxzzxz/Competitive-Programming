@@ -16,8 +16,8 @@ else
 		  -lstdc++ -Wl,-stack_size -Wl,1000000000
 endif
 
-%:
-	${CXX} $@.cpp -o $(shell basename $@)
+compile:
+	${CXX} ${s} -o $(shell basename ${s} .cpp)
 
 clean: clean_tu
 	@find . -type f -perm +111 -and -not -name "*.py" -delete
