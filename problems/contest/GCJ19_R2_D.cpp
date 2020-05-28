@@ -19,6 +19,13 @@ template<class T> rge<T> range(T i, T j) { return rge<T>{i, j}; }
 template<class T> auto dud(T* x) -> decltype(cerr << *x, 0);
 template<class T> char dud(...);
 
+template<class T> struct is_vector : false_type {};
+template<class T> struct is_vector<vector<T>> : true_type {};
+template<class T> typename enable_if<!is_vector<T>::value, size_t>::type bytes(const T& x) { return sizeof(x); }
+template<class T> typename enable_if<is_vector<T>::value, size_t>::type bytes(const T& x) {
+    return x.size() == 0 ? 0 : x.size() * bytes(x[0]);
+}
+
 struct debug {
 #ifdef LOCAL
     debug(int line) {
@@ -70,163 +77,156 @@ const pair<LL, bool> LLINF = {1e18, true};
 const int MAX_N = 100005;
 const int MOD = 1e9 + 7;
 
-int n;
-pair<LL, bool> g[MAX_N];
-bool visited[MAX_N];
-bool selfloop[MAX_N];
-vector<int> vs;
-vector<int> G0[MAX_N], rG0[MAX_N], G1[MAX_N], rG1[MAX_N];
+struct Solution {
+    int n;
+    vector<pair<LL, bool>> g;
+    vector<int> visited, selfloop;
+    vector<int> vs;
+    vector<vector<int>> G0, rG0, G1, rG1;
 
-template<class T>
-vector<int> dfs2(int v, const T& rG) {
-    visited[v] = true;
-    vector<int> res = {v};
-    for(int u : rG[v]) {
-        if(not visited[u]) {
-            auto res_u = dfs2(u, rG);
-            res.insert(res.end(), all(res_u));
-        }
-    }
-    return res;
-}
-
-template<class T>
-void dfs1(int v, const T& G) {
-    visited[v] = true;
-    for(int u : G[v]) {
-        if(not visited[u]) {
-            dfs1(u, G);
-        }
-    }
-    vs.push_back(v);
-}
-
-void add(pair<LL, bool>& a, const pair<LL, bool>& b) {
-    if(a == LLINF or b == LLINF) {
-        a = LLINF;
-    } else {
-        a.first += b.first;
-        if(a.first >= MOD) {
-            a.first -= MOD;
-            a.second = true;
-        }
-        a.second |= b.second;
-    }
-}
-
-template<class T>
-pair<LL, bool> solve2(const T& G, const T& rG, int target) {
-    vs.clear();
-    memset(visited, 0, sizeof(visited));
-    for(int i = 1; i <= n + 1; ++i) {
-        if(not visited[i]) {
-            dfs1(i, G);
-        }
-    }
-    debug() << imie(vs) << endl;
-
-    memset(visited, 0, sizeof(visited));
-    for(int i = n; i >= 0; --i) {
-        if(not visited[vs[i]]) {
-            auto res = dfs2(vs[i], rG);
-            debug() << imie(res) << endl;
-            bool found = false;
-            pair<LL, bool> sum = {0, false};
-            for(auto v : res) {
-                add(sum, g[v]);
-
-                if(v == target) {
-                    found = true;
+    template<class T>
+        vector<int> dfs2(int v, const T& rG) {
+            visited[v] = true;
+            vector<int> res = {v};
+            for(int u : rG[v]) {
+                if(not visited[u]) {
+                    auto res_u = dfs2(u, rG);
+                    res.insert(res.end(), all(res_u));
                 }
-                //debug(0) << format("%d(%d) # ", v, g[v]);
             }
-            //debug(0) << endl;
+            return res;
+        }
 
-            if(found) {
-                return sum;
+    template<class T>
+        void dfs1(int v, const T& G) {
+            visited[v] = true;
+            for(int u : G[v]) {
+                if(not visited[u]) {
+                    dfs1(u, G);
+                }
+            }
+            vs.push_back(v);
+        }
+
+    void add(pair<LL, bool>& a, const pair<LL, bool>& b) {
+        if(a == LLINF or b == LLINF) {
+            a = LLINF;
+        } else {
+            a.first += b.first;
+            if(a.first >= MOD) {
+                a.first -= MOD;
+                a.second = true;
+            }
+            a.second |= b.second;
+        }
+    }
+
+    template<class T>
+        pair<LL, bool> solve2(const T& G, const T& rG, int target) {
+            vs.clear();
+            memset(&visited[0], 0, bytes(visited));
+
+            for(int i = 1; i <= n + 1; ++i) {
+                if(not visited[i]) {
+                    dfs1(i, G);
+                }
             }
 
-            bool is_inf = ((res.size() > 1 or selfloop[res[0]]) and sum != make_pair(0LL, false));
+            memset(&visited[0], 0, bytes(visited));
+            for(int i = n; i >= 0; --i) {
+                if(not visited[vs[i]]) {
+                    auto res = dfs2(vs[i], rG);
+                    bool found = false;
+                    pair<LL, bool> sum = {0, false};
+                    for(auto v : res) {
+                        add(sum, g[v]);
 
-            for(auto v : res) {
-                for(auto u : G[v]) {
-                    if(not visited[u]) {
-                        add(g[u], is_inf ? LLINF : g[v]);
-                        //debug(0) << format("%d(%lld) -> %d(%lld) # ", v, g[v], u, g[u]);
+                        if(v == target) {
+                            found = true;
+                        }
+                    }
+                    if(found) {
+                        return sum;
+                    }
+
+                    bool is_inf = ((res.size() > 1 or selfloop[res[0]]) and sum != make_pair(0LL, false));
+
+                    for(auto v : res) {
+                        for(auto u : G[v]) {
+                            if(not visited[u]) {
+                                add(g[u], is_inf ? LLINF : g[v]);
+                            }
+                        }
                     }
                 }
             }
-            //debug(0) << endl;
+            assert(false);
+            return LLINF;
         }
-    }
-    assert(false);
-    return LLINF;
-}
 
-void solve(int) {
-    debug(0) << endl;
+    Solution(int) {
+        cin >> n;
 
-    cin >> n;
-    for(int i = 1; i <= n + 1; ++i) {
-        G0[i].clear();
-        rG0[i].clear();
-        G1[i].clear();
-        rG1[i].clear();
-    }
+        g.resize(n + 2);
+        selfloop.resize(n + 2);
+        visited.resize(n + 2);
+        G0.resize(n + 2);
+        rG0.resize(n + 2);
+        G1.resize(n + 2);
+        rG1.resize(n + 2);
 
-    memset(selfloop, 0, sizeof(selfloop));
-    for(int i = 1; i <= n; ++i) {
-        int u, v;
-        cin >> u >> v;
-        G0[i].push_back(u);
-        G0[i].push_back(v);
-        rG0[u].push_back(i);
-        rG0[v].push_back(i);
+        memset(&selfloop[0], 0, bytes(selfloop));
+        for(int i = 1; i <= n; ++i) {
+            int u, v;
+            cin >> u >> v;
 
-        G1[i].push_back(u == 1 ? n + 1 : u);
-        rG1[u == 1 ? n + 1 : u].push_back(i);
-        G1[i].push_back(v == 1 ? n + 1 : v);
-        rG1[v == 1 ? n + 1 : v].push_back(i);
+            G0[i].push_back(u);
+            G0[i].push_back(v);
+            rG0[u].push_back(i);
+            rG0[v].push_back(i);
 
-        if(i == u or i == v) {
-            selfloop[i] = true;
+            G1[i].push_back(u == 1 ? n + 1 : u);
+            rG1[u == 1 ? n + 1 : u].push_back(i);
+            G1[i].push_back(v == 1 ? n + 1 : v);
+            rG1[v == 1 ? n + 1 : v].push_back(i);
+
+            if(i == u or i == v) {
+                selfloop[i] = true;
+            }
         }
-    }
-    memset(g, 0, sizeof(g));
-    for(int i = 1; i <= n; ++i) {
-        cin >> g[i].first;
-    }
 
-    auto ans = solve2(G0, rG0, 1);
-    debug() << range(g + 1, g + n + 1) << endl;
-    debug() << imie(ans) << endl;
+        memset(&g[0], 0, bytes(g));
+        for(int i = 1; i <= n; ++i) {
+            cin >> g[i].first;
+        }
 
-    if(ans != make_pair(0LL, false)) {
-        memset(g, 0, sizeof(g));
-        g[1] = {1, false};
-        selfloop[1] = false;
+        auto ans = solve2(G0, rG0, 1);
 
-        auto ans2 = solve2(G1, rG1, n + 1);
-        if(ans2 == make_pair(1LL, false) or ans2 == make_pair(0LL, false)) {
-            ;
+        if(ans != make_pair(0LL, false)) {
+            memset(&g[0], 0, bytes(g));
+            g[1] = {1, false};
+            selfloop[1] = false;
+
+            auto ans2 = solve2(G1, rG1, n + 1);
+            if(ans2 != make_pair(1LL, false) and ans2 != make_pair(0LL, false)) {
+                ans = LLINF;
+            }
+        }
+
+        if(ans == LLINF) {
+            cout << "UNBOUNDED" << endl;
         } else {
-            ans = LLINF;
+            cout << ans.first << endl;
         }
     }
-
-    if(ans == LLINF) {
-        cout << "UNBOUNDED" << endl;
-    } else {
-        cout << ans.first << endl;
-    }
-}
+};
 
 int main() {
     int T;
     cin >> T;
     for(int i = 1; i <= T; ++i) {
         cout << "Case #" << i << ": ";
-        solve(i);
+        ignore = Solution(i);
     }
     return 0;
 }
