@@ -1,80 +1,75 @@
-//{{{
-#pragma comment(linker, "/stack:200000000")
-#pragma GCC optimize("Ofast")
-#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native")
-
-#include <bits/stdc++.h>
+/*{{{*/
+#include "bits/stdc++.h"
 using namespace std;
 
-using PII = pair<int, int>;
-using TI3 = tuple<int, int, int>;
-using LL = long long;
-using ULL = unsigned long long;
-using MAT = array<array<LL, 2>, 2>;
+#define all(x) begin(x), end(x)
+#define putchar(x) cout << (x)
+static int fastio = [](){ ios_base::sync_with_stdio(false); cin.tie(0); cout.precision(17); return 0; }();
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
-template<class T> constexpr inline T begin(const T&) {return 0;}
-template<class T> constexpr inline T end(const T& x) {return max(T(0), x);}
-
-#define SZ(x) int((x).size())
-#define PB push_back
-#define EB emplace_back
-#define GET_MACRO(_1,_2,_3,_4,NAME,...) NAME
-#define CHECK(a,b) static_assert(std::is_same<decltype(a), decltype(b)>::value, "REP diff types");
-
-#define REPPP(i,s,c,t) for(i; ((s) and (c)) or (putchar("\n "[c]) and (c)); (t))
-#define REPP2(i,n) REPPP(auto i=begin(n),i==begin(n),i!=end(n),++i)
-#define REPP3(i,m,n) CHECK(m,n) REPPP(auto i=(m),i==(m),i<(n),++i)
-#define REPP4(i,m,n,s) CHECK(m,n) REPPP(auto i=(m),i==(m),((s)>0 and i<(n)) or ((s)<0 and i>(n)),i+=(s))
-#define REPP(...) GET_MACRO(__VA_ARGS__, REPP4, REPP3, REPP2)(__VA_ARGS__)
-
-#define REP2(i,n) for(auto i=begin(n);i!=end(n);++i)
-#define REP3(i,m,n) CHECK(m,n) for(auto i=(m);i<(n);++i)
-#define REP4(i,m,n,s) CHECK(m,n) for(auto i=(m);((s)>0 and i<(n)) or ((s)<0 and i>(n));i+=(s))
-#define REP(...) GET_MACRO(__VA_ARGS__, REP4, REP3, REP2)(__VA_ARGS__)
-
-template<class T> void _read(T &x) {cin >> x;}
-void _read(size_t &x) {scanf("%zu", &x);}
-void _read(int &x) {scanf("%d", &x);}
-void _read(LL &x) {scanf("%lld", &x);}
-void _read(ULL &x) {scanf("%llu", &x);}
-void _read(double &x) {scanf("%lf", &x);}
-void _read(char &x) {scanf(" %c", &x);}
-void _read(char *x) {scanf("%s", x);}
-void read() {}
-template<class T, class... U>
-void read(T& head, U&... tail) {
-    _read(head);
-    read(tail...);
+template<typename ...T> string format(const string& fmt, T&&... args) {
+    size_t sz = snprintf(nullptr, 0, fmt.c_str(), args...) + 1;
+    unique_ptr<char[]> buf(new char[sz]);
+    snprintf(buf.get(), sz, fmt.c_str(), args...);
+    return string(buf.get(), buf.get() + sz - 1);
 }
 
-template<class T> void _print(const T &x) {cout << x;}
-void _print(const size_t &x) {printf("%zu", x);}
-void _print(const int &x) {printf("%d", x);}
-void _print(const LL &x) {printf("%lld", x);}
-void _print(const ULL &x) {printf("%llu", x);}
-void _print(const double &x) {printf("%.16lf", x);}
-void _print(const char &x) {putchar(x);}
-void _print(const char *x) {printf("%s", x);}
-void _print(const string &x) {printf("%s", x.c_str());}
-template<class T> void _print(const vector<T> &x) {
-    for(auto i = x.begin(); i != x.end(); _print(*i++)) {
-        if (i != x.cbegin()) putchar(' ');
+template<class T> struct rge { T b, e; auto begin() const { return b; } auto end() const { return e; } };
+template<class T> rge<T> range(T i, T j) { return rge<T>{i, j}; }
+template<class T> auto dud(T* x) -> decltype(cerr << *x, 0);
+template<class T> char dud(...);
+
+struct debug {
+#ifdef LOCAL
+    debug(int line) {
+        if(line) cerr << "LINE(" << line << ") -> ";
     }
-}
-void print() {putchar('\n');}
-template<class T, class... U> void print(const T& head, const U&... tail) {
-    _print(head);
-    if(sizeof...(tail)) putchar(' ');
-    print(tail...);
-}
+    template<class T> typename enable_if<sizeof dud<T>(0) != 1, debug&>::type operator<<(T i) {
+        cerr << boolalpha << i; return * this;
+    }
+    template<class T> typename enable_if<sizeof dud<T>(0) == 1, debug&>::type operator<<(T i) {
+        return *this << range(begin(i), end(i));
+    }
+    template<class T, class U> debug& operator<<(pair<T, U> d) {
+        return *this << "(" << d.first << ", " << d.second << ")";
+    }
+    debug& operator<<(tuple<>&) { return *this << "()"; };
+    template<class ...T> debug& operator<<(tuple<T...> d) {
+        *this << "("; debug_tuple<sizeof...(T), 0>(d);
+        return *this << ")";
+    }
+    template<size_t L, size_t I, class T> void debug_tuple(const T& t) {
+        *this << (I == 0 ? "" : ", ") << get<I>(t);
+        if(I + 1 < L) debug_tuple<L, (I + 1) % L>(t);
+    }
+    template<class T> debug & operator <<(rge<T> d) {
+        *this << "[";
+        for(auto it = d.b; it != d.e; ++it)
+            *this << (it != d.b ?  ", " : "") << *it;
+        return *this << "]";
+    }
+    debug& operator<<(ostream&(*pf)(std::ostream&)) {
+        cerr << pf; return *this;
+    }
+#else
+    debug(int) {}
+    template<class T> debug& operator<<(T&&) { return *this; }
+    debug& operator<<(ostream&(*)(std::ostream&)) { return *this; }
+#endif
+};
+#define imie(...) " [" << #__VA_ARGS__ << ": " << (__VA_ARGS__) << "] "
 
-//}}}
-const int MOD = 1000000007;
+#define debug0()  debug(__LINE__)
+#define debug1(x) debug(0)
+#define GET_MACRO(_0, _1, NAME, ...) NAME
+#define debug(...) GET_MACRO(_0, ##__VA_ARGS__, debug1, debug0)(__VA_ARGS__)
+/*}}}*/
+using LL = long long;
+using TI3 = tuple<int, int, int>;
+using PII = pair<int, int>;
 
-#define LLINF 0x3f3f3f3f3f3f3f3f
-#define INF 0x3f3f3f3f
-
-#define MAX_N 200005
+const int INF = 0x3f3f3f3f;
+const int MAX_N = 200005;
 
 int a[MAX_N];
 TI3 trap[MAX_N];
@@ -86,16 +81,17 @@ TI3 trap[MAX_N];
 int main()
 {
     int m, n, k, t;
-    read(m, n, k, t);
-    REP(i, m) {
-        read(a[i]);
+    cin >> m >> n >> k >> t;
+    for(int i = 0; i < m; ++i) {
+        cin >> a[i];
     }
 
-    REP(i, k) {
+    for(int i = 0; i < k; ++i) {
         int l, r, d;
-        read(l, r, d);
+        cin >> l >> r >> d;
         trap[i] = {l - 1, r, d};
     }
+
     sort(trap, trap + k,
          [&](const TI3 t1, const TI3 t2) {
             int l1, r1, d1, l2, r2, d2;
@@ -108,13 +104,14 @@ int main()
     int extra = 0, remove = -1;
     set<PII> S = {{INT_MIN, INT_MIN}};
 
-    REP(i, k) {
+    for(int i = 0; i < k; ++i) {
         int l, r, d;
         tie(l, r, d) = trap[i];
 
-        auto it = --S.upper_bound(PII(l, INT_MAX));
+        auto it = prev(S.upper_bound(PII(l, INT_MIN)));
         while(it != S.end() and it->first < r) {
-            auto [l1, r1] = *it;
+            int l1, r1;
+            tie(l1, r1) = *it;
             if(l1 < r and l < r1) {
                 extra -= r1 - l1;
                 l = min(l, l1);
@@ -140,11 +137,11 @@ int main()
     }
 
     int ans = 0;
-    REP(i, m) {
+    for(int i = 0; i < m; ++i) {
         if(a[i] >= M) {
             ans += 1;
         }
     }
-    print(ans);
+    cout << ans << endl;
     return 0;
 }
