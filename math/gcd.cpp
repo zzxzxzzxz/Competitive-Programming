@@ -1,10 +1,8 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-const int MOD = 1000000007;
-#define MAX_N 300005
-
-int gcd(int a, int b) {
+template<class T>
+T gcd(T a, T b) {
     while(b) {
         a = a % b;
         swap(a, b);
