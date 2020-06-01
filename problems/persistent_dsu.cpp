@@ -1,8 +1,4 @@
 //{{{
-#pragma comment(linker, "/stack:200000000")
-#pragma GCC optimize("Ofast")
-#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native")
-
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -220,15 +216,17 @@ struct Solution {
         auto dsu = DSU(n + 1);
 
         array<int, MAX_N> cost2ver = {};
-        int i = 1;
-        while(i <= m) {
-            int j = idx[i];
-            while(i <= m and cost[idx[i]] == cost[j]) {
-                auto [u, v] = E[idx[i]];
-                dsu.unite(u, v);
-                ++i;
+        {
+            int i = 1;
+            while(i <= m) {
+                int j = idx[i];
+                while(i <= m and cost[idx[i]] == cost[j]) {
+                    auto [u, v] = E[idx[i]];
+                    dsu.unite(u, v);
+                    ++i;
+                }
+                cost2ver[cost[j]] = dsu.commit();
             }
-            cost2ver[cost[j]] = dsu.commit();
         }
 
         int q;
@@ -271,6 +269,8 @@ struct Solution {
         }
     }
 };
+
+// https://codeforces.com/contest/891/problem/C
 
 int main() {
     int T = 1;

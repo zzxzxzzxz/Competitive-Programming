@@ -26,4 +26,4 @@ clean_tu:
 	@find . -name '*.tu*' -delete
 
 clean_all:
-	@find . -type f -not -name "Makefile" -delete
+	@find . -type f -maxdepth 1 -not -name "Makefile" -delete
