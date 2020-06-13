@@ -6,9 +6,10 @@ private:
     const int INF = 1e9 + 10;
     vector<vector<int>> dp, cost;
     void divide_and_conquer(int t, int l, int r, int optl, int optr) {
-        if(l > r) {
+        if(l + 1 == r) {
             return;
         }
+
         int mid = l + (r - l) / 2;
         pair<int, int> best = {INF, -1};
 
@@ -19,8 +20,8 @@ private:
         int opt;
         tie(dp[t][mid], opt) = best;
 
-        divide_and_conquer(t, l, mid - 1, optl, opt);
-        divide_and_conquer(t, mid + 1, r, opt, optr);
+        divide_and_conquer(t, l, mid, optl, opt);
+        divide_and_conquer(t, mid, r, opt, optr);
     }
 
 public:
@@ -33,10 +34,8 @@ public:
 
         for(int mid = 0; mid < n; ++mid) {
             for(auto [l, r] : { pair{mid, mid + 1}, pair{mid, mid + 2} }) {
-                int c = 0;
                 while(l >= 0 and r < n) {
-                    c += houses[r] - houses[l];
-                    cost[l][r + 1] = c;
+                    cost[l][r + 1] = cost[l + 1][r] + houses[r] - houses[l];
                     --l, ++r;
                 }
             }
@@ -47,7 +46,7 @@ public:
         }
 
         for(int t = 2; t <= k; ++t) {
-            divide_and_conquer(t, 0, n, 0, n);
+            divide_and_conquer(t, 1, n + 1, 1, n);
         }
         return dp[k][n];
     }
