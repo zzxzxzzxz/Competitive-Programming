@@ -68,6 +68,31 @@ template<class T> class Treap {//{{{
             }
         }
 
+        NodePtr unite(NodePtr& a, NodePtr& b) {
+            if(not a or not b) {
+                return a ? move(a) : move(b);
+            }
+
+            if(prior(a, b)) {
+                NodePtr bl, br;
+                tie(bl, br) = split(b, a->val);
+                a->push();
+                a->left = unite(a->left, bl);
+                a->right = unite(a->right, br);
+                a->pull();
+                return move(a);
+            } else {
+                NodePtr al, ar;
+                tie(al, ar) = split(a, b->val);
+                b->push();
+                b->left = unite(b->left, al);
+                b->right = unite(b->right, ar);
+                b->pull();
+                return move(b);
+            }
+        }
+
+
     public:
         Treap(): root(nullptr) {}
 
@@ -99,6 +124,11 @@ template<class T> class Treap {//{{{
             f(f, root);
             root = nullptr;
         }
+
+        void unite(Treap& other) {
+            root = unite(root, other.root);
+            other.root = nullptr;
+        }
 };//}}}
 
 int main(){
@@ -111,5 +141,15 @@ int main(){
     for(int i = 0; i <= 6; ++i) {
         cout << i << ": " << t.count_ge(i) << endl;
     }
+    Treap<int> t2;
+    for(int v : {1, 5, 6, 7}) {
+        t2.insert(v);
+    }
+    cout << "unite t with t2([1, 5, 6, 7])" << endl;
+    t.unite(t2);
+    for(int i = 0; i <= 6; ++i) {
+        cout << i << ": " << t.count_ge(i) << endl;
+    }
+    t.free();
     return 0;
 }
