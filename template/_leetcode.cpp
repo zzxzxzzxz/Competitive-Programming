@@ -80,7 +80,7 @@ template<class T, class ...U> unique_ptr<tuple<T, U...>> read1(T, U ...tail) {
     getline(cin, s);
     if(cin.eof()) return nullptr;
     auto iss = istringstream(s);
-    auto t1 = make_tuple(read<T>(iss, T()));
+    auto t1 = make_tuple(read(iss, T()));
     auto t2_ptr = read1(tail...);
     return make_unique<tuple<T, U...>>(tuple_cat(t1, *t2_ptr));
 }

@@ -2,16 +2,17 @@
 using namespace std;
 
 mt19937 rng(123123123);
-
 size_t seed = rng();
-template<class T> class Treap {//{{{
+
+using DataType = int;
+class Treap {//{{{
     private:
         struct Node {
             size_t sz;
-            T val;
+            DataType val;
             Node* left;
             Node* right;
-            Node(const T& v): sz(1), val(v), left(nullptr), right(nullptr) {}
+            Node(const DataType& v): sz(1), val(v), left(nullptr), right(nullptr) {}
             void pull() {
                 sz = 1 + (left ? left->sz : 0) + (right ? right->sz : 0);
             };
@@ -31,7 +32,7 @@ template<class T> class Treap {//{{{
             return node ? node->sz : 0;
         }
 
-        pair<NodePtr, NodePtr> split(NodePtr& node, const T& val) {
+        pair<NodePtr, NodePtr> split(NodePtr& node, const DataType& val) {
             if(not node) {
                 return { nullptr, nullptr };
             }
@@ -96,7 +97,7 @@ template<class T> class Treap {//{{{
     public:
         Treap(): root(nullptr) {}
 
-        void insert(const T& val) {
+        void insert(const DataType& val) {
             auto node = new Node(val);
             NodePtr a, b;
             tie(a, b) = split(root, val);
@@ -104,7 +105,7 @@ template<class T> class Treap {//{{{
             root = merge(a, b);
         }
 
-        int count_ge(const T& val) {
+        int count_ge(const DataType& val) {
             NodePtr a, b;
             tie(a, b) = split(root, val);
             int ans = size(b);
@@ -132,7 +133,7 @@ template<class T> class Treap {//{{{
 };//}}}
 
 int main(){
-    Treap<int> t;
+    Treap t;
     t.insert(2);
     t.insert(3);
     t.insert(4);
@@ -141,7 +142,7 @@ int main(){
     for(int i = 0; i <= 6; ++i) {
         cout << i << ": " << t.count_ge(i) << endl;
     }
-    Treap<int> t2;
+    Treap t2;
     for(int v : {1, 5, 6, 7}) {
         t2.insert(v);
     }
