@@ -100,7 +100,7 @@ class Treap {//{{{
             tie(a, b) = split(root, l);
             tie(b, c) = split(b, r - l);
 
-            DataType ans = b ? b->maxv : INT_MIN;
+            DataType ans = b ? b->maxv : minval;
 
             b = merge(b, c);
             root = merge(a, b);
