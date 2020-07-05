@@ -30,7 +30,7 @@ class Treap {//{{{
             void push() {
                 if(left) left->add(lazy);
                 if(right) right->add(lazy);
-                lazy = 0;
+                lazy = {};
             };
         };
         using NodePtr = Node*;
