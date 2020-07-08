@@ -18,10 +18,10 @@ struct debug {
     }
     template<class ...T> debug& operator<<(tuple<T...> d) {
         *this << "(";
-        debug_tuple(*this, index_sequence_for<T...>{}, d);
+        debug_tuple(index_sequence_for<T...>{}, d);
         return *this << ")";
     }
-    template<class T> debug & operator <<(rge<T> d) {
+    template<class T> debug& operator<<(rge<T> d) {
         *this << "[";
         for(auto it = d.b; it != d.e; ++it)
             *this << (it != d.b ?  ", " : "") << *it;
@@ -39,10 +39,11 @@ struct debug {
 };
 #define imie(...) " [" << #__VA_ARGS__ << ": " << (__VA_ARGS__) << "] "
 
-template<class...> struct types { using type = types; };
-template<class Sig> struct args;
-template<class R, class... Args> struct args<R(Args...)> : types<Args...> {};
-template<class Sig> using args_t = typename args<Sig>::type;
+template<typename S> struct Sig;
+template<typename R, typename C, typename... Args>
+struct Sig<R(C::*)(Args...)> {
+    using argument_type = std::tuple<remove_reference_t<Args>...>;
+};
 
 template<typename T> struct is_vector : false_type {};
 template<typename T> struct is_vector<vector<T>> : true_type {};
@@ -67,7 +68,7 @@ auto read(istringstream& iss, T&&) {
     T res;
     char c; iss >> c;
     while(c != ']') {
-        auto tmp = read<VT>(iss, VT());
+        auto tmp = read(iss, VT());
         res.push_back(tmp);
         iss >> c;
     }
@@ -85,26 +86,28 @@ template<class T, class ...U> unique_ptr<tuple<T, U...>> read1(T, U ...tail) {
     return make_unique<tuple<T, U...>>(tuple_cat(t1, *t2_ptr));
 }
 
-template<class ...T, class U = tuple<remove_reference_t<T>...>>
-unique_ptr<U> parse_input(types<T...>) {
-    return read1<remove_reference_t<T>...>( remove_reference_t<T>()... );
+template<class ...T, class U = tuple<T...>>
+unique_ptr<U> parse_input(tuple<T...>) {
+    return read1<T...>(T()...);
 }
 
 template<size_t ...Is, class F, class T> void apply(index_sequence<Is...>, F f, T&& t) { f(get<Is>(t)...); }
 template<class F, class ...T> void apply(F f, tuple<T...> t) { apply(index_sequence_for<T...>{}, f, t); }
 /*}}}*/
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
-#define all(x) begin(x), end(x)
-using LL = long long;
 
 #define METHOD //
+using args_t = Sig<decltype(&Solution::METHOD)>::argument_type;
 
 int main() {
-    while(true) {
-        auto input = parse_input(args_t<decltype(METHOD)>{});
-        if(input == nullptr) break;
-        auto sol = Solution();
-        apply([&sol](auto ...args) { debug() << sol.METHOD(args...) << endl; }, *input);
+    auto sol = Solution();
+    auto print_ans = [&sol](auto ...args) {
+        debug() << sol.METHOD(args...) << endl;
+    };
+
+    auto input = parse_input(args_t{});
+    while(input != nullptr) {
+        apply(print_ans, *input);
+        input = parse_input(args_t{});
     }
     return 0;
 }
