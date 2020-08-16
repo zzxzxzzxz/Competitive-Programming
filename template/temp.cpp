@@ -21,7 +21,7 @@ template<class T> auto dud(T* x) -> decltype(cerr << *x, 0);
 template<class T> char dud(...);
 
 struct debug {
-#ifdef LOCAL
+#if DEBUG == 2
     debug(int line) {
         if(line) cerr << "LINE(" << line << ") -> ";
     }

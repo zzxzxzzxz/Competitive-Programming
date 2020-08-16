@@ -1,19 +1,12 @@
-LOCAL ?= 1
-DEBUG ?= 1
+DEBUG ?= 2
 VER ?= 14
 
-ifeq (${LOCAL}, 1)
-	F_LOCAL = -DLOCAL
-else
-	F_LOCAL =
-endif
-
-ifeq (${DEBUG}, 1)
-	CXX = g++ -O3 -std=c++${VER} -Wshadow -Wall -Wno-unused-const-variable -Wno-string-plus-int \
-		  -fsanitize=address -fsanitize=undefined -D_GLIBCXX_DEBUG ${F_LOCAL}
-else
+ifeq (${DEBUG}, 0)
 	CXX = g++ -Ofast -std=c++17 -Wshadow -Wall -Wno-unused-const-variable -Wno-string-plus-int \
 		  -lstdc++ -Wl,-stack_size -Wl,1000000000
+else
+	CXX = g++ -O3 -std=c++${VER} -Wshadow -Wall -Wno-unused-const-variable -Wno-string-plus-int \
+		  -fsanitize=address -fsanitize=undefined -D_GLIBCXX_DEBUG -DDEBUG=${DEBUG}
 endif
 
 compile:

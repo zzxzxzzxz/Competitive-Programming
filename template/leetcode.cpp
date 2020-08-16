@@ -50,6 +50,47 @@ template<typename T> struct is_vector<vector<T>> : true_type {};
 template<class T> using IsV = typename enable_if<is_vector<T>::value>::type;
 template<class T> using NotV = typename enable_if<!is_vector<T>::value>::type;
 
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
+
+TreeNode* read(istringstream& iss, TreeNode*&&) {
+    char c; iss >> c;
+    string s;
+    getline(iss, s, ']');
+
+    int i = 1;
+    vector<TreeNode*> tmp;
+    istringstream iss2(s);
+    while(not iss2.eof()) {
+        string val;
+        getline(iss2, val, ',');
+        if(val == "null") {
+            tmp.push_back(nullptr);
+        } else {
+            tmp.push_back(new TreeNode(stoi(val)));
+        }
+        if(i > 1) {
+            if(i & 1) {
+                tmp[i / 2 - 1]->right = tmp.back();
+            } else {
+                tmp[i / 2 - 1]->left = tmp.back();
+            }
+        }
+        iss >> c;
+        ++i;
+    }
+    if(tmp.empty()) {
+        return nullptr;
+    }
+    return tmp.front();
+}
+
 auto read(istringstream& iss, string&&) {
     char c; iss >> c;
     string res;
