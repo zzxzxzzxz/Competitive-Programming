@@ -1,3 +1,5 @@
+"""compare two solutions
+"""
 import subprocess
 
 cases_gen = ['python', 'test.py']
@@ -18,4 +20,3 @@ while True:
     if a != b:
         print('\n!!!!!!!!!!!!!!!!!')
         break
-

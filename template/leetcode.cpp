@@ -91,6 +91,12 @@ TreeNode* read(istringstream& iss, TreeNode*&&) {
     return tmp.front();
 }
 
+auto read(istringstream& iss, char) {
+    char c, res;
+    iss >> c >> res >> c;
+    return res;
+}
+
 auto read(istringstream& iss, string&&) {
     char c; iss >> c;
     string res;
